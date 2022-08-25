@@ -38,7 +38,7 @@ jobs:
     - name: Install Azure static web apps
       run: npm install -g @azure/static-web-apps-cli
     - name: Install Azure function apps
-      run: npm i -g azure-functions-core-tools@3 --unsafe-perm true
+      run: npm i -g azure-functions-core-tools@4 --unsafe-perm true
     - name: Run your tests
       run: npm run playwright_test
     - name: Get current date
@@ -53,44 +53,44 @@ jobs:
         name: onDemand
         path: pw-report/
 
-  storeReports:
-    name: Store reports
-    if: ${{ always() }}
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download all workflow run artifacts
-      uses: actions/download-artifact@v3
-      id: download
-    - name: Publish to external repo
-      if: always()
-      uses: peaceiris/actions-gh-pages@v3.7.3
-      with:
-        external_repository: mspnp/intern-js-pipeline
-        publish_branch: gh-pages
-        personal_token: ${{ secrets.PAT_TOKEN }}
-        publish_dir: ${{steps.download.outputs.download-path}}
-        destination_dir: test-reports/${{ github.repository }}
-        keep_files: true
-        user_name: "github-actions[bot]"
-        user_email: "github-actions[bot]@users.noreply.github.com"
+  #storeReports:
+  #  name: Store reports
+  #  if: ${{ always() }}
+  #  needs: test
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - name: Download all workflow run artifacts
+  #    uses: actions/download-artifact@v3
+  #    id: download
+  #  - name: Publish to external repo
+  #    if: always()
+  #    uses: peaceiris/actions-gh-pages@v3.7.3
+  #    with:
+  #      external_repository: mspnp/intern-js-pipeline
+  #      publish_branch: gh-pages
+  #      personal_token: ${{ secrets.PAT_TOKEN }}
+  #      publish_dir: ${{steps.download.outputs.download-path}}
+  #      destination_dir: test-reports/${{ github.repository }}
+  #      keep_files: true
+  #      user_name: "github-actions[bot]"
+  #      user_email: "github-actions[bot]@users.noreply.github.com"
 
-  notify-dashboard:
-    name: Notify Dashboard
-    if: ${{ always() }}
-    needs: [test, storeReports]
+  #notify-dashboard:
+  #  name: Notify Dashboard
+  #  if: ${{ always() }}
+  #  needs: [test, storeReports]
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  #  runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
+  #  steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+  #    - uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
-      - name: Notify docusaurus repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          gh api repos/mspnp/intern-js-pipeline/dispatches \
-              --raw-field event_type=rebuild-site
+ #     - name: Notify docusaurus repo
+ #       env:
+ #         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+ #       run: |
+ #         gh api repos/mspnp/intern-js-pipeline/dispatches \
+ #             --raw-field event_type=rebuild-site
