@@ -1,15 +1,30 @@
 @page "/about"
 @using BlazorApp.Shared
- @inject NavigationManager NavigationManager
+@using BlazorApp.Client.Utils
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
 
 <div class="card">
     <div class="card-header">
         <h4>Über Bergfest</h4>
     </div>
     <div class="card-body">
-    </div>
+        <p class="bg-light font-italic">
+            Versionen: Client - @clientVersion / Functions - @functionsVersion
+        </p>
+    </div> 
     <div class="card-footer">
         <a href="/dataprotection">Datenschutz</a> | <a href="/impressum">Impressum</a>
-
     </div>
 </div>
+
+@code {
+    private const string clientVersion = "2022-08-25";
+    private string functionsVersion = "tbd";
+
+    protected override async Task OnInitializedAsync()
+    {
+        functionsVersion = await Api.GetFunctionsVersion();
+    }
+
+}
