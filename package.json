@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "start": "swa start http://localhost:5000 --run 'dotnet run --project Client/Client.csproj' --api-location Api",
-    "playwright_test" : "playwright test"
+    "playwright_test": "playwright test"
   },
- "devDependencies": {
-    "@playwright/test": "^1.22.2"
+  "devDependencies": {
+    "@playwright/test": "^1.25.1"
   },
   "dependencies": {
     "sirv-cli": "^2.0.2"
