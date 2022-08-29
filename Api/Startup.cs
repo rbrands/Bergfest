@@ -6,9 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
+using BlazorApp.Api.Repositories;
 using BlazorApp.Shared;
 using Microsoft.AspNetCore.Routing;
 using System.Xml.Linq;
+using Flurl;
+using Flurl.Http.Configuration;
 
 [assembly: FunctionsStartup(typeof(BlazorApp.Api.Startup))]
 namespace BlazorApp.Api
@@ -39,6 +42,8 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(config);
             CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
+            builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+            builder.Services.AddSingleton<StravaRepository>(); 
             /*
             builder.Services.AddSingleton<CosmosDBRepository<TenantSettings>>();
             builder.Services.AddSingleton<CosmosDBRepository<UserContactInfo>>();
@@ -51,6 +56,6 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(new ServerSettingsRepository(config, cosmosClient));
             builder.Services.AddSingleton(new TenantSettingsRepository(config, cosmosClient));
             */
-       }
+        }
     }
 }
