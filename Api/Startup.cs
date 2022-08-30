@@ -34,7 +34,7 @@ namespace BlazorApp.Api
 
 
 
-            var config = new ConfigurationBuilder()
+            IConfiguration config = new ConfigurationBuilder()
                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                            .AddEnvironmentVariables()
                            .Build();

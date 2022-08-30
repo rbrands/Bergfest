@@ -14,6 +14,9 @@ using System.Web.Http;
 
 namespace BlazorApp.Api.Repositories
 {
+    /// <summary>
+    /// Interface to Strava API. For Strava API see https://developers.strava.com/ 
+    /// </summary>
     public class StravaRepository : CosmosDBRepository<StravaAccess>
     {
         private const string STRAVA_API_ENDPOINT = "https://www.strava.com/api/v3";
@@ -29,35 +32,80 @@ namespace BlazorApp.Api.Repositories
             _flurlClient = flurlClientFactory.Get(STRAVA_API_ENDPOINT);
         }
 
+        /// <summary>
+        /// Get access token for calling the Strava API. The token is stored in the database. If expired get a new one with the stored refresh token
+        /// See https://developers.strava.com/docs/authentication/ for details.
+        /// </summary>
+        /// <param name="athleteId"></param>
+        /// <returns></returns>
         public async Task<string> GetAccessToken(int athleteId)
         {
             try
             { 
-            StravaAccess stravaAccess = await this.GetFirstItemOrDefault(a => a.AthleteId == athleteId);
-            if (null == stravaAccess)
-            {
-                throw new Exception($"No access token found for athlete {athleteId}.");
-            }
-            if (stravaAccess.ExpirationAt < DateTime.UtcNow)
-            {
-
+                StravaAccess stravaAccess = await this.GetFirstItemOrDefault(a => a.AthleteId == athleteId);
+                if (null == stravaAccess)
+                {
+                    throw new Exception($"No access token found for athlete {athleteId}.");
+                }
+                if (stravaAccess.ExpirationAt < DateTime.UtcNow)
+                {
                     dynamic response = await _flurlClient.Request("oauth/token")
-                                                         .SetQueryParams(new {
-                                                             client_id = _config["STRAVA_CLIENT_ID"],
-                                                             client_secret = _config["STRAVA_CLIENT_SECRET"],
-                                                             grant_type = "refresh_token",
-                                                             refresh_token = stravaAccess.RefreshToken
-                                                         })
-                                                         .PostJsonAsync(null);
+                                                            .SetQueryParams(new {
+                                                                client_id = _config["STRAVA_CLIENT_ID"],
+                                                                client_secret = _config["STRAVA_CLIENT_SECRET"],
+                                                                grant_type = "refresh_token",
+                                                                refresh_token = stravaAccess.RefreshToken
+                                                            })
+                                                            .PostJsonAsync(null)
+                                                            .ReceiveJson();
                     stravaAccess.AccessToken = response.access_token;
                     stravaAccess.RefreshToken = response.refresh_token;
                     stravaAccess.ExpirationAt = DateTime.UtcNow.AddSeconds(response.expires_in);
                     await this.UpsertItem(stravaAccess);
-                    return stravaAccess.AccessToken;
+                }
+                return stravaAccess.AccessToken;
             }
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetAccessToken failed.");
+                throw;
             }
-            catch(Exception ex)
+        }
+        /// <summary>
+        /// Authorize application "Bergfest" on Strava.
+        /// See https://developers.strava.com/docs/authentication/ for details.
+        /// </summary>
+        /// <param name="athleteId">Id of athlete received as query param after redirecting from Strava</param>
+        /// <param name="code">Received as query param after redirecting from Strava</param>
+        /// <returns>Access token</returns>
+        public async Task<StravaAccess> Authorize(string code)
+        {
+            try
+            {
+                dynamic response = await _flurlClient.Request("oauth/token")
+                                                     .SetQueryParams(new
+                                                     {
+                                                       client_id = _config["STRAVA_CLIENT_ID"],
+                                                       client_secret = _config["STRAVA_CLIENT_SECRET"],
+                                                       code = code,
+                                                       grant_type = "authorization_code"
+                                                      })
+                                                      .PostJsonAsync(null)
+                                                      .ReceiveJson();
+                StravaAccess stravaAccess = new StravaAccess();
+                stravaAccess.AccessToken = response.access_token;
+                stravaAccess.RefreshToken = response.refresh_token;
+                stravaAccess.ExpirationAt = DateTime.UtcNow.AddSeconds(response.expires_in);
+                stravaAccess.AthleteSummary = response.athlete;
+                stravaAccess.AthleteId = response.athlete.id;
+                stravaAccess.FirstName = response.athlete.firstName;
+                stravaAccess.LastName = response.athlete.lastName;
+                stravaAccess.Sex = response.athlete.sex;
+
+                await this.UpsertItem(stravaAccess);
+                return stravaAccess;
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "GetAccessToken failed.");
                 throw;

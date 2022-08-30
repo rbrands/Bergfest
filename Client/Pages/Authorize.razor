@@ -1,0 +1,29 @@
+﻿@page "/authorize"
+@page "/authorize?code={Code}"
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<div class="card">
+    <div class="card-header">
+        <h4>Bergfest autorisieren</h4>
+    </div>
+    <div class="card-body">
+        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)/Authorize &approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Code { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!String.IsNullOrEmpty(Code))
+        {
+            StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code); 
+        }
+    }
+}
