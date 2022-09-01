@@ -1,5 +1,4 @@
 ﻿@page "/authorize"
-@page "/authorize?code={Code}"
 @using BlazorApp.Shared
 @using BlazorApp.Client.Utils
 @inject AppState AppStateStore
@@ -11,7 +10,7 @@
         <h4>Bergfest autorisieren</h4>
     </div>
     <div class="card-body">
-        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)/Authorize &approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
+        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)Authorize&approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
     </div>
 </div>
 
