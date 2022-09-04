@@ -10,19 +10,9 @@
         <h4>Bergfest autorisieren</h4>
     </div>
     <div class="card-body">
-        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)Authorize&approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
+        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)stravaresponse&approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
     </div>
 </div>
 
 @code {
-    [Parameter]
-    public string? Code { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!String.IsNullOrEmpty(Code))
-        {
-            StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code); 
-        }
-    }
 }

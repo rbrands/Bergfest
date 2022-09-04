@@ -11,6 +11,7 @@ using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
 using System.Web.Http;
+using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api.Repositories
 {
@@ -42,7 +43,7 @@ namespace BlazorApp.Api.Repositories
         {
             try
             { 
-                StravaAccess stravaAccess = await this.GetFirstItemOrDefault(a => a.AthleteId == athleteId);
+                StravaAccess stravaAccess = await this.GetItemByKey(athleteId.ToString());
                 if (null == stravaAccess)
                 {
                     throw new Exception($"No access token found for athlete {athleteId}.");
@@ -92,22 +93,25 @@ namespace BlazorApp.Api.Repositories
                                                       })
                                                       .PostJsonAsync(null)
                                                       .ReceiveJson();
+                _logger.LogInformation($"Authorize returned {response.ToString()}");
                 StravaAccess stravaAccess = new StravaAccess();
                 stravaAccess.AccessToken = response.access_token;
                 stravaAccess.RefreshToken = response.refresh_token;
                 stravaAccess.ExpirationAt = DateTime.UtcNow.AddSeconds(response.expires_in);
-                stravaAccess.AthleteSummary = response.athlete;
                 stravaAccess.AthleteId = response.athlete.id;
-                stravaAccess.FirstName = response.athlete.firstName;
-                stravaAccess.LastName = response.athlete.lastName;
+                stravaAccess.LogicalKey = stravaAccess.AthleteId.ToString();
+                stravaAccess.FirstName = response.athlete.firstname;
+                stravaAccess.LastName = response.athlete.lastname;
                 stravaAccess.Sex = response.athlete.sex;
+                stravaAccess.TimeToLive = Constants.TTL_STRAVA_ACCESS;
+                _logger.LogInformation($"Athlete: LogicalKey {stravaAccess.LogicalKey} Name {stravaAccess.FirstName} {stravaAccess.LastName} ");
 
                 await this.UpsertItem(stravaAccess);
                 return stravaAccess;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetAccessToken failed.");
+                _logger.LogError(ex, "Authorize failed.");
                 throw;
             }
         }

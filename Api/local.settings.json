@@ -5,9 +5,10 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "COSMOS_DB_CONNECTION_STRING": "connectionstring",
     "COSMOS_DB_DATABASE": "website",
-    "COSMOS_DB_CONTAINER": "bergfest",
-    "STRAVA_CLIENT_ID": "clientid",
-    "STRAVA_CLIENT_SECRET": "client_secret"
+    "COSMOS_DB_CONTAINER": "bergfest"
+    //"STRAVA_CLIENT_ID": "clientid",
+    //"STRAVA_CLIENT_SECRET": "client_secret"
+
   },
   "Host": {
     "LocalHttpPort": 7071,

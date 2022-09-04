@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using System.Xml.Linq;
 using Flurl;
 using Flurl.Http.Configuration;
+using System.Reflection;
 
 [assembly: FunctionsStartup(typeof(BlazorApp.Api.Startup))]
 namespace BlazorApp.Api
@@ -36,6 +37,7 @@ namespace BlazorApp.Api
 
             IConfiguration config = new ConfigurationBuilder()
                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                           .AddUserSecrets("818a9f36-2019-44ce-8917-4aae26f1f2c2")
                            .AddEnvironmentVariables()
                            .Build();
 
