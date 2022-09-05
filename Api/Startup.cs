@@ -37,7 +37,7 @@ namespace BlazorApp.Api
 
             IConfiguration config = new ConfigurationBuilder()
                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                           .AddUserSecrets("818a9f36-2019-44ce-8917-4aae26f1f2c2")
+                           .AddUserSecrets(Assembly.GetExecutingAssembly())
                            .AddEnvironmentVariables()
                            .Build();
 

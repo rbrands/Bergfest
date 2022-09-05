@@ -43,6 +43,7 @@
                 _stravaAccount = stravaAccount;
             } else
             {
+                await Api.GetFunctionsVersion();
                 throw new Exception($"Zugriff verweigert.");
             }
         }
