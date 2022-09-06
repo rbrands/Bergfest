@@ -10,8 +10,6 @@ using BlazorApp.Api.Repositories;
 using BlazorApp.Shared;
 using Microsoft.AspNetCore.Routing;
 using System.Xml.Linq;
-using Flurl;
-using Flurl.Http.Configuration;
 using System.Reflection;
 
 [assembly: FunctionsStartup(typeof(BlazorApp.Api.Startup))]
@@ -44,8 +42,6 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(config);
             CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
-            builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
-            builder.Services.AddSingleton<StravaRepository>(); 
         }
     }
 }
