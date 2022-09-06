@@ -9,6 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bergfest-Webhook", "Bergfest-Webhook\Bergfest-Webhook.csproj", "{AB79612A-8378-472A-81B9-8644F30D3321}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +32,10 @@ Global
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}.Release|Any CPU.Build.0 = Release|Any CPU
-		{162B3342-33B4-49D4-BFD9-F10C053B2025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{162B3342-33B4-49D4-BFD9-F10C053B2025}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{162B3342-33B4-49D4-BFD9-F10C053B2025}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{162B3342-33B4-49D4-BFD9-F10C053B2025}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB79612A-8378-472A-81B9-8644F30D3321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB79612A-8378-472A-81B9-8644F30D3321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB79612A-8378-472A-81B9-8644F30D3321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB79612A-8378-472A-81B9-8644F30D3321}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
