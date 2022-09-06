@@ -8,6 +8,6 @@ namespace Bergfest_Webhook.Utils
 {
     public class Constants
     {
-        public const string VERSION = "2022-09-06/1";
+        public const string VERSION = "2022-09-06/2";
     }
 }
