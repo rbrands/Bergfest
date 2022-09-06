@@ -10,6 +10,13 @@ on:
     paths:
       - 'Bergfest-Webhook/**'
       - 'Shared/**'
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+    paths:
+      - 'Bergfest-Webhook/**'
+      - 'Shared/**'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -20,6 +27,7 @@ env:
 
 jobs:
   build-and-deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed') || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     steps:
       - name: 'Checkout GitHub Action'
