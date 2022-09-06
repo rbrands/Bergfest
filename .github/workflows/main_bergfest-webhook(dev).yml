@@ -10,7 +10,6 @@ on:
   paths:
       - 'Bergfest-Webhook/**'
       - 'Shared/**'
-  workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'Bergfest-Webhook' # set this to the path to your web app project, defaults to the repository root
