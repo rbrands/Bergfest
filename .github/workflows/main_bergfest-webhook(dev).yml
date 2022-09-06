@@ -7,9 +7,12 @@ on:
   push:
     branches:
       - main
-  paths:
-      - 'Bergfest*/**'
+    paths:
+      - 'Bergfest-Webhook/**'
       - 'Shared/**'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'Bergfest-Webhook' # set this to the path to your web app project, defaults to the repository root
