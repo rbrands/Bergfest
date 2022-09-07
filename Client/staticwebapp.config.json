@@ -1,5 +1,15 @@
 {
+    "routes": [
+        {
+          "route": "/api/GetVersion",
+          "allowedRoles": [ "anonymous" ]
+        }
+    ],
     "navigationFallback": {
-        "rewrite": "/index.html"
-    }
+        "rewrite": "index.html",
+        "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
+      },
+      "platform": {
+        "apiRuntime": "dotnet:6.0"
+      }
 }
