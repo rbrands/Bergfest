@@ -6,11 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
-using BlazorApp.Api.Repositories;
+using Bergfest_Webhook.Repositories;
 using BlazorApp.Shared;
 using Microsoft.AspNetCore.Routing;
 using System.Xml.Linq;
 using System.Reflection;
+using Flurl;
+using Flurl.Http.Configuration;
 
 [assembly: FunctionsStartup(typeof(BlazorApp.Api.Startup))]
 namespace BlazorApp.Api
@@ -31,8 +33,6 @@ namespace BlazorApp.Api
                 loggingBuilder.AddFilter(level => true);
             });
 
-
-
             IConfiguration config = new ConfigurationBuilder()
                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                            .AddUserSecrets(Assembly.GetExecutingAssembly())
@@ -42,6 +42,8 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(config);
             CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
+            builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+            builder.Services.AddSingleton<StravaRepository>(); 
         }
     }
 }

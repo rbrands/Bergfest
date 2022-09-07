@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using BlazorApp.Shared;
 
-namespace BlazorApp.Api.Repositories
+namespace Bergfest_Webhook.Repositories
 {
     public class CosmosDBRepository<T> where T : CosmosDBEntity, new()
     {
