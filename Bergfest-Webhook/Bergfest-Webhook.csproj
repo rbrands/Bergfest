@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <RootNamespace>Bergfest_Webhook</RootNamespace>
+    <UserSecretsId>d3457c86-f5ed-4a04-8cf2-9569fc52372a</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AzureFunctions.Extensions.DependencyInjection" Version="1.1.3" />

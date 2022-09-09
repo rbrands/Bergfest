@@ -6,6 +6,10 @@
     <UserSecretsId>818a9f36-2019-44ce-8917-4aae26f1f2c2</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="local.settings.example.json" />
+    <None Remove="local.settings.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AzureFunctions.Extensions.DependencyInjection" Version="1.1.3" />
     <PackageReference Include="Flurl" Version="3.0.6" />
     <PackageReference Include="Flurl.Http" Version="3.2.4" />
@@ -17,10 +21,6 @@
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
