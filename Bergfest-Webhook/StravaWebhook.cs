@@ -6,11 +6,11 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Bergfest_Webhook.Repositories;
 using Microsoft.AspNetCore.Routing;
 using BlazorApp.Shared;
 using Bergfest_Webhook.Utils;
+using System.Text.Json;
 
 namespace Bergfest_Webhook
 {
@@ -27,7 +27,7 @@ namespace Bergfest_Webhook
             _stravaRepository = stravaRepository;
         }   
         [FunctionName("ValidateStravaWebhook")]
-        public async Task<IActionResult> RunValidation(
+        public ObjectResult RunValidation(
                 [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ValidateStravaWebhook")] HttpRequest req
             )
         {
@@ -40,8 +40,11 @@ namespace Bergfest_Webhook
                 {
                     throw new Exception("Verify token doesn't match.");
                 }
- 
-                return new OkObjectResult("hallo");
+                StravaValidationResponse response = new StravaValidationResponse();
+                response.HubChallenge = hubChallenge;
+                string responseSerialized = JsonSerializer.Serialize(response);
+                _logger.LogInformation(responseSerialized);
+                return new OkObjectResult(responseSerialized);
             }
             catch (Exception ex)
             {
