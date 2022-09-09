@@ -40,7 +40,6 @@ namespace Bergfest_Webhook
                 {
                     throw new Exception("Verify token doesn't match.");
                 }
-                StravaValidationResponse validationResponse = new StravaValidationResponse();
  
                 return new OkObjectResult("hallo");
             }
