@@ -11,7 +11,7 @@ using BlazorApp.Api.Repositories;
 using Microsoft.AspNetCore.Routing;
 using BlazorApp.Shared;
 
-namespace BlazorApp.Api
+namespace Bergfest.Api
 {
     public class AuthorizeBergfestOnStrava
     {

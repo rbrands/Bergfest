@@ -104,7 +104,7 @@ namespace Bergfest_Webhook.Repositories
                 stravaAccess.FirstName = response.athlete.firstname;
                 stravaAccess.LastName = response.athlete.lastname;
                 stravaAccess.Sex = response.athlete.sex;
-                stravaAccess.TimeToLive = Constants.TTL_STRAVA_ACCESS;
+                stravaAccess.TimeToLive = Constants.STRAVA_TTL_ACCESS;
                 _logger.LogInformation($"Athlete: LogicalKey {stravaAccess.LogicalKey} Name {stravaAccess.FirstName} {stravaAccess.LastName} ");
 
                 await this.UpsertItem(stravaAccess);
