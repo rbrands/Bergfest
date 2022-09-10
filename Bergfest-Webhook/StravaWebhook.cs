@@ -52,7 +52,7 @@ namespace Bergfest_Webhook
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                     _logger.LogInformation($"StravaWebhook {requestBody}");
                     dynamic postRequest = JsonSerializer.Deserialize<ExpandoObject>(requestBody);
-                    HandleWebhookPost(postRequest);
+                    await HandleWebhookPost(postRequest);
                     return new OkResult();
                 }
                 else

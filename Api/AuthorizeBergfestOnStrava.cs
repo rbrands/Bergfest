@@ -27,13 +27,18 @@ namespace Bergfest.Api
 
         [FunctionName("AuthorizeBergfestOnStrava")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "AuthorizeBergfestOnStrava")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "AuthorizeBergfestOnStrava")] HttpRequest req
+            )
         {
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                StravaAuthorization stravaAuthorization = JsonSerializer.Deserialize<StravaAuthorization>(requestBody);
+                var serializeOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                };
+                StravaAuthorization stravaAuthorization = JsonSerializer.Deserialize<StravaAuthorization>(requestBody, serializeOptions);
 
                 _logger.LogInformation($"Authorize Bergfest on Strava for athlete {stravaAuthorization.Code}");
                 StravaAccess stravaAccess = await _stravaRepository.Authorize(stravaAuthorization.Code);

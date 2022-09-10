@@ -4,10 +4,10 @@
           "route": "/api/GetVersion",
           "allowedRoles": [ "anonymous" ]
         },
-      {
-        "route": "/api/AuthorizeBergfestOnStrava",
-        "allowedRoles": [ "anonymous" ]
-      }
+        {
+          "route": "/api/AuthorizeBergfestOnStrava",
+          "allowedRoles": [ "anonymous" ]
+        }
     ],
     "navigationFallback": {
         "rewrite": "index.html",
