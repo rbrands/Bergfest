@@ -12,7 +12,8 @@ namespace Bergfest_Webhook.Utils
         public const string VERSION = "2022-09-07";
         public const int STRAVA_TTL_ACCESS = 3 * 30 * 24 * 3600; // 3 month TTL for Strava Access
         public const string STRAVA_WEBHOOK_VERIFY_TOKEN = "Bergfest-Webhook";
-
-        
+        public const int STRAVA_MESSAGE_VISIBILITY_TIMEOUT = 9;
+        public const string QUEUE_NAME = "stravaeventqueue";
+ 
     }
 }

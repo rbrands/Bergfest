@@ -43,7 +43,8 @@ namespace BlazorApp.Api
             CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
             builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
-            builder.Services.AddSingleton<StravaRepository>(); 
+            builder.Services.AddSingleton<StravaRepository>();
+            builder.Services.AddSingleton<QueueStorageRepository>();
         }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 using BlazorApp.Api.Repositories;
 using Microsoft.AspNetCore.Routing;
 using BlazorApp.Shared;
@@ -33,7 +33,7 @@ namespace Bergfest.Api
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                StravaAuthorization stravaAuthorization = JsonConvert.DeserializeObject<StravaAuthorization>(requestBody);
+                StravaAuthorization stravaAuthorization = JsonSerializer.Deserialize<StravaAuthorization>(requestBody);
 
                 _logger.LogInformation($"Authorize Bergfest on Strava for athlete {stravaAuthorization.Code}");
                 StravaAccess stravaAccess = await _stravaRepository.Authorize(stravaAuthorization.Code);

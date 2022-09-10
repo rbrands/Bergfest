@@ -13,6 +13,7 @@ using Bergfest_Webhook.Utils;
 using System.Text.Json;
 using System.Dynamic;
 using Microsoft.Extensions.Configuration;
+using System.Collections;
 
 namespace Bergfest_Webhook
 {
@@ -20,16 +21,19 @@ namespace Bergfest_Webhook
     {
         private readonly ILogger _logger;
         private StravaRepository _stravaRepository;
+        private QueueStorageRepository _queueRepository;
         private IConfiguration _config;
 
         public StravaWebhook(ILogger<StravaWebhook> logger,
                              IConfiguration config,
-                             StravaRepository stravaRepository
+                             StravaRepository stravaRepository,
+                             QueueStorageRepository queueRepository
                             )
         {
             _logger = logger;
             _config = config;
             _stravaRepository = stravaRepository;
+            _queueRepository = queueRepository;
         }   
         [FunctionName("StravaWebhook")]
         public async Task<IActionResult> Run(
@@ -63,9 +67,10 @@ namespace Bergfest_Webhook
             }
         }
 
-        internal void HandleWebhookPost(dynamic postRequest)
+        internal async void HandleWebhookPost(dynamic postRequest)
         {
             string subscriptionId = _config["STRAVA_SUBSCRIPTION_ID"];
+            Hashtable updates = new Hashtable();
             if (String.IsNullOrEmpty(subscriptionId))
             {
                 throw new Exception("STRAVA_SUBSCRIPTION_ID not configured.");
@@ -76,7 +81,35 @@ namespace Bergfest_Webhook
                 throw new Exception("Wrong subscription id.");
             }
             _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
+            StravaEvent stravaEvent = new StravaEvent();
+            stravaEvent.ObjectId = postRequest.object_id;
+            stravaEvent.AthleteId = postRequest.owner_id;
+            stravaEvent.EventType = (postRequest.object_type == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
+            switch (postRequest.aspect_type)
+            {
+                case "create":
+                    stravaEvent.Aspect = StravaEvent.AspectType.Create;
+                    break;
+                case "update":
+                    stravaEvent.Aspect = StravaEvent.AspectType.Update;
+                    break;
+                case "delete":
+                    stravaEvent.Aspect = StravaEvent.AspectType.Delete;
+                    break;
+                default:
+                    break;
+            }
+            updates = JsonSerializer.Deserialize<Hashtable>(postRequest.updates);
+            foreach (DictionaryEntry entry in updates)
+            {
+                _logger.LogInformation($"HandleWebhookPost {entry.Key} - {entry.Value}");
+            }
+            if (stravaEvent.EventType == StravaEvent.ObjectType.Activity && stravaEvent.Aspect == StravaEvent.AspectType.Update)
+            {
+            }
+            await _queueRepository.InsertMessage(stravaEvent);
         }
+  
         internal string ValidateSubscrption(HttpRequest req)
         {
             string verifyToken = req.Query["hub.verify_token"];
