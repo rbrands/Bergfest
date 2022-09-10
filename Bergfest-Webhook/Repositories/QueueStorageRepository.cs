@@ -26,7 +26,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="cosmosClient"></param>
         /// <param name="config"></param>
-        public QueueStorageRepository(IConfiguration config, ILogger logger)
+        public QueueStorageRepository(IConfiguration config, ILogger<QueueStorageRepository> logger)
         {
             _config = config;
             _logger = logger;
@@ -35,7 +35,11 @@ namespace Bergfest_Webhook.Repositories
             {
                 throw new Exception("Config value AzureWebJobsStorage not found.");
             }
-            _queueClient = new QueueClient(connectionString, Constants.QUEUE_NAME);
+            QueueClientOptions queueClientOptions = new QueueClientOptions()
+            {
+                MessageEncoding = QueueMessageEncoding.Base64
+            };
+            _queueClient = new QueueClient(connectionString, Constants.QUEUE_NAME, queueClientOptions);
             // Create the queue
             _queueClient.CreateIfNotExists();
         }

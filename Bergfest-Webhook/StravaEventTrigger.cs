@@ -24,11 +24,12 @@ namespace Bergfest_Webhook
         }
 
         [FunctionName("StravaEventTrigger")]
-        public async Task Run([QueueTrigger("stravaeventqueue", Connection = "AzureWebJobsStorage")]StravaEvent myQueueItem)
+        public async Task Run([QueueTrigger("stravaeventqueue", Connection = "AzureWebJobsStorage")]string myQueueItem)
         {
             try
             { 
-                _logger.LogInformation($"StravaEventTrigger: {myQueueItem.EventType} - {myQueueItem.Aspect} for athlete {myQueueItem.AthleteId} with object {myQueueItem.ObjectId}");
+                StravaEvent stravaEvent = JsonSerializer.Deserialize<StravaEvent>(myQueueItem);
+                _logger.LogInformation($"StravaEventTrigger: {stravaEvent.EventType} - {stravaEvent.Aspect} for athlete {stravaEvent.AthleteId} with object {stravaEvent.ObjectId}");
             }
             catch (Exception ex)
             {

@@ -82,10 +82,10 @@ namespace Bergfest_Webhook
             }
             _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
             StravaEvent stravaEvent = new StravaEvent();
-            stravaEvent.ObjectId = (long)postRequest.object_id;
-            stravaEvent.AthleteId = (long)postRequest.owner_id;
-            stravaEvent.EventType = (postRequest.object_type == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
-            switch (postRequest.aspect_type)
+            stravaEvent.ObjectId = postRequest.object_id.ToString();
+            stravaEvent.AthleteId = postRequest.owner_id.ToString();
+            stravaEvent.EventType = (postRequest.object_type.ToString() == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
+            switch (postRequest.aspect_type.ToString())
             {
                 case "create":
                     stravaEvent.Aspect = StravaEvent.AspectType.Create;

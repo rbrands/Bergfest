@@ -11,8 +11,7 @@
   "extensions": {
     "queues": {
       "batchSize": 1,
-      "maxDequeueCount": 3,
-      "messageEncoding": "base64"
+      "maxDequeueCount": 3
     }
   }
 }

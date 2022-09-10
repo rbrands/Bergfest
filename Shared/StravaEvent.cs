@@ -21,8 +21,8 @@ namespace BlazorApp.Shared
 
         public ObjectType EventType { get; set; }
         public AspectType Aspect { get; set; }
-        public long ObjectId { get; set; }
-        public long AthleteId { get; set; }
+        public string ObjectId { get; set; }
+        public string AthleteId { get; set; }
 
     }
 
