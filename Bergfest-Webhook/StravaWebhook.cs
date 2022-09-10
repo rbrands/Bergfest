@@ -67,7 +67,7 @@ namespace Bergfest_Webhook
             }
         }
 
-        internal async void HandleWebhookPost(dynamic postRequest)
+        internal async Task HandleWebhookPost(dynamic postRequest)
         {
             string subscriptionId = _config["STRAVA_SUBSCRIPTION_ID"];
             Hashtable updates = new Hashtable();
