@@ -82,8 +82,8 @@ namespace Bergfest_Webhook
             }
             _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
             StravaEvent stravaEvent = new StravaEvent();
-            stravaEvent.ObjectId = postRequest.object_id;
-            stravaEvent.AthleteId = postRequest.owner_id;
+            stravaEvent.ObjectId = (long)postRequest.object_id;
+            stravaEvent.AthleteId = (long)postRequest.owner_id;
             stravaEvent.EventType = (postRequest.object_type == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
             switch (postRequest.aspect_type)
             {
