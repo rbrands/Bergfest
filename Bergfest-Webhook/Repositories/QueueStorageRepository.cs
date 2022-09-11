@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using Azure.Storage.Queues; // Namespace for Queue storage types
 using Azure.Storage.Queues.Models; // Namespace for PeekedMessage
 using Microsoft.Azure.Cosmos;
@@ -21,6 +22,7 @@ namespace Bergfest_Webhook.Repositories
         private IConfiguration _config;
         private QueueClient _queueClient;
         private ILogger _logger;
+        private int _messageCounter = 0;
         /// <summary>
         /// Create repository, typically as singleton. Create CosmosClient before.
         /// </summary>
@@ -43,11 +45,22 @@ namespace Bergfest_Webhook.Repositories
             // Create the queue
             _queueClient.CreateIfNotExists();
         }
+        public int DecrementMessageCounter() 
+        {
+            Interlocked.Decrement(ref _messageCounter);
+            return _messageCounter;
+        }
+        public int IncrementMessageCounter()
+        {
+            Interlocked.Increment(ref _messageCounter);
+            return _messageCounter;
+        }
 
         public async Task InsertMessage(StravaEvent stravaEvent)
         {
             string messageSerialized = JsonSerializer.Serialize<StravaEvent>(stravaEvent);
-            TimeSpan visibilityTimeout = new TimeSpan(0, 0, Constants.STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
+            IncrementMessageCounter();
+            TimeSpan visibilityTimeout = new TimeSpan(0, 0, _messageCounter * Constants.STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
             _logger.LogInformation($"QueueStorageRepository.InsertMessage({messageSerialized})");
             await _queueClient.SendMessageAsync(messageSerialized, visibilityTimeout);
         }

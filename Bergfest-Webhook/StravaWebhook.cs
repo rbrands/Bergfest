@@ -76,14 +76,15 @@ namespace Bergfest_Webhook
                 throw new Exception("STRAVA_SUBSCRIPTION_ID not configured.");
             }
             _logger.LogInformation($"Subscription-Id expected: {subscriptionId}");
-            if (subscriptionId != postRequest.subscription_id.ToString())
+            string subscriptionIdReceived = postRequest.subscription_id.ToString();
+            if (subscriptionId != subscriptionIdReceived)
             {
-                throw new Exception("Wrong subscription id.");
+                throw new Exception($"Wrong subscription id. Expected >{subscriptionId}< received >{subscriptionIdReceived}<");
             }
             _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
             StravaEvent stravaEvent = new StravaEvent();
-            stravaEvent.ObjectId = postRequest.object_id.ToString();
-            stravaEvent.AthleteId = postRequest.owner_id.ToString();
+            stravaEvent.ObjectId = Convert.ToInt64(postRequest.object_id.ToString());
+            stravaEvent.AthleteId = Convert.ToInt64(postRequest.owner_id.ToString());
             stravaEvent.EventType = (postRequest.object_type.ToString() == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
             switch (postRequest.aspect_type.ToString())
             {

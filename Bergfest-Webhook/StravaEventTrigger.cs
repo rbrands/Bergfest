@@ -15,19 +15,23 @@ namespace Bergfest_Webhook
     {
         private readonly ILogger _logger;
         private StravaRepository _stravaRepository;
+        private QueueStorageRepository _queueStorageRepository;
         public StravaEventTrigger(ILogger<StravaWebhook> logger,
-                             StravaRepository stravaRepository
+                             StravaRepository stravaRepository,
+                             QueueStorageRepository queueRepository
                             )
         {
             _logger = logger;
             _stravaRepository = stravaRepository;
+            _queueStorageRepository = queueRepository;
         }
 
         [FunctionName("StravaEventTrigger")]
         public async Task Run([QueueTrigger("stravaeventqueue", Connection = "AzureWebJobsStorage")]string myQueueItem)
         {
             try
-            { 
+            {
+                _queueStorageRepository.DecrementMessageCounter();
                 StravaEvent stravaEvent = JsonSerializer.Deserialize<StravaEvent>(myQueueItem);
                 _logger.LogInformation($"StravaEventTrigger: {stravaEvent.EventType} - {stravaEvent.Aspect} for athlete {stravaEvent.AthleteId} with object {stravaEvent.ObjectId}");
             }
