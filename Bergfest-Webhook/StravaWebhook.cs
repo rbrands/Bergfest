@@ -14,6 +14,7 @@ using System.Text.Json;
 using System.Dynamic;
 using Microsoft.Extensions.Configuration;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Bergfest_Webhook
 {
@@ -70,7 +71,7 @@ namespace Bergfest_Webhook
         internal async Task HandleWebhookPost(dynamic postRequest)
         {
             string subscriptionId = _config["STRAVA_SUBSCRIPTION_ID"];
-            Hashtable updates = new Hashtable();
+            Dictionary<string, string> updates = new Dictionary<string, string>();
             if (String.IsNullOrEmpty(subscriptionId))
             {
                 throw new Exception("STRAVA_SUBSCRIPTION_ID not configured.");
@@ -85,6 +86,12 @@ namespace Bergfest_Webhook
             StravaEvent stravaEvent = new StravaEvent();
             stravaEvent.ObjectId = Convert.ToInt64(postRequest.object_id.ToString());
             stravaEvent.AthleteId = Convert.ToInt64(postRequest.owner_id.ToString());
+            StravaAccess stravaAccess = await _stravaRepository.GetStravaAccess(stravaEvent.AthleteId);
+            if (null == stravaAccess)
+            {
+                _logger.LogWarning($"No data for athlete id {stravaEvent.AthleteId}");
+                return;
+            }
             stravaEvent.EventType = (postRequest.object_type.ToString() == "activity") ? StravaEvent.ObjectType.Activity : StravaEvent.ObjectType.Athlete;
             switch (postRequest.aspect_type.ToString())
             {
@@ -100,13 +107,24 @@ namespace Bergfest_Webhook
                 default:
                     break;
             }
-            updates = JsonSerializer.Deserialize<Hashtable>(postRequest.updates);
-            foreach (DictionaryEntry entry in updates)
+            updates = JsonSerializer.Deserialize<Dictionary<string,string>>(postRequest.updates);
+            foreach (KeyValuePair<string,string> entry in updates)
             {
                 _logger.LogInformation($"HandleWebhookPost {entry.Key} - {entry.Value}");
             }
             if (stravaEvent.EventType == StravaEvent.ObjectType.Activity && stravaEvent.Aspect == StravaEvent.AspectType.Update)
             {
+                if (updates.ContainsKey("private"))
+                {
+                    if (updates["private"] == "true")
+                    {
+                        stravaEvent.Aspect = StravaEvent.AspectType.Deauthorize;
+                    }
+                }
+            }
+            if (stravaEvent.EventType == StravaEvent.ObjectType.Athlete && stravaEvent.Aspect == StravaEvent.AspectType.Update && updates.ContainsKey("authorized"))
+            {
+                stravaEvent.Aspect = StravaEvent.AspectType.Deauthorize;
             }
             await _queueRepository.InsertMessage(stravaEvent);
         }

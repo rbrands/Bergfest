@@ -34,13 +34,23 @@ namespace Bergfest_Webhook
                 _queueStorageRepository.DecrementMessageCounter();
                 StravaEvent stravaEvent = JsonSerializer.Deserialize<StravaEvent>(myQueueItem);
                 _logger.LogInformation($"StravaEventTrigger: {stravaEvent.EventType} - {stravaEvent.Aspect} for athlete {stravaEvent.AthleteId} with object {stravaEvent.ObjectId}");
+                switch (stravaEvent.EventType)
+                {
+                    case StravaEvent.ObjectType.Activity:
+                        await ScanSegmentsInActivity(stravaEvent);
+                        break;
+                }
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "StravaEventTrigger failed.");
                 throw;
             }
-
+        }
+        public async Task ScanSegmentsInActivity(StravaEvent stravaEvent)
+        {
+            await _stravaRepository.ScanSegmentsInActivity(stravaEvent.AthleteId, stravaEvent.ObjectId);
         }
     }
 }

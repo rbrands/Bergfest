@@ -22,7 +22,6 @@ namespace Bergfest_Webhook.Repositories
     public class StravaRepository : CosmosDBRepository<StravaAccess>
     {
         private const string STRAVA_API_ENDPOINT = "https://www.strava.com/api/v3";
-        private const string STRAVA_TOKEN_ENDPOINT = "https://www.strava.com/api/v3/oauth/token";
         private readonly IFlurlClient _flurlClient;
         private readonly ILogger _logger;
         private IConfiguration _config;
@@ -40,7 +39,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(int athleteId)
+        public async Task<string> GetAccessToken(long athleteId)
         {
             try
             { 
@@ -73,6 +72,26 @@ namespace Bergfest_Webhook.Repositories
                 throw;
             }
         }
+        /// <summary>
+        /// Gets the StravaAccess item for the given athlete id. If not found null is returned.
+        /// </summary>
+        /// <param name="athleteId"></param>
+        /// <returns></returns>
+        public async Task<StravaAccess> GetStravaAccess(long athleteId)
+        {
+            try
+            {
+                StravaAccess stravaAccess = await this.GetItemByKey(athleteId.ToString());
+                return stravaAccess;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetStravaAccess failed.");
+                throw;
+            }
+
+        }
+
         /// <summary>
         /// Authorize application "Bergfest" on Strava.
         /// See https://developers.strava.com/docs/authentication/ for details.
@@ -113,6 +132,24 @@ namespace Bergfest_Webhook.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Authorize failed.");
+                throw;
+            }
+        }
+        public async Task ScanSegmentsInActivity(long athleteId, long activityId)
+        {
+            try
+            {
+                _logger.LogInformation($"ScanSegmentsInActivity activityId {activityId} athleteId {athleteId}");
+                string accessToken = await GetAccessToken(athleteId);
+                dynamic response = await _flurlClient.Request("activities", activityId)
+                                                .SetQueryParam("include_all_efforts", "true")
+                                                .WithOAuthBearerToken(accessToken)
+                                                .GetJsonAsync();
+                _logger.LogInformation($"Activity name {response.name}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "ScanSegmentsInActivity failed.");
                 throw;
             }
         }
