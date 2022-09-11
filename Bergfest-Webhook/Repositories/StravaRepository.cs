@@ -13,6 +13,8 @@ using Flurl.Http;
 using System.Web.Http;
 using Bergfest_Webhook.Utils;
 using Bergfest_Webhook.Repositories;
+using System.Dynamic;
+using System.Text.Json;
 
 namespace Bergfest_Webhook.Repositories
 {
@@ -145,7 +147,12 @@ namespace Bergfest_Webhook.Repositories
                                                 .SetQueryParam("include_all_efforts", "true")
                                                 .WithOAuthBearerToken(accessToken)
                                                 .GetJsonAsync();
-                _logger.LogInformation($"Activity name {response.name}");
+                _logger.LogInformation($"Activity name {response.name} {response.segment_efforts}");
+                IList<Object> segmentEfforts = response.segment_efforts;
+                foreach (dynamic segmentEffort in segmentEfforts)
+                {
+                    _logger.LogInformation($"Segment {segmentEffort.name}");
+                }
             }
             catch (Exception ex)
             {
