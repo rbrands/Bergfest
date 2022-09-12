@@ -151,7 +151,20 @@ namespace Bergfest_Webhook.Repositories
                 IList<Object> segmentEfforts = response.segment_efforts;
                 foreach (dynamic segmentEffort in segmentEfforts)
                 {
-                    _logger.LogInformation($"Segment {segmentEffort.name}");
+                    // TODO: Filter segments applied with list of segments of interest
+                    if (segmentEffort.segment.id == 3730649)
+                    {
+                        StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
+                        {
+                            SegmentId = segmentEffort.segment.id,
+                            SegmentName = segmentEffort.segment.name,
+                            AthleteId = athleteId,
+                            ActivityId = activityId,
+                            ElapsedTime = segmentEffort.elapsed_time,
+                            StartDateLocal = segmentEffort.start_date_local
+                        };
+                        _logger.LogInformation($"Segment {stravaSegmentEffort.SegmentId} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
+                    }
                 }
             }
             catch (Exception ex)

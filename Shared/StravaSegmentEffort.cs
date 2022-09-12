@@ -10,7 +10,7 @@ namespace BlazorApp.Shared
         public string SegmentName { get; set; }
         public long AthleteId { get; set; }
         public long ActivityId { get; set; }   
-        public int ElapsedTime { get; set; }
+        public long ElapsedTime { get; set; }
         public DateTime StartDateLocal { get; set; }
 
 
