@@ -13,5 +13,10 @@ namespace BlazorApp.Shared
         public DateTime ExpirationAt { get; set; }
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
+        public string GetAhtleteLink()
+        {
+            string link = $"https://www.strava.com/athletes/{AthleteId}";
+            return link;
+        }
     }
 }

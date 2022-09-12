@@ -122,7 +122,7 @@ namespace Bergfest_Webhook
                     }
                 }
             }
-            if (stravaEvent.EventType == StravaEvent.ObjectType.Athlete && stravaEvent.Aspect == StravaEvent.AspectType.Update && updates.ContainsKey("authorized"))
+            if (stravaEvent.EventType == StravaEvent.ObjectType.Athlete && updates.ContainsKey("authorized"))
             {
                 stravaEvent.Aspect = StravaEvent.AspectType.Deauthorize;
             }

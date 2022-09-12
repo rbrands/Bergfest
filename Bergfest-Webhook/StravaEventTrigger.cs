@@ -11,7 +11,7 @@ using Bergfest_Webhook.Utils;
 using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
-
+using System.Linq;
 
 namespace Bergfest_Webhook
 {
@@ -52,7 +52,7 @@ namespace Bergfest_Webhook
                 switch (stravaEvent.EventType)
                 {
                     case StravaEvent.ObjectType.Activity:
-                        if (stravaEvent.Aspect == StravaEvent.AspectType.Deauthorize)
+                        if (stravaEvent.Aspect == StravaEvent.AspectType.Deauthorize || stravaEvent.Aspect == StravaEvent.AspectType.Delete)
                         {
                             await DeleteSegmentEffortsForActivity(stravaEvent);
                         }
@@ -77,40 +77,42 @@ namespace Bergfest_Webhook
         }
         public async Task ScanSegmentsInActivity(StravaEvent stravaEvent)
         {
-                _logger.LogInformation($"ScanSegmentsInActivity activityId {stravaEvent.ObjectId} athleteId {stravaEvent.AthleteId}");
-                string accessToken = await _stravaRepository.GetAccessToken(stravaEvent.AthleteId);
-                dynamic response = await _flurlClient.Request("activities", stravaEvent.ObjectId)
-                                                .SetQueryParam("include_all_efforts", "true")
-                                                .WithOAuthBearerToken(accessToken)
-                                                .GetJsonAsync();
-                _logger.LogInformation($"Activity name {response.name} {response.segment_efforts}");
-                IList<Object> segmentEfforts = response.segment_efforts;
-                foreach (dynamic segmentEffort in segmentEfforts)
+            _logger.LogInformation($"ScanSegmentsInActivity activityId {stravaEvent.ObjectId} athleteId {stravaEvent.AthleteId}");
+            string accessToken = await _stravaRepository.GetAccessToken(stravaEvent.AthleteId);
+            dynamic response = await _flurlClient.Request("activities", stravaEvent.ObjectId)
+                                            .SetQueryParam("include_all_efforts", "true")
+                                            .WithOAuthBearerToken(accessToken)
+                                            .GetJsonAsync();
+            _logger.LogInformation($"Activity name {response.name} {response.segment_efforts}");
+            IList<Object> segmentEfforts = response.segment_efforts;
+            IEnumerable<StravaSegment> segments = await _segmentRepository.GetItems();
+            foreach (dynamic segmentEffort in segmentEfforts)
+            {
+                // TODO: Filter segments applied with list of segments of interest
+                if (segmentEffort.segment.id == 3730649 || segmentEffort.segment.id == 20350376 || null != segments.FirstOrDefault(s => s.SegmentId == segmentEffort.segment_id))
                 {
-                    // TODO: Filter segments applied with list of segments of interest
-                    if (segmentEffort.segment.id == 3730649 || segmentEffort.segment_id == 20350376)
+                    StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
                     {
-                        StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
-                        {
-                            SegmentId = segmentEffort.segment.id,
-                            SegmentName = segmentEffort.segment.name,
-                            AthleteId = stravaEvent.AthleteId,
-                            ActivityId = stravaEvent.ObjectId,
-                            ElapsedTime = segmentEffort.elapsed_time,
-                            StartDateLocal = segmentEffort.start_date_local,
-                            TimeToLive = Constants.STRAVA_TTL_SEGMENT_EFFORT
-                        };
-                        await _segmentEffortsRepository.UpsertItem(stravaSegmentEffort);
-                        _logger.LogInformation($"Segment {stravaSegmentEffort.SegmentId} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
-                    }
+                        SegmentId = segmentEffort.segment.id,
+                        SegmentName = segmentEffort.segment.name,
+                        AthleteId = stravaEvent.AthleteId,
+                        ActivityId = stravaEvent.ObjectId,
+                        ElapsedTime = segmentEffort.elapsed_time,
+                        StartDateLocal = segmentEffort.start_date_local,
+                        TimeToLive = Constants.STRAVA_TTL_SEGMENT_EFFORT
+                    };
+                    await _segmentEffortsRepository.UpsertItem(stravaSegmentEffort);
+                    _logger.LogInformation($"Segment {stravaSegmentEffort.SegmentId} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
                 }
+            }
         }
 
         public async Task DeAuthorize(StravaEvent stravaEvent)
         {
+            _logger.LogInformation($"DeAuthorize athleteId {stravaEvent.AthleteId}");
             await _stravaRepository.DeAuthorize(stravaEvent.AthleteId);
             // Delete all segment efforts for athlete
-            IEnumerable<StravaSegmentEffort> segmentEfforts = await _segmentEffortsRepository.GetItems(se => se.AthleteId.Equals(stravaEvent.AthleteId));
+            IEnumerable<StravaSegmentEffort> segmentEfforts = await _segmentEffortsRepository.GetItems(se => se.AthleteId == stravaEvent.AthleteId);
             foreach (StravaSegmentEffort se in segmentEfforts)
             {
                 await _segmentEffortsRepository.DeleteItemAsync(se.Id);
@@ -118,8 +120,9 @@ namespace Bergfest_Webhook
         }
         public async Task DeleteSegmentEffortsForActivity(StravaEvent stravaEvent)
         {
+            _logger.LogInformation($"DeleteSegmentEffortsForActivity activityId {stravaEvent.ObjectId} athleteId {stravaEvent.AthleteId}");
             // Delete all segment efforts for given activity
-            IEnumerable<StravaSegmentEffort> segmentEfforts = await _segmentEffortsRepository.GetItems(se => se.ActivityId.Equals(stravaEvent.ObjectId));
+            IEnumerable<StravaSegmentEffort> segmentEfforts = await _segmentEffortsRepository.GetItems(se => se.ActivityId == stravaEvent.ObjectId);
             foreach (StravaSegmentEffort se in segmentEfforts)
             {
                 await _segmentEffortsRepository.DeleteItemAsync(se.Id);
