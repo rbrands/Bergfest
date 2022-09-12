@@ -137,41 +137,14 @@ namespace Bergfest_Webhook.Repositories
                 throw;
             }
         }
-        public async Task ScanSegmentsInActivity(long athleteId, long activityId)
+        /// <summary>
+        /// User deauthorized application "Bergfest" on Strava ==> delete athlete
+        /// See https://developers.strava.com/docs/authentication/ for details.
+        /// </summary>
+        /// <param name="athleteId">Id of athlete</param>
+        public async Task DeAuthorize(long athleteId)
         {
-            try
-            {
-                _logger.LogInformation($"ScanSegmentsInActivity activityId {activityId} athleteId {athleteId}");
-                string accessToken = await GetAccessToken(athleteId);
-                dynamic response = await _flurlClient.Request("activities", activityId)
-                                                .SetQueryParam("include_all_efforts", "true")
-                                                .WithOAuthBearerToken(accessToken)
-                                                .GetJsonAsync();
-                _logger.LogInformation($"Activity name {response.name} {response.segment_efforts}");
-                IList<Object> segmentEfforts = response.segment_efforts;
-                foreach (dynamic segmentEffort in segmentEfforts)
-                {
-                    // TODO: Filter segments applied with list of segments of interest
-                    if (segmentEffort.segment.id == 3730649)
-                    {
-                        StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
-                        {
-                            SegmentId = segmentEffort.segment.id,
-                            SegmentName = segmentEffort.segment.name,
-                            AthleteId = athleteId,
-                            ActivityId = activityId,
-                            ElapsedTime = segmentEffort.elapsed_time,
-                            StartDateLocal = segmentEffort.start_date_local
-                        };
-                        _logger.LogInformation($"Segment {stravaSegmentEffort.SegmentId} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "ScanSegmentsInActivity failed.");
-                throw;
-            }
+            await this.DeleteItemByKeyAsync(athleteId.ToString());
         }
     }
 }

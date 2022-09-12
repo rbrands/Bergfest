@@ -12,7 +12,5 @@ namespace BlazorApp.Shared
         public long ActivityId { get; set; }   
         public long ElapsedTime { get; set; }
         public DateTime StartDateLocal { get; set; }
-
-
     }
 }

@@ -44,6 +44,8 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton(cosmosClient);
             builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
             builder.Services.AddSingleton<StravaRepository>();
+            builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentEffort>>();
+            builder.Services.AddSingleton<CosmosDBRepository<StravaSegment>>();
             builder.Services.AddSingleton<QueueStorageRepository>();
         }
     }

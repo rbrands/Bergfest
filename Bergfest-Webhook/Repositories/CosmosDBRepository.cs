@@ -47,6 +47,17 @@ namespace Bergfest_Webhook.Repositories
                                .GetContainer(_cosmosDbContainer)
                                .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
         }
+        public async Task DeleteItemByKeyAsync(string key)
+        {
+            if (String.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException("Missing item key.");
+            }
+            string id = typeof(T).Name + "-" + key;
+            await _cosmosClient.GetDatabase(_cosmosDbDatabase)
+                               .GetContainer(_cosmosDbContainer)
+                               .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
+        }
 
         public async Task<T> GetItem(string id)
         {
