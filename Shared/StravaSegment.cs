@@ -7,6 +7,10 @@ namespace BlazorApp.Shared
     public class StravaSegment : CosmosDBEntity
     {
         public long SegmentId { get; set; }
+        // If enabled segment efforts are recorded for this segment
+        public bool IsEnabled { get; set; } = true;
+        // If false the results for this segment are not shown
+        public bool DisplayEnabled { get; set; } = true;
         public string SegmentName { get; set; }
         // Optional description for segment
         public string Description {get; set;}

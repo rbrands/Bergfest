@@ -89,7 +89,8 @@ namespace Bergfest_Webhook
             foreach (dynamic segmentEffort in segmentEfforts)
             {
                 // TODO: Filter segments applied with list of segments of interest
-                if (segmentEffort.segment.id == 3730649 || segmentEffort.segment.id == 20350376 || null != segments.FirstOrDefault(s => s.SegmentId == segmentEffort.segment_id))
+                StravaSegment? stravaSegment = segments.FirstOrDefault(s => s.SegmentId == segmentEffort.segment_id);
+                if (segmentEffort.segment.id == 3730649 || segmentEffort.segment.id == 20350376 || null != stravaSegment && stravaSegment.IsEnabled)
                 {
                     StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
                     {
