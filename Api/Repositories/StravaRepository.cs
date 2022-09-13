@@ -24,7 +24,7 @@ namespace BlazorApp.Api.Repositories
         private readonly IFlurlClient _flurlClient;
         private readonly ILogger _logger;
         private IConfiguration _config;
-        private long _adminAthleteId = 0; 
+        private ulong _adminAthleteId = 0; 
 
         public StravaRepository(ILogger<StravaRepository> logger, IConfiguration config, CosmosClient cosmosClient, IFlurlClientFactory flurlClientFactory) : base(config, cosmosClient)
         {
@@ -41,7 +41,7 @@ namespace BlazorApp.Api.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(long athleteId)
+        public async Task<string> GetAccessToken(ulong athleteId)
         {
             try
             { 

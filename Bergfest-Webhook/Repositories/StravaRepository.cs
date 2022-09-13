@@ -41,7 +41,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(long athleteId)
+        public async Task<string> GetAccessToken(ulong athleteId)
         {
             try
             { 
@@ -79,7 +79,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<StravaAccess> GetStravaAccess(long athleteId)
+        public async Task<StravaAccess> GetStravaAccess(ulong athleteId)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace Bergfest_Webhook.Repositories
         /// See https://developers.strava.com/docs/authentication/ for details.
         /// </summary>
         /// <param name="athleteId">Id of athlete</param>
-        public async Task DeAuthorize(long athleteId)
+        public async Task DeAuthorize(ulong athleteId)
         {
             await this.DeleteItemByKeyAsync(athleteId.ToString());
         }

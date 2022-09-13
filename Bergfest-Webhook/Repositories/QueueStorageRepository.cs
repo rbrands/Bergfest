@@ -39,7 +39,8 @@ namespace Bergfest_Webhook.Repositories
             }
             QueueClientOptions queueClientOptions = new QueueClientOptions()
             {
-                MessageEncoding = QueueMessageEncoding.Base64
+                MessageEncoding = QueueMessageEncoding.Base64,
+                Retry = { MaxRetries = 2 }
             };
             _queueClient = new QueueClient(connectionString, Constants.QUEUE_NAME, queueClientOptions);
             // Create the queue

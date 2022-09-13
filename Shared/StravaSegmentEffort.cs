@@ -6,10 +6,11 @@ namespace BlazorApp.Shared
 {
     public class StravaSegmentEffort : CosmosDBEntity
     {
-        public long SegmentId { get; set; }
+        public ulong SegmentEffortId { get; set; }
+        public ulong SegmentId { get; set; }
         public string SegmentName { get; set; }
-        public long AthleteId { get; set; }
-        public long ActivityId { get; set; }   
+        public ulong AthleteId { get; set; }
+        public ulong ActivityId { get; set; }   
         public long ElapsedTime { get; set; }
         public DateTime StartDateLocal { get; set; }
         public string GetSegmentLink()
@@ -25,6 +26,11 @@ namespace BlazorApp.Shared
         public string GetAhtleteLink()
         {
             string link = $"https://www.strava.com/athletes/{AthleteId}";
+            return link;
+        }
+        public string GetActivitySegmentLink()
+        {
+            string link = $"https://www.strava.com/activities/{ActivityId}/segments/{SegmentEffortId}";
             return link;
         }
     }

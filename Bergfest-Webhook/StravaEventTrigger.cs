@@ -83,18 +83,29 @@ namespace Bergfest_Webhook
                                             .SetQueryParam("include_all_efforts", "true")
                                             .WithOAuthBearerToken(accessToken)
                                             .GetJsonAsync();
-            _logger.LogInformation($"Activity name {response.name} {response.segment_efforts}");
+            _logger.LogInformation($"Activity name {response.name}");
             IList<Object> segmentEfforts = response.segment_efforts;
+            // Get all defined segments and load them into a dictionary for faster lookup
+            // TODO: Store dictionary and refresh regularly e.g. every 30 minutes
             IEnumerable<StravaSegment> segments = await _segmentRepository.GetItems();
+            Dictionary<ulong, StravaSegment> segmentLookup = new Dictionary<ulong, StravaSegment>();
+            foreach (StravaSegment s in segments)
+            {
+                segmentLookup.Add(s.SegmentId, s);
+            }
+            _logger.LogInformation($"{segmentLookup.Count} segments configured.");
             foreach (dynamic segmentEffort in segmentEfforts)
             {
                 // TODO: Filter segments applied with list of segments of interest
-                StravaSegment? stravaSegment = segments.FirstOrDefault(s => s.SegmentId == segmentEffort.segment_id);
-                if (segmentEffort.segment.id == 3730649 || segmentEffort.segment.id == 20350376 || null != stravaSegment && stravaSegment.IsEnabled)
+                StravaSegment stravaSegment = null;
+                ulong segmentId = (ulong)segmentEffort.segment.id;
+                bool segmentFound = segmentLookup.TryGetValue(segmentId, out stravaSegment);
+                if (segmentId == 3730649 || segmentId == 20350376 || segmentFound && stravaSegment.IsEnabled)
                 {
                     StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
                     {
-                        SegmentId = segmentEffort.segment.id,
+                        SegmentEffortId = (ulong)segmentEffort.id,
+                        SegmentId = segmentId,
                         SegmentName = segmentEffort.segment.name,
                         AthleteId = stravaEvent.AthleteId,
                         ActivityId = stravaEvent.ObjectId,
@@ -102,8 +113,9 @@ namespace Bergfest_Webhook
                         StartDateLocal = segmentEffort.start_date_local,
                         TimeToLive = Constants.STRAVA_TTL_SEGMENT_EFFORT
                     };
+                    stravaSegmentEffort.LogicalKey = stravaSegmentEffort.SegmentEffortId.ToString();
                     await _segmentEffortsRepository.UpsertItem(stravaSegmentEffort);
-                    _logger.LogInformation($"Segment {stravaSegmentEffort.SegmentId} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
+                    _logger.LogInformation($"SegmentEffort {stravaSegmentEffort.Id} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
                 }
             }
         }

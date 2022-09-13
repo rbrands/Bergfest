@@ -84,8 +84,8 @@ namespace Bergfest_Webhook
             }
             _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
             StravaEvent stravaEvent = new StravaEvent();
-            stravaEvent.ObjectId = Convert.ToInt64(postRequest.object_id.ToString());
-            stravaEvent.AthleteId = Convert.ToInt64(postRequest.owner_id.ToString());
+            stravaEvent.ObjectId = Convert.ToUInt64(postRequest.object_id.ToString());
+            stravaEvent.AthleteId = Convert.ToUInt64(postRequest.owner_id.ToString());
             StravaAccess stravaAccess = await _stravaRepository.GetStravaAccess(stravaEvent.AthleteId);
             if (null == stravaAccess)
             {
