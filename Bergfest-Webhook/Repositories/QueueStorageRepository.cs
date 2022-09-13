@@ -61,6 +61,13 @@ namespace Bergfest_Webhook.Repositories
         {
             string messageSerialized = JsonSerializer.Serialize<StravaEvent>(stravaEvent);
             IncrementMessageCounter();
+            if (_messageCounter < 0)
+            {
+                lock(this)
+                { 
+                    _messageCounter = 0;
+                }
+            }
             TimeSpan visibilityTimeout = new TimeSpan(0, 0, _messageCounter * Constants.STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
             _logger.LogInformation($"QueueStorageRepository.InsertMessage({messageSerialized})");
             await _queueClient.SendMessageAsync(messageSerialized, visibilityTimeout);
