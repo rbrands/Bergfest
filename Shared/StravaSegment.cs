@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorApp.Shared
 {
@@ -12,8 +13,13 @@ namespace BlazorApp.Shared
         // If false the results for this segment are not shown
         public bool DisplayEnabled { get; set; } = true;
         public string SegmentName { get; set; }
+        // Optional link to be used as header
+        public string ImageLink { get; set; }
         // Optional description for segment
         public string Description {get; set;}
+        // Optional link to a recommendated route that includes the segment
+        public string RouteRecommendation { get; set; }
+
         // Comma-separated list of tags to filter segments for presentation. E.g. "scuderia,dsd"
         public string Tags { get; set; }
         // Comma-separated list of labels to used for display labels when presenting the results. E.g. "Sprint,Cat1" 
