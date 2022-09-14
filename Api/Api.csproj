@@ -7,7 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="local.settings.example.json" />
-    <None Remove="local.settings.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AzureFunctions.Extensions.DependencyInjection" Version="1.1.3" />

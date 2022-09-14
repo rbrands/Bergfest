@@ -1,4 +1,10 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@implements IDisposable
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Bergfest</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -30,5 +36,13 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    protected override void OnInitialized()
+    {
+        AppStateStore.OnChange += StateHasChanged;
+    }
+    public void Dispose()
+    {
+        AppStateStore.OnChange -= StateHasChanged;
     }
 }
