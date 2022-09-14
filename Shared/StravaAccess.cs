@@ -18,5 +18,9 @@ namespace BlazorApp.Shared
             string link = $"https://www.strava.com/athletes/{AthleteId}";
             return link;
         }
+        public string GetFullName()
+        {
+            return $"{FirstName} {LastName}";
+        }
     }
 }

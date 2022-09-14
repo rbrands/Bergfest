@@ -5,6 +5,7 @@
 
 <AuthorizeView>
     <Authorized>
+        @context.User.Identity?.Name
         <a href="" @onclick="@(() => Logout())">Abmelden</a>
     </Authorized>
     <NotAuthorized>

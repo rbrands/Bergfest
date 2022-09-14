@@ -51,7 +51,6 @@ namespace Bergfest_Webhook
                 else if (req.Method == "POST")
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                    _logger.LogInformation($"StravaWebhook {requestBody}");
                     dynamic postRequest = JsonSerializer.Deserialize<ExpandoObject>(requestBody);
                     await HandleWebhookPost(postRequest);
                     return new OkResult();
@@ -76,13 +75,13 @@ namespace Bergfest_Webhook
             {
                 throw new Exception("STRAVA_SUBSCRIPTION_ID not configured.");
             }
-            _logger.LogInformation($"Subscription-Id expected: {subscriptionId}");
+            _logger.LogDebug($"Subscription-Id expected: {subscriptionId}");
             string subscriptionIdReceived = postRequest.subscription_id.ToString();
             if (subscriptionId != subscriptionIdReceived)
             {
                 throw new Exception($"Wrong subscription id. Expected >{subscriptionId}< received >{subscriptionIdReceived}<");
             }
-            _logger.LogInformation($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
+            _logger.LogDebug($"Webhook for subscription_id {postRequest.subscription_id} object_id {postRequest.object_id}");
             StravaEvent stravaEvent = new StravaEvent();
             stravaEvent.ObjectId = Convert.ToUInt64(postRequest.object_id.ToString());
             stravaEvent.AthleteId = Convert.ToUInt64(postRequest.owner_id.ToString());
@@ -108,10 +107,6 @@ namespace Bergfest_Webhook
                     break;
             }
             updates = JsonSerializer.Deserialize<Dictionary<string,string>>(postRequest.updates);
-            foreach (KeyValuePair<string,string> entry in updates)
-            {
-                _logger.LogInformation($"HandleWebhookPost {entry.Key} - {entry.Value}");
-            }
             if (stravaEvent.EventType == StravaEvent.ObjectType.Activity && stravaEvent.Aspect == StravaEvent.AspectType.Update)
             {
                 if (updates.ContainsKey("private"))
@@ -126,6 +121,7 @@ namespace Bergfest_Webhook
             {
                 stravaEvent.Aspect = StravaEvent.AspectType.Deauthorize;
             }
+            _logger.LogInformation($"Webhook event for >{stravaAccess.GetFullName()}< - {stravaEvent.EventType} - {stravaEvent.Aspect} ");
             await _queueRepository.InsertMessage(stravaEvent);
         }
   

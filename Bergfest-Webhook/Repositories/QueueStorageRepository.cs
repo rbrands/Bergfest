@@ -69,7 +69,7 @@ namespace Bergfest_Webhook.Repositories
                 }
             }
             TimeSpan visibilityTimeout = new TimeSpan(0, 0, _messageCounter * Constants.STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
-            _logger.LogInformation($"QueueStorageRepository.InsertMessage({messageSerialized})");
+            _logger.LogDebug($"QueueStorageRepository.InsertMessage({messageSerialized})");
             await _queueClient.SendMessageAsync(messageSerialized, visibilityTimeout);
         }
     }

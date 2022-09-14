@@ -77,13 +77,12 @@ namespace Bergfest_Webhook
         }
         public async Task ScanSegmentsInActivity(StravaEvent stravaEvent)
         {
-            _logger.LogInformation($"ScanSegmentsInActivity activityId {stravaEvent.ObjectId} athleteId {stravaEvent.AthleteId}");
             string accessToken = await _stravaRepository.GetAccessToken(stravaEvent.AthleteId);
             dynamic response = await _flurlClient.Request("activities", stravaEvent.ObjectId)
                                             .SetQueryParam("include_all_efforts", "true")
                                             .WithOAuthBearerToken(accessToken)
                                             .GetJsonAsync();
-            _logger.LogInformation($"Activity name {response.name}");
+            _logger.LogInformation($"ScanSegmentsInActivity >{response.name}< athleteId {stravaEvent.AthleteId}");
             IList<Object> segmentEfforts = response.segment_efforts;
             // Get all defined segments and load them into a dictionary for faster lookup
             // TODO: Store dictionary and refresh regularly e.g. every 30 minutes
@@ -93,7 +92,7 @@ namespace Bergfest_Webhook
             {
                 segmentLookup.Add(s.SegmentId, s);
             }
-            _logger.LogInformation($"{segmentLookup.Count} segments configured.");
+            _logger.LogDebug($"{segmentLookup.Count} segments configured.");
             foreach (dynamic segmentEffort in segmentEfforts)
             {
                 // TODO: Filter segments applied with list of segments of interest
