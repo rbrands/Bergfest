@@ -24,6 +24,8 @@ namespace BlazorApp.Shared
         public double AverageGrade { get; set; }
         [JsonPropertyName("elevation")]
         public double Elevation { get; set; }
+        [JsonPropertyName("climbCategory")]
+        public int ClimbCategory { get; set; }
         // Optional link to be used as header
         [JsonPropertyName("imageLink")]
         public string ImageLink { get; set; }

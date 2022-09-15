@@ -62,7 +62,8 @@ namespace BlazorApp.Api
                     SegmentName = response.name,
                     Distance = response.distance,
                     AverageGrade = response.average_grade,
-                    Elevation = response.elevation_high - response.elevation_low
+                    Elevation = response.elevation_high - response.elevation_low,
+                    ClimbCategory = response.climb_category
                 };
                 stravaSegment.LogicalKey = stravaSegment.SegmentId.ToString();
                 
