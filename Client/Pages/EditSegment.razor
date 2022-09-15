@@ -32,9 +32,11 @@
 </EditForm>
 <div>
     <p>Name: @_segmentOnStrava?.SegmentName</p>
+    <p>Ort: @_segmentOnStrava?.City</p>
     <p>Länge: @_segmentOnStrava?.Distance</p>
     <p>Steigung: @_segmentOnStrava?.AverageGrade</p>
     <p>Höhenunterschied: @_segmentOnStrava?.Elevation</p>
+    <p>Bergkategorie: @_segmentOnStrava?.ClimbCategory</p>
 </div>
 
 @code {
