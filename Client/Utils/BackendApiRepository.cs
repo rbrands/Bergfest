@@ -36,6 +36,23 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetStringAsync($"/api/GetVersion");
         }
+        public async Task<Article?> WriteArticle(Article article)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<Article>($"/api/WriteArticle", article);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Article>();
+        }
+        public async Task<Article?> GetArticle(string key)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<Article>($"/api/GetArticle/{key}");
+        }
+        public async Task<StravaSegment?> GetSegmentFromStrava(ulong segmentId)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<StravaSegment>($"/api/GetSegmentFromStrava/{segmentId}");
+        }
 
 
     }

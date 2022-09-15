@@ -1,15 +1,28 @@
  {
-    "routes": [
-        {
-          "route": "/api/GetVersion",
-          "allowedRoles": [ "anonymous" ]
-        },
-        {
-          "route": "/api/AuthorizeBergfestOnStrava",
-          "allowedRoles": [ "anonymous" ]
-        }
-    ],
-    "navigationFallback": {
+  "routes": [
+    {
+      "route": "/api/GetVersion",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/AuthorizeBergfestOnStrava",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/WriteArticle",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetArticle/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetSegmentFromStrava/*",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    }
+
+   ],
+  "navigationFallback": {
         "rewrite": "index.html",
         "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
       },

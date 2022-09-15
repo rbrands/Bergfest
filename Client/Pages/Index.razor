@@ -1,12 +1,20 @@
 ﻿@page "/"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
 
-<PageTitle>Bergfest</PageTitle>
-
+<PageTitle>
+    Bergfest
+</PageTitle>
 
 <div class="mt-4 p-5 bg-light border">
-    <h2>Cols und Sprints</h2>
-    <p>
-        Die schönsten Segmente
-    </p>
+    <EditArticle ArticleKey="Index"></EditArticle>
 </div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
+@code {
+    private NotificationMessage? _notificationMessage;
+
+}

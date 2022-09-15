@@ -1,0 +1,75 @@
+﻿@page "/editsegment"
+@page "/editsegment/{Id}"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<h3>Segment editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<EditForm Model="@_segmentToEdit">
+    <DataAnnotationsValidator />
+
+    <div class="form-row">
+        <div class="form-group col-md-10">
+            <InputNumber id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
+            <small id="segmentIdHelp" class="form-text text-muted">
+                Die Id des Segments aus der URL der Form https://www.strava.com/segments/id
+            </small>
+        </div>
+        <div class="form-group col-md-2">
+            <div class="form-check">
+                <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div>
+    <p>Name: @_segmentOnStrava?.SegmentName</p>
+    <p>Länge: @_segmentOnStrava?.Distance</p>
+    <p>Steigung: @_segmentOnStrava?.AverageGrade</p>
+    <p>Höhenunterschied: @_segmentOnStrava?.Elevation</p>
+</div>
+
+@code {
+    [Parameter]
+    public ulong Id { get; set; }
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+    private StravaSegment _segmentToEdit = new StravaSegment();
+    private StravaSegment? _segmentOnStrava = new StravaSegment();
+    private int _segmentId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected async Task GetSegmentFromStrava()
+    {
+        try
+        {
+            _segmentOnStrava = await Api.GetSegmentFromStrava((ulong)_segmentId);
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+}

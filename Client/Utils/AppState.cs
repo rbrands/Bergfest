@@ -12,17 +12,8 @@ namespace BlazorApp.Client.Utils
     /// </summary>
     public class AppState
     {
-        private string? _trackKey = null;
-  
-        public string? TrackKey
-        {
-            get { return _trackKey; }
-            set
-            {
-                _trackKey = value;
-                NotifyStateChanged();
-            } 
-        }
+        public IDictionary<string, Article> ArticleCache { get; set; } = new Dictionary<string, Article>();
+
  
         public event Action? OnChange;
         public bool NotificationSubscriptionRequested { get; set; } = false;

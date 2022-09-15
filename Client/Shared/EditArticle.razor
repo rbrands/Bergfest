@@ -1,0 +1,125 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@implements IDisposable
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+@if (!_editMode)
+{
+    @if (!String.IsNullOrEmpty(_article?.ArticleText))
+    {
+        @((MarkupString)_article.ArticleText)
+    }
+    <AuthorizeView Roles="admin">
+        <Authorized>
+            <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SwitchToEditMode())"><span class="oi oi-pencil"></span></button>
+        </Authorized>
+    </AuthorizeView>
+}
+else
+{
+    <BlazoredTextEditor @ref="_htmlArticle" Placeholder="Artikel-Text">
+        <ToolbarContent>
+           <select class="ql-header">
+                <option selected=""></option>
+                <option value="1"></option>
+                <option value="2"></option>
+                <option value="3"></option>
+                <option value="4"></option>
+                <option value="5"></option>
+            </select>
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+            </span>
+            <span class="ql-formats">
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-link"></button>
+            </span>
+        </ToolbarContent>
+        <EditorContent>
+            @if (null != _article?.ArticleText)
+            {
+                @((MarkupString)_article.ArticleText)
+            }
+        </EditorContent>
+    </BlazoredTextEditor>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
+}
+
+@code {
+    [Parameter]
+    public string ArticleKey { get; set; } = String.Empty;
+    private Article? _article = new Article();
+    private bool _editMode = false;
+    private BlazoredTextEditor? _htmlArticle;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppStateStore.OnChange += ReadArticle;
+        if (AppStateStore.ArticleCache.ContainsKey(ArticleKey))
+        {
+            _article = AppStateStore.ArticleCache[ArticleKey];
+        }
+        else
+        {
+            _article = await Api.GetArticle(ArticleKey);
+            if (null != _article)
+            {
+                AppStateStore.ArticleCache[ArticleKey] = _article;
+            }
+        }
+    }
+
+    private async Task SaveArticle()
+    {
+        if (null != _article && null != _htmlArticle)
+        {
+            _article.ArticleText = await _htmlArticle.GetHTML();
+            _article.ArticleKey = ArticleKey;
+            await Api.WriteArticle(_article);
+        }
+        _editMode = false;
+    }
+
+    private void SwitchToEditMode()
+    {
+        _editMode = true;
+    }
+    private void Cancel()
+    {
+        _editMode = false;
+    }
+    private async void ReadArticle()
+    {
+        if (AppStateStore.ArticleCache.ContainsKey(ArticleKey))
+        {
+            _article = AppStateStore.ArticleCache[ArticleKey];
+        }
+        else
+        {
+            _article = await Api.GetArticle(ArticleKey);
+            if (null != _article)
+            {
+                AppStateStore.ArticleCache[ArticleKey] = _article;
+            }
+        }
+        StateHasChanged();
+    }
+    public void Dispose()
+    {
+        AppStateStore.OnChange -= ReadArticle;
+    }
+
+}

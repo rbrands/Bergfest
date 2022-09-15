@@ -76,6 +76,10 @@ namespace BlazorApp.Api.Repositories
         }
         public async Task<string> GetAccessTokenForAdmin()
         {
+            if (0 == _adminAthleteId)
+            {
+                throw new Exception("STRAVA_ADMIN_ATHLETE_ID not configured.");
+            }
             return await GetAccessToken(_adminAthleteId);
         }
         /// <summary>

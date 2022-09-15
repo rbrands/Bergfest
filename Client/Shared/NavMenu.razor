@@ -6,8 +6,7 @@
 @inject NavigationManager NavigationManager
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Bergfest</a>
-        <img class="img-fluid" style="height:1.5em" src="/images/api_logo_pwrdBy_strava_horiz_light.png" />
+        <a class="navbar-brand" href="">Bergfest</a><img class="img-fluid" style="height:1.5em" src="/images/api_logo_pwrdBy_strava_horiz_light.png" />
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -18,9 +17,18 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Authorize">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Strava
+                <span class="oi oi-link-intact" aria-hidden="true"></span> Strava Connect
             </NavLink>
         </div>
+        <AuthorizeView Roles="admin,segmentadmin">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="EditSegment">
+                        <span class="oi oi-document" aria-hidden="true"></span> Neues Segment
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="About">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Über ...
