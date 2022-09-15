@@ -55,6 +55,14 @@ else
     </BlazoredTextEditor>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
+    <div class="row">
+        <div class="col-md-10">
+           <input class="form-control" @bind="@_imageLink" placeholder="Link zu einem Bild" title="Bildlink"></input>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => InsertImage())">Bild einfügen</button>
+        </div>
+     </div>
 }
 
 @code {
@@ -63,6 +71,7 @@ else
     private Article? _article = new Article();
     private bool _editMode = false;
     private BlazoredTextEditor? _htmlArticle;
+    private string _imageLink = String.Empty;
 
 
     protected override async Task OnInitializedAsync()
@@ -116,6 +125,13 @@ else
             }
         }
         StateHasChanged();
+    }
+    public async Task InsertImage()
+    {
+        if (null != _htmlArticle && !String.IsNullOrEmpty(_imageLink))
+        {
+            await _htmlArticle.InsertImage(_imageLink); 
+        }
     }
     public void Dispose()
     {
