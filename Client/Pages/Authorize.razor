@@ -7,11 +7,13 @@
 
 <PageTitle>Bergfest - Strava Login</PageTitle>
 
-<div class="mt-4 p-5 bg-light border">
-    <h2>Bei Strava anmelden</h2>
-    <p>
-        Damit "Bergfest" deine Segment-Leistungen auswerten kannst, musst du "Bergfest" auf Strava autorisieren. 
-    </p>
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="Authorize">
+        <h2>Mit Strava verbinden</h2>
+        <p>
+            Damit "Bergfest" deine Segmentleistungen auswerten kann, musst du "Bergfest" als Anwendung mit deinem Strava-Account verbinden.
+        </p>
+    </EditArticle>
     <p>
         <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)stravaresponse&approval_prompt=force&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
     </p>

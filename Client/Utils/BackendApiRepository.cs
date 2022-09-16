@@ -52,7 +52,6 @@ namespace BlazorApp.Client.Utils
         public async Task<StravaSegment?> GetSegmentFromStrava(ulong segmentId)
         {
             this.PrepareHttpClient();
-            //return await _http.GetFromJsonAsync<StravaSegment>($"/api/GetSegmentFromStrava/{segmentId}");
             var response = await _http.GetAsync($"/api/GetSegmentFromStrava/{segmentId}");
             if (response.IsSuccessStatusCode)
             {
