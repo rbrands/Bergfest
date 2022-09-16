@@ -22,12 +22,18 @@ namespace BlazorApp.Shared
         public double Distance { get; set; }
         [JsonPropertyName("averageGrade")]
         public double AverageGrade { get; set; }
+        [JsonPropertyName("maximumGrade")]
+        public double MaximumGrade { get; set; }
         [JsonPropertyName("elevation")]
         public double Elevation { get; set; }
         [JsonPropertyName("climbCategory")]
         public long ClimbCategory { get; set; }
         [JsonPropertyName("city")]
         public string City { get; set; }
+        [JsonPropertyName("effortCount")]
+        public long EffortCount { get; set; }
+        [JsonPropertyName("athleteCount")]
+        public long AthleteCount { get; set; }
         // Optional link to be used as header
         [JsonPropertyName("imageLink")]
         public string ImageLink { get; set; }
@@ -48,6 +54,11 @@ namespace BlazorApp.Shared
         {
             string segmentLink = $"https://www.strava.com/segments/{SegmentId}";
             return segmentLink;
+        }
+        public string GetClimbCategoryLabel()
+        {
+            string[] climbCategories = { "-", "4", "3", "2", "1", "HC" };
+            return climbCategories[ClimbCategory];
         }
     }
 }

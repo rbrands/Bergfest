@@ -4,22 +4,22 @@
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
-<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row px-3 m-2 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Bergfest</a><img class="img-fluid" style="height:1.5em" src="/images/api_logo_pwrdBy_strava_horiz_light.png" />
+        <a class="navbar-brand" href="">Bergfest</a>
+        <img class="img-fluid" style="height:2em" src="/images/api_logo_pwrdBy_strava_horiz_light.png" />
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
-
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <li class="nav-item px-3">
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Segmente
             </NavLink>
-        </li>
+        </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Authorize">
                 <span class="oi oi-link-intact" aria-hidden="true"></span> Strava Connect

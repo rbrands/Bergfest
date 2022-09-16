@@ -35,8 +35,10 @@
     <p>Ort: @_segmentOnStrava?.City</p>
     <p>Länge: @_segmentOnStrava?.Distance</p>
     <p>Steigung: @_segmentOnStrava?.AverageGrade</p>
+    <p>Max Steigung: @_segmentOnStrava?.MaximumGrade</p>
     <p>Höhenunterschied: @_segmentOnStrava?.Elevation</p>
-    <p>Bergkategorie: @_segmentOnStrava?.ClimbCategory</p>
+    <p>Bergkategorie: @_segmentOnStrava?.GetClimbCategoryLabel() - @_segmentOnStrava?.ClimbCategory</p>
+    <p>Anzahl: @_segmentOnStrava?.EffortCount</p>
 </div>
 
 @code {
@@ -69,7 +71,12 @@
         }
         catch (Exception ex)
         {
-            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            string message = ex.Message;
+            if (null != ex.InnerException)
+            {
+                message = ex.InnerException.Message;
+            }
+            _notificationMessage?.ShowError($"Fehler: {message}");
             return;
         }
     }

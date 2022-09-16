@@ -12,6 +12,7 @@ using System.Web.Http;
 using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
+using Flurl.Http.Content;
 using System.Collections.Generic;
 using BlazorApp.Api.Repositories;
 using BlazorApp.Api.Utils;
@@ -62,17 +63,30 @@ namespace BlazorApp.Api
                     SegmentName = response.name,
                     Distance = response.distance,
                     AverageGrade = response.average_grade,
-                    Elevation = response.elevation_high - response.elevation_low,
+                    Elevation = response.total_elevation_gain,
                     ClimbCategory = response.climb_category,
-                    City = response.city
+                    City = response.city,
+                    EffortCount = response.effort_count,
+                    AthleteCount = response.athlete_count,
+                    MaximumGrade = response.maximum_grade
                 };
                 stravaSegment.LogicalKey = stravaSegment.SegmentId.ToString();
+                if (response.hazardous)
+                {
+                    throw new Exception("Segment is marked as hazardous.");
+                }
                 
                 return new OkObjectResult(stravaSegment);
             }
+            catch (FlurlHttpException ex)
+            {
+                string error = await ex.GetResponseStringAsync();
+                _logger.LogError(ex, $"GetSegmentFromStrava(segmentId = {segmentId}) failed: {error}");
+                return new BadRequestErrorMessageResult(error);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetArticle failed.");
+                _logger.LogError(ex, $"GetSegmentFromStrava(segmentId = {segmentId}) failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }
