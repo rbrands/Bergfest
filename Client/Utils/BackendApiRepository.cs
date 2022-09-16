@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using BlazorApp.Shared;
 
 namespace BlazorApp.Client.Utils
@@ -51,9 +52,36 @@ namespace BlazorApp.Client.Utils
         public async Task<StravaSegment?> GetSegmentFromStrava(ulong segmentId)
         {
             this.PrepareHttpClient();
-            return await _http.GetFromJsonAsync<StravaSegment>($"/api/GetSegmentFromStrava/{segmentId}");
+            //return await _http.GetFromJsonAsync<StravaSegment>($"/api/GetSegmentFromStrava/{segmentId}");
+            var response = await _http.GetAsync($"/api/GetSegmentFromStrava/{segmentId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<StravaSegment>();
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage() {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch(Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
         }
+    }
 
-
+    public class ErrorMessage
+    {
+        public string Message { get; set; } = String.Empty;
     }
 }

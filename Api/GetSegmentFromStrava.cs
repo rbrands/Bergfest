@@ -80,9 +80,10 @@ namespace BlazorApp.Api
             }
             catch (FlurlHttpException ex)
             {
-                string error = await ex.GetResponseStringAsync();
-                _logger.LogError(ex, $"GetSegmentFromStrava(segmentId = {segmentId}) failed: {error}");
-                return new BadRequestErrorMessageResult(error);
+                dynamic error = await ex.GetResponseJsonAsync();
+                string errorMessage = error.message; 
+                _logger.LogError(ex, $"GetSegmentFromStrava(segmentId = {segmentId}) failed: {errorMessage}");
+                return new BadRequestErrorMessageResult(errorMessage);
             }
             catch (Exception ex)
             {
