@@ -15,7 +15,6 @@
 
 <EditForm Model="@_segmentToEdit">
     <DataAnnotationsValidator />
-
     <div class="form-row">
         <div class="form-group col-md-10">
             <InputNumber id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
@@ -29,18 +28,43 @@
             </div>
         </div>
     </div>
+    <div class="form-row">
+        @if (null != _segmentOnStrava && _segmentOnStrava.SegmentId > 0)
+        {
+            <h4>@_segmentOnStrava?.SegmentName</h4>
+            <div class="list-group list-group-horizontal-md flex-fill">
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Ort</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.City</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Distanz</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Distance<text>m</text></p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Höhenzunahme</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Elevation<text>m</text></p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Steigung</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.AverageGrade%</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Max. Steigung</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.MaximumGrade%</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Bergkategorie</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.GetClimbCategoryLabel()</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Beliebtheit</p>
+                    <p class="fs-6 mb-0 mt-0">@_segmentOnStrava?.EffortCount Versuche von @_segmentOnStrava?.AthleteCount Personen</p>
+                </div>
+            </div>
+        }
+    </div>
 </EditForm>
-<div>
-    <p>Name: @_segmentOnStrava?.SegmentName</p>
-    <p>Ort: @_segmentOnStrava?.City</p>
-    <p>Länge: @_segmentOnStrava?.Distance</p>
-    <p>Steigung: @_segmentOnStrava?.AverageGrade</p>
-    <p>Max Steigung: @_segmentOnStrava?.MaximumGrade</p>
-    <p>Höhenunterschied: @_segmentOnStrava?.Elevation</p>
-    <p>Bergkategorie: @_segmentOnStrava?.GetClimbCategoryLabel() - @_segmentOnStrava?.ClimbCategory</p>
-    <p>Anzahl: @_segmentOnStrava?.EffortCount von @_segmentOnStrava?.AthleteCount</p>
-</div>
-
 @code {
     [Parameter]
     public ulong Id { get; set; }
