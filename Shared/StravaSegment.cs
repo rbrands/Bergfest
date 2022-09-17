@@ -60,5 +60,19 @@ namespace BlazorApp.Shared
             string[] climbCategories = { "-", "4", "3", "2", "1", "HC" };
             return climbCategories[ClimbCategory];
         }
+        public string GetDistanceAsText()
+        {
+            string distanceFormat = String.Empty;
+            if (Distance > 1000)
+            {
+                double distanceKm = Distance / 1000.0;
+                distanceFormat = String.Format("{0:N2}km", distanceKm);
+            }
+            else
+            {
+                distanceFormat = String.Format("{0:N0}m", Distance);
+            }
+            return distanceFormat;
+        }
     }
 }

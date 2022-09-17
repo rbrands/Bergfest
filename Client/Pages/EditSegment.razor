@@ -32,6 +32,7 @@
         @if (null != _segmentOnStrava && _segmentOnStrava.SegmentId > 0)
         {
             <h4>@_segmentOnStrava?.SegmentName</h4>
+            <a class="small" href="@_segmentOnStrava?.GetSegmentLink()" target="_blank">Segment auf Strava</a>
             <div class="list-group list-group-horizontal-md flex-fill">
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Ort</p>
@@ -39,19 +40,19 @@
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Distanz</p>
-                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Distance<text>m</text></p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.GetDistanceAsText()</p>
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Höhenzunahme</p>
-                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Elevation<text>m</text></p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Elevation.ToString("N0")<text>m</text></p>
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Steigung</p>
-                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.AverageGrade%</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.AverageGrade.ToString("N2")%</p>
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Max. Steigung</p>
-                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.MaximumGrade%</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.MaximumGrade.ToString("N2")%</p>
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Bergkategorie</p>
@@ -59,7 +60,7 @@
                 </div>
                 <div class="list-group-item border-0">
                     <p class="small mb-0 text-muted">Beliebtheit</p>
-                    <p class="fs-6 mb-0 mt-0">@_segmentOnStrava?.EffortCount Versuche von @_segmentOnStrava?.AthleteCount Personen</p>
+                    <p class="fs-6 mb-0 mt-0">@_segmentOnStrava?.EffortCount.ToString("N0") Versuche von @_segmentOnStrava?.AthleteCount.ToString("N0") Personen</p>
                 </div>
             </div>
         }
