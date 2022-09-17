@@ -52,7 +52,7 @@ namespace BlazorApp.Api
                 {
                     throw new Exception("Missing segmentId for call GetSegmentFromStrava()");
                 }
-                _logger.LogInformation("GetSegmentFromStrava({segmentId})", segmentId);
+                _logger.LogInformation($"GetSegmentFromStrava({segmentId})", segmentId);
                 string accessToken = await _stravaRepository.GetAccessTokenForAdmin();
                 dynamic response = await _flurlClient.Request("segments", segmentId)
                                                 .WithOAuthBearerToken(accessToken)

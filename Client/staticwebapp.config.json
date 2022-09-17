@@ -19,9 +19,17 @@
     {
       "route": "/api/GetSegmentFromStrava/*",
       "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/WriteSegment",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/GetSegment/*",
+      "allowedRoles": [ "anonymous" ]
     }
 
-   ],
+  ],
   "navigationFallback": {
         "rewrite": "index.html",
         "exclude": [ "/images/*.{png,jpg,gif}", "/css/*" ]
