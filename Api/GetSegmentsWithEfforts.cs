@@ -24,7 +24,7 @@ namespace BlazorApp.Api
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<StravaSegment> _cosmosRepository;
-        private CosmosDBRepository<StravaSegmentEffort> _cosmos ffortRepository;
+        private CosmosDBRepository<StravaSegmentEffort> _cosmosEffortRepository;
         public GetSegmentsWithEfforts(ILogger<GetSegmentsWithEfforts> logger,
                         IConfiguration config,
                         CosmosDBRepository<StravaSegmentEffort> cosmosEffortRepository,
@@ -33,7 +33,7 @@ namespace BlazorApp.Api
         {
             _logger = logger;
             _config = config;
-            _cosmos ffortRepository = cosmosEffortRepository;
+            _cosmosEffortRepository = cosmosEffortRepository;
             _cosmosRepository = cosmosRepository;
         }
 
@@ -49,7 +49,7 @@ namespace BlazorApp.Api
                 foreach (StravaSegment s in segments)
                 {
                     StravaSegmentWithEfforts segmentWithEfforts = new StravaSegmentWithEfforts(s);
-                    List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmos ffortRepository.GetItems(e => e.SegmentId == s.SegmentId));
+                    List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.SegmentId));
                     segmentWithEfforts.Efforts = efforts.OrderBy(e => e.ElapsedTime);
 
                     segmentsWithEfforts.Add(segmentWithEfforts);
