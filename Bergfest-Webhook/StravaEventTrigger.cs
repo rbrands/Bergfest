@@ -77,10 +77,10 @@ namespace Bergfest_Webhook
         }
         public async Task ScanSegmentsInActivity(StravaEvent stravaEvent)
         {
-            string accessToken = await _stravaRepository.GetAccessToken(stravaEvent.AthleteId);
+            StravaAccess stravaAccess = await _stravaRepository.GetAccessToken(stravaEvent.AthleteId);
             dynamic response = await _flurlClient.Request("activities", stravaEvent.ObjectId)
                                             .SetQueryParam("include_all_efforts", "true")
-                                            .WithOAuthBearerToken(accessToken)
+                                            .WithOAuthBearerToken(stravaAccess.AccessToken)
                                             .GetJsonAsync();
             _logger.LogInformation($"ScanSegmentsInActivity >{response.name}< athleteId {stravaEvent.AthleteId}");
             IList<Object> segmentEfforts = response.segment_efforts;
@@ -95,11 +95,11 @@ namespace Bergfest_Webhook
             _logger.LogDebug($"{segmentLookup.Count} segments configured.");
             foreach (dynamic segmentEffort in segmentEfforts)
             {
-                // TODO: Filter segments applied with list of segments of interest
+                // Filter segments applied with list of segments of interest
                 StravaSegment stravaSegment = null;
                 ulong segmentId = (ulong)segmentEffort.segment.id;
                 bool segmentFound = segmentLookup.TryGetValue(segmentId, out stravaSegment);
-                if (segmentId == 3730649 || segmentId == 20350376 || segmentFound && stravaSegment.IsEnabled)
+                if (segmentFound && stravaSegment.IsEnabled)
                 {
                     StravaSegmentEffort stravaSegmentEffort = new StravaSegmentEffort()
                     {
@@ -107,6 +107,7 @@ namespace Bergfest_Webhook
                         SegmentId = segmentId,
                         SegmentName = segmentEffort.segment.name,
                         AthleteId = stravaEvent.AthleteId,
+                        AthleteName = stravaAccess.GetFullName(),
                         ActivityId = stravaEvent.ObjectId,
                         ElapsedTime = segmentEffort.elapsed_time,
                         StartDateLocal = segmentEffort.start_date_local,

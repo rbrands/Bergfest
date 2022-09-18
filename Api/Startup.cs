@@ -48,6 +48,7 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton<StravaRepository>();
             builder.Services.AddSingleton<CosmosDBRepository<Article>>();
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegment>>();
+            builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentEffort>>();
         }
     }
 }

@@ -43,7 +43,10 @@ namespace BlazorApp.Api
                     throw new Exception($"WriteSegment called with invalid SegmentId");
                 }
                 _logger.LogInformation($"WriteSegment(SegmentId = {segment.SegmentId} SegmentName = {segment.SegmentName})");
-
+                if (String.IsNullOrEmpty(segment.Scope))
+                {
+                    segment.Scope = segment.GetUrlFriendlyTitle();
+                }
                 segment.LogicalKey = segment.SegmentId.ToString();
                 StravaSegment updatedSegment = await _cosmosRepository.UpsertItem(segment);
 

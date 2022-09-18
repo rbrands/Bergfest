@@ -50,6 +50,8 @@ namespace BlazorApp.Shared
         // Comma-separated list of labels to used for display labels when presenting the results. E.g. "Sprint,Cat1" 
         [JsonPropertyName("labels")]
         public string Labels { get; set; }
+        [JsonPropertyName("scope")]
+        public string Scope { get; set; }
         public string GetSegmentLink()
         {
             string segmentLink = $"https://www.strava.com/segments/{SegmentId}";
@@ -73,6 +75,94 @@ namespace BlazorApp.Shared
                 distanceFormat = String.Format("{0:N0}m", Distance);
             }
             return distanceFormat;
+        }
+        public string GetUrlFriendlyTitle()
+        {
+            string urlFriendlyTitle = null;
+            if (!String.IsNullOrEmpty(SegmentName))
+            {
+                string titleLowerCase = SegmentName.ToLowerInvariant();
+                StringBuilder sb = new StringBuilder();
+                int charCounter = 0;
+                foreach (char c in titleLowerCase)
+                {
+                    if (++charCounter > 160)
+                    {
+                        // url not longer than 160 chars
+                        break;
+                    }
+                    switch (c)
+                    {
+                        case 'ö':
+                        case 'Ö':
+                            sb.Append("oe");
+                            break;
+                        case 'ü':
+                        case 'Ü':
+                            sb.Append("ue");
+                            break;
+                        case 'ä':
+                        case 'Ä':
+                            sb.Append("ae");
+                            break;
+                        case 'ß':
+                            sb.Append("ss");
+                            break;
+                        case 'a':
+                        case 'b':
+                        case 'c':
+                        case 'd':
+                        case 'e':
+                        case 'f':
+                        case 'g':
+                        case 'h':
+                        case 'i':
+                        case 'j':
+                        case 'k':
+                        case 'l':
+                        case 'm':
+                        case 'n':
+                        case 'o':
+                        case 'p':
+                        case 'q':
+                        case 'r':
+                        case 's':
+                        case 't':
+                        case 'u':
+                        case 'v':
+                        case 'w':
+                        case 'x':
+                        case 'y':
+                        case 'z':
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            sb.Append(c);
+                            break;
+                        default:
+                            sb.Append('-');
+                            break;
+                    }
+                }
+                urlFriendlyTitle = sb.ToString().Trim('-');
+            }
+            return urlFriendlyTitle;
+        }
+        public string[] GetTags()
+        {
+            string[] tagsAsArray = { };
+            if (!String.IsNullOrEmpty(Tags))
+            {
+                tagsAsArray = this.Tags.Split(',');
+            }
+            return tagsAsArray;
         }
     }
 }

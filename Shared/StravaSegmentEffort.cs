@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BlazorApp.Shared
 {
     public class StravaSegmentEffort : CosmosDBEntity
     {
+        [JsonPropertyName("segmentEffortId")]
         public ulong SegmentEffortId { get; set; }
+        [JsonPropertyName("segmentId")]
         public ulong SegmentId { get; set; }
+        [JsonPropertyName("segmentName")]
         public string SegmentName { get; set; }
+        [JsonPropertyName("athleteId")]
         public ulong AthleteId { get; set; }
-        public ulong ActivityId { get; set; }   
+        [JsonPropertyName("athleteName")]
+        public string AthleteName { get; set; }
+        [JsonPropertyName("activityId")]
+        public ulong ActivityId { get; set; }
+        [JsonPropertyName("elapsedTime")]
         public long ElapsedTime { get; set; }
+        [JsonPropertyName("startDateLocal")]
         public DateTime StartDateLocal { get; set; }
         public string GetSegmentLink()
         {

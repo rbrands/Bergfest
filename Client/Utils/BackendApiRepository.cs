@@ -114,6 +114,41 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
+        public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts()
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetSegmentsWithEfforts");
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<StravaSegmentWithEfforts> returnList = new List<StravaSegmentWithEfforts>();
+                IEnumerable<StravaSegmentWithEfforts>? segmentsWithEfforts = await response.Content.ReadFromJsonAsync<IEnumerable<StravaSegmentWithEfforts>>();
+                if (null != segmentsWithEfforts)
+                {
+                    returnList = segmentsWithEfforts;
+                }
+                return returnList;
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
 
     }
 

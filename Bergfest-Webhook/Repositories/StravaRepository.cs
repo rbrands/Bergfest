@@ -41,7 +41,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(ulong athleteId)
+        public async Task<StravaAccess> GetAccessToken(ulong athleteId)
         {
             try
             { 
@@ -66,7 +66,7 @@ namespace Bergfest_Webhook.Repositories
                     stravaAccess.ExpirationAt = DateTime.UtcNow.AddSeconds(response.expires_in);
                     await this.UpsertItem(stravaAccess);
                 }
-                return stravaAccess.AccessToken;
+                return stravaAccess;
             }
             catch (Exception ex)
             {
