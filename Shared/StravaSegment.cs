@@ -93,19 +93,19 @@ namespace BlazorApp.Shared
                     }
                     switch (c)
                     {
-                        case 'ö':
-                        case 'Ö':
+                        case '\u00F6':  
+                        case '\u00D6':
                             sb.Append("oe");
                             break;
-                        case 'ü':
-                        case 'Ü':
+                        case '\u00FC':
+                        case '\u00DC':
                             sb.Append("ue");
                             break;
-                        case 'ä':
-                        case 'Ä':
+                        case '\u00E4':
+                        case '\u00C4':
                             sb.Append("ae");
                             break;
-                        case 'ß':
+                        case '\u00DF':
                             sb.Append("ss");
                             break;
                         case 'a':
