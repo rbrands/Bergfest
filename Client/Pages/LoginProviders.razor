@@ -1,0 +1,58 @@
+﻿@page "/LoginProviders"
+@page "/LoginProviders/{TargetPage}"
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject NavigationManager NavigationManager
+
+<div class="mt-4 p-5 bg-light border">
+    <h2>Anmeldung für Adminstratoren</h2>
+    <p>
+        Für die Administration von "Bergfest" ist eine Anmeldung und entsprechende Autorisierung notwendig. Es werden die unten aufgeführten Identitäts-Provider
+        unterstützt. Ein neuer Account kann z.B. über
+        <a href="https://account.microsoft.com" title="Microsoft Account" target="_blank">https://account.microsoft.com</a> angelegt werden.
+    </p>
+</div>
+
+@{
+    var providers = new Dictionary<string, string>
+    {
+        { "aad", "Microsoft" },
+        { "google", "Google" },
+        //{ "facebook", "Facebook" },
+        { "github", "GitHub" },
+        { "twitter", "Twitter" }
+    };
+    string redirectUrl = $"{NavigationManager.BaseUri}";
+}
+
+
+<div class="container col-6">
+    @foreach (var provider in providers)
+    {
+            <div class="d-grid gap-2">
+                <a class="btn btn-lg btn-social btn-@(provider.Key.Equals("aad") ? "microsoft" : provider.Key)" href="/.auth/login/@provider.Key?post_login_redirect_uri=@_redirectUrl">
+                    <span class="fa fa-@(provider.Key.Equals("aad") ? "windows" : provider.Key)"></span> Anmelden mit @provider.Value
+                </a>
+            </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? TargetPage { get; set; }
+
+    private string? _redirectUrl;
+
+    protected override void OnInitialized()
+    {
+        if (String.IsNullOrEmpty(TargetPage))
+        {
+            _redirectUrl = $"{NavigationManager.BaseUri}";
+        }
+        else
+        {
+            _redirectUrl = $"{NavigationManager.BaseUri}/{TargetPage}";
+        }
+    }
+}

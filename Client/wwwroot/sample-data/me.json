@@ -1,0 +1,13 @@
+﻿{
+  "clientPrincipal": {
+    "identityProvider": "devtest",
+    "userId": "rbrands",
+    "userDetails": "rbrands",
+    "userRoles": [
+      "anonymous",
+      "authenticated",
+      "admin",
+      "segmentadmin"
+    ]
+  }
+}

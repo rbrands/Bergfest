@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using BlazorApp.Shared;
 
-namespace BlazorApp.Api.Repositories
+namespace Bergfest_Webhook.Repositories
 {
     public class CosmosDBRepository<T> where T : CosmosDBEntity, new()
     {
@@ -43,6 +43,17 @@ namespace BlazorApp.Api.Repositories
         }
         public async Task DeleteItemAsync(string id)
         {
+            await _cosmosClient.GetDatabase(_cosmosDbDatabase)
+                               .GetContainer(_cosmosDbContainer)
+                               .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
+        }
+        public async Task DeleteItemByKeyAsync(string key)
+        {
+            if (String.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException("Missing item key.");
+            }
+            string id = typeof(T).Name + "-" + key;
             await _cosmosClient.GetDatabase(_cosmosDbDatabase)
                                .GetContainer(_cosmosDbContainer)
                                .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));

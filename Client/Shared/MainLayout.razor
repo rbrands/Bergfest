@@ -1,13 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
+    <div style="background-image: none; background-color: #1d123a; color: #efe46b;" class="sidebar">
         <NavMenu />
     </div>
 
-    <main>
-        <article class="content px-4">
+    <div class="main w-100">
+        <div class="top-row px-4">
+            <AccessControl />
+        </div>
+
+        <div class="content px-4">
             @Body
-        </article>
-    </main>
+        </div>
+    </div>
 </div>

@@ -6,6 +6,18 @@
     "storage1": {
       "type": "storage",
       "connectionId": "AzureWebJobsStorage"
+    },
+    "secrets1": {
+      "type": "secrets"
+    },
+    "cosmosdb1": {
+      "type": "cosmosdb",
+      "connectionId": "COSMOS_DB_CONNECTION_STRING"
+    },
+    "storage2": {
+      "type": "storage",
+      "connectionId": "AzureWebJobsStorage",
+      "dynamicId": null
     }
   }
 }

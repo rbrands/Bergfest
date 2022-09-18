@@ -1,9 +1,77 @@
 ﻿@page "/"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
 
-<PageTitle>Index</PageTitle>
+<PageTitle>
+    Bergfest
+</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="Index">
+        <h2>Cols und Sprints</h2>
+        <p>
+            Leistungen auf den Lieblingssegmenten.
+        </p>
+    </EditArticle>
+</div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-Welcome to your new app.
+@if (null == _segments)
+{
+    <p><em>Daten werden geladen... Beim ersten Aufruf dauert das ein bisschen.</em></p>
+}
+else
+{
+    <p>
+        <AuthorizeView Roles="admin,segmentadmin">
+            <Authorized>
+                <a class="btn btn-primary" href=@($"editsegment") title="Segment anlegen">Segment anlegen</a>
+            </Authorized>
+        </AuthorizeView>
+        <a class="btn btn-primary" title="Hilfe" href="https://docs.meetuproutes.de" target="_blank"><span class="oi oi-question-mark"></span></a>
+    </p>
+    <div class="row">
+        @foreach (StravaSegmentWithEfforts segment in _segments)
+        {
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                <SegmentCard SegmentWithEfforts="@segment" OnReload="Reload"></SegmentCard>
+            </div>
+        }
+    </div>
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    private NotificationMessage? _notificationMessage;
+    IEnumerable<StravaSegmentWithEfforts>? _segments = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _segments = await Api.GetSegmentsWithEfforts();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    private async Task Reload()
+    {
+        try
+        {
+            _notificationMessage?.Hide();
+            _segments = await Api.GetSegmentsWithEfforts();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+        }
+    }
+
+}

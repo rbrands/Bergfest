@@ -1,0 +1,263 @@
+﻿@page "/editsegment"
+@page "/editsegment/{Id}"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<h3>Segment editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<EditForm Model="@_segmentToEdit" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+    @if (String.IsNullOrEmpty(Id))
+    {
+        <div class="form-row">
+            <div class="form-group col-md-10">
+                <InputNumber id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
+                <small id="segmentIdHelp" class="form-text text-muted">
+                    Die Id des Segments aus der URL der Form https://www.strava.com/segments/id
+                </small>
+            </div>
+            <div class="form-group col-md-2">
+                <div class="form-check">
+                    <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (null != _segmentOnStrava && _segmentOnStrava.SegmentId > 0)
+    {
+        <div class="form-row mt-3">
+            <h4 class="mb-0">@_segmentOnStrava?.SegmentName</h4>
+            <a class="small mt-0" href="@_segmentOnStrava?.GetSegmentLink()" target="_blank">Segment auf Strava</a>
+            <div class="list-group list-group-horizontal-md flex-fill">
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Ort</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.City</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Distanz</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.GetDistanceAsText()</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Höhenzunahme</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.Elevation.ToString("N0")<text>m</text></p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Steigung</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.AverageGrade.ToString("N2")%</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Max. Steigung</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.MaximumGrade.ToString("N2")%</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Bergkategorie</p>
+                    <p class="h5 mb-0 mt-0">@_segmentOnStrava?.GetClimbCategoryLabel()</p>
+                </div>
+                <div class="list-group-item border-0">
+                    <p class="small mb-0 text-muted">Beliebtheit</p>
+                    <p class="fs-6 mb-0 mt-0">@_segmentOnStrava?.EffortCount.ToString("N0") Versuche von @_segmentOnStrava?.AthleteCount.ToString("N0") Personen</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-3">
+            <label for="description">Beschreibung</label>
+            <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung des Segments">
+                <ToolbarContent>
+                    <span class="ql-formats">
+                        <select class="ql-font">
+                            <option selected=""></option>
+                            <option value="serif"></option>
+                            <option value="monospace"></option>
+                        </select>
+                        <select class="ql-size">
+                            <option value="small"></option>
+                            <option selected=""></option>
+                            <option value="large"></option>
+                            <option value="huge"></option>
+                        </select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-link"></button>
+                    </span>
+                </ToolbarContent>
+                <EditorContent>
+                    @if (null != _segmentToEdit.Description)
+                    {
+                        @((MarkupString)_segmentToEdit.Description)
+                    }
+                </EditorContent>
+            </BlazoredTextEditor>
+        </div>
+        <div class="form-group">
+            <label for="level">Tags</label>
+            <InputText id="tags" aria-describedby="tagsHelp" class="form-control" @bind-Value="_segmentToEdit.Tags" autocomplete="on" placeholder="Tags" />
+            <small id="tagsHelp" class="form-text text-muted">
+                Mit Komma getrennte Liste von Hash-Tags wie #sprint, #klassiker usw.
+            </small>
+        </div>
+        <div class="form-group">
+            <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_segmentToEdit.RouteRecommendation" placeholder="Streckenvorschlag zum Segment" title="Streckenvorschlag zum Segment" />
+            <small id="linkHelp" class="form-text text-muted">
+                Optional: Link zu einer Strecke mit dem Segment, z.B. Komoot, Strava usw.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="public" aria-describedby="enabledHelp" class="form-check-input" @bind-Value="_segmentToEdit.IsEnabled" />
+                <label for="public" class="form-checklabel">
+                    Segment aktiv schalten?
+                </label>
+            </div>
+            <small id="enabledHelp" class="form-text text-muted">
+                Ist das Segment aktiv?
+            </small>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="public" aria-describedby="displayEnabledHelp" class="form-check-input" @bind-Value="_segmentToEdit.DisplayEnabled" />
+                <label for="public" class="form-checklabel">
+                    Segment aktiv?
+                </label>
+            </div>
+            <small id="displayEnabledHelp" class="form-text text-muted">
+                Soll das Segment angezeigt werden?
+            </small>
+        </div>
+        @if (!String.IsNullOrEmpty(_segmentToEdit.ImageLink))
+        {
+            <div class="form-row">
+                <div class="form-group col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                    <img src="@_segmentToEdit.ImageLink" class="img-fluid" />
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <label for="linkImage">Link zu einem Bild</label>
+            <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_segmentToEdit.ImageLink" placeholder="URL" title="Link zu einem Image" />
+            <small id="linkImageHelp" class="form-text text-muted">
+                Optional: Link zu einem Bild zum Segment
+            </small>
+        </div>
+
+
+        <ValidationSummary />
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
+        <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+        <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+    }
+
+</EditForm>
+@code {
+    [Parameter]
+    public string Id { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+    private StravaSegment _segmentToEdit = new StravaSegment();
+    private StravaSegment? _segmentOnStrava = new StravaSegment();
+    private int _segmentId = 0;
+    private BlazoredTextEditor? _htmlDescription;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!String.IsNullOrEmpty(Id))
+            {
+                StravaSegment? _segmentFromDb = await Api.GetSegment(Convert.ToUInt64(Id));
+                if ( null != _segmentFromDb)
+                {
+                    _segmentToEdit = _segmentFromDb;
+                    _segmentOnStrava = _segmentToEdit;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected async Task GetSegmentFromStrava()
+    {
+        try
+        {
+            _segmentOnStrava = await Api.GetSegmentFromStrava((ulong)_segmentId);
+            if (null != _segmentOnStrava)
+            {
+                _segmentToEdit.SegmentId = _segmentOnStrava.SegmentId;
+                _segmentToEdit.SegmentName = _segmentOnStrava.SegmentName;
+                _segmentToEdit.City = _segmentOnStrava.City;
+                _segmentToEdit.EffortCount = _segmentOnStrava.EffortCount;
+                _segmentToEdit.AthleteCount = _segmentOnStrava.AthleteCount;
+                _segmentToEdit.AverageGrade = _segmentOnStrava.AverageGrade;
+                _segmentToEdit.MaximumGrade = _segmentOnStrava.MaximumGrade;
+                _segmentToEdit.Distance = _segmentOnStrava.Distance;
+                _segmentToEdit.ClimbCategory = _segmentOnStrava.ClimbCategory;
+            }
+        }
+        catch (Exception ex)
+        {
+            string message = ex.Message;
+            if (null != ex.InnerException)
+            {
+                message = ex.InnerException.Message;
+            }
+            _notificationMessage?.ShowError($"Segmentdaten können nicht gelesen werden: {message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+    private string? StripEmptyHtml(string htmlContent)
+    {
+        return (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            if (null != _htmlDescription)
+            {
+                _segmentToEdit.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
+            }
+            await Api.WriteSegment(_segmentToEdit);
+            NavigationManager.NavigateTo($"/");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+}

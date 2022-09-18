@@ -21,16 +21,18 @@ namespace BlazorApp.Api.Repositories
     public class StravaRepository : CosmosDBRepository<StravaAccess>
     {
         private const string STRAVA_API_ENDPOINT = "https://www.strava.com/api/v3";
-        private const string STRAVA_TOKEN_ENDPOINT = "https://www.strava.com/api/v3/oauth/token";
         private readonly IFlurlClient _flurlClient;
         private readonly ILogger _logger;
         private IConfiguration _config;
+        private ulong _adminAthleteId = 0; 
 
         public StravaRepository(ILogger<StravaRepository> logger, IConfiguration config, CosmosClient cosmosClient, IFlurlClientFactory flurlClientFactory) : base(config, cosmosClient)
         {
             _logger = logger;
             _config = config;
             _flurlClient = flurlClientFactory.Get(STRAVA_API_ENDPOINT);
+            // Get ID of athlete that is used to read segments.
+            _adminAthleteId = Convert.ToUInt32(_config["STRAVA_ADMIN_ATHLETE_ID"]);
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace BlazorApp.Api.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(int athleteId)
+        public async Task<string> GetAccessToken(ulong athleteId)
         {
             try
             { 
@@ -71,6 +73,14 @@ namespace BlazorApp.Api.Repositories
                 _logger.LogError(ex, "GetAccessToken failed.");
                 throw;
             }
+        }
+        public async Task<string> GetAccessTokenForAdmin()
+        {
+            if (0 == _adminAthleteId)
+            {
+                throw new Exception("STRAVA_ADMIN_ATHLETE_ID not configured.");
+            }
+            return await GetAccessToken(_adminAthleteId);
         }
         /// <summary>
         /// Authorize application "Bergfest" on Strava.

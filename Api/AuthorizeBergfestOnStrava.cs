@@ -6,12 +6,12 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 using BlazorApp.Api.Repositories;
 using Microsoft.AspNetCore.Routing;
 using BlazorApp.Shared;
 
-namespace BlazorApp.Api
+namespace Bergfest.Api
 {
     public class AuthorizeBergfestOnStrava
     {
@@ -27,13 +27,18 @@ namespace BlazorApp.Api
 
         [FunctionName("AuthorizeBergfestOnStrava")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "AuthorizeBergfestOnStrava")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "AuthorizeBergfestOnStrava")] HttpRequest req
+            )
         {
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                StravaAuthorization stravaAuthorization = JsonConvert.DeserializeObject<StravaAuthorization>(requestBody);
+                var serializeOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                };
+                StravaAuthorization stravaAuthorization = JsonSerializer.Deserialize<StravaAuthorization>(requestBody, serializeOptions);
 
                 _logger.LogInformation($"Authorize Bergfest on Strava for athlete {stravaAuthorization.Code}");
                 StravaAccess stravaAccess = await _stravaRepository.Authorize(stravaAuthorization.Code);

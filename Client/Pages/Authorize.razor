@@ -5,14 +5,20 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<div class="card">
-    <div class="card-header">
-        <h4>Bergfest autorisieren</h4>
-    </div>
-    <div class="card-body">
-        <a href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)stravaresponse&approval_prompt=force&scope=activity:read&response_type=code">Strava</a>
-    </div>
+<PageTitle>Bergfest - Strava Login</PageTitle>
+
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="Authorize">
+        <h2>Mit Strava verbinden</h2>
+        <p>
+            Damit "Bergfest" deine Segmentleistungen auswerten kann, musst du "Bergfest" als Anwendung mit deinem Strava-Account verbinden.
+        </p>
+    </EditArticle>
+    <p>
+        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)stravaresponse&approval_prompt=force&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
+    </p>
 </div>
+
 
 @code {
 }

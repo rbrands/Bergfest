@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bergfest-Webhook", "Bergfest-Webhook\Bergfest-Webhook.csproj", "{AB79612A-8378-472A-81B9-8644F30D3321}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bergfest-Webhook", "Bergfest-Webhook\Bergfest-Webhook.csproj", "{AB79612A-8378-472A-81B9-8644F30D3321}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
 	EndProjectSection

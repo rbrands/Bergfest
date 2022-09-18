@@ -1,0 +1,126 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<div class="card">
+    <div class="card-header">
+        <em>
+            @SegmentWithEfforts.StravaSegment.SegmentName
+            <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank"><span class="oi oi-link-intact"></span></a>
+        </em>
+        @foreach (string tag in SegmentWithEfforts.StravaSegment.GetTags())
+        {
+            <span class="badge bg-info text-dark p-2 m-1">
+                @tag
+            </span>
+        }
+    </div>
+    @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.ImageLink))
+    {
+        <a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank">
+            <img class="card-img-top" src="@SegmentWithEfforts.StravaSegment.ImageLink" alt="@SegmentWithEfforts.StravaSegment.SegmentName">
+        </a>
+    }
+    <div class="card-body">
+        <div class="row">
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Ort</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.City</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Distanz</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetDistanceAsText()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Höhenzunahme</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.Elevation.ToString("N0")<text>m</text></p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Steigung</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.AverageGrade.ToString("N2")%</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Max. Steigung</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.MaximumGrade.ToString("N2")%</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Bergkategorie</p>
+                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetClimbCategoryLabel()</p>
+            </div>
+        </div>
+        <hr />
+        <p class="card-text">
+            <div class="overflow-auto" style="max-height: 500px">
+                @((MarkupString)SegmentWithEfforts.StravaSegment.Description)
+            </div>
+        </p>
+        <hr />
+            <ul class="list-group list-group-numbered list-group-flush">
+                @foreach(StravaSegmentEffort e in SegmentWithEfforts.Efforts)
+                {
+                     <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">@e.AthleteName</div>
+                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung">@e.StartDateLocal.ToString("dd.MM. HH:mm") Uhr</a>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span>
+                     </li>
+                }
+            </ul>
+    </div>
+    <div class="card-footer">
+        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+            <AuthorizeView Roles="admin,segmentadmin">
+                <Authorized>
+                    <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(SegmentWithEfforts.StravaSegment.SegmentId))"><span class="oi oi-pencil"></span></button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentWithEfforts SegmentWithEfforts { get; set; } = new StravaSegmentWithEfforts();
+    [Parameter]
+    public EventCallback OnReload { get; set; }
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+
+
+    protected void EditItem(ulong itemId)
+    {
+        NavigationManager.NavigateTo($"/editsegment/{itemId}");
+    }
+    protected void DeleteItem(string itemId)
+    {
+
+    }
+
+    protected async Task DeleteItem()
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Segment löschen?", "Soll das Segment wirklich gelöscht werden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            NavigationManager.NavigateTo($"/", true);
+        }
+    }
+
+    private async Task OnSaveComment()
+    {
+        await OnReload.InvokeAsync();
+    }
+    private async Task Reload()
+    {
+        await OnReload.InvokeAsync();
+    }
+}

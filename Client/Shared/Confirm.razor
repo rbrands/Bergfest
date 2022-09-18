@@ -1,0 +1,33 @@
+﻿<div>
+    <p>
+        @((MarkupString)Message)
+    </p>
+
+    <button @onclick="Close" class="btn btn-primary">Bestätigen</button>
+    <button @onclick="Cancel" class="btn btn-secondary">Zurück</button>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = new BlazoredModalInstance();
+    [Parameter] public string Message { get; set; } = "Bitte bestätigen oder abbrechen.";
+
+    void Close() => BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    void Cancel() => BlazoredModal.CancelAsync();
+
+    /// <summary>
+    /// Method to call a confirmations call "all-in-one"
+    /// </summary>
+    /// <param name="modalService"></param>
+    /// <param name="title"></param>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    public static async Task<ModalResult> ShowDialog(IModalService modalService, string title, string message)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(Confirm.Message), message);
+        var modal = modalService.Show<Confirm>(title, parameters);
+        return await modal.Result;
+    }
+
+
+}
