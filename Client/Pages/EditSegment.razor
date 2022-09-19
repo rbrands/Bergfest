@@ -25,15 +25,16 @@
                 </small>
             </div>
             <div class="form-group col-md-2">
-                <div class="form-check">
-                    <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
-                </div>
+                <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
             </div>
         </div>
     }
     @if (null != _segmentOnStrava && _segmentOnStrava.SegmentId > 0)
     {
         <div class="form-row mt-3">
+            <div class="form-group col-md-2">
+                 <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
+            </div>
             <h4 class="mb-0">@_segmentOnStrava?.SegmentName</h4>
             <a class="small mt-0" href="@_segmentOnStrava?.GetSegmentLink()" target="_blank">Segment auf Strava</a>
             <div class="list-group list-group-horizontal-md flex-fill">
@@ -192,6 +193,7 @@
                 {
                     _segmentToEdit = _segmentFromDb;
                     _segmentOnStrava = _segmentToEdit;
+                    _segmentId = (int)_segmentToEdit.SegmentId;
                 }
             }
         }
@@ -218,6 +220,7 @@
                 _segmentToEdit.MaximumGrade = _segmentOnStrava.MaximumGrade;
                 _segmentToEdit.Distance = _segmentOnStrava.Distance;
                 _segmentToEdit.ClimbCategory = _segmentOnStrava.ClimbCategory;
+                _segmentToEdit.Elevation = _segmentOnStrava.Elevation;
             }
         }
         catch (Exception ex)

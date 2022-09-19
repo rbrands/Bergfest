@@ -27,15 +27,11 @@
     <div class="card-body">
         <div class="row">
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Ort</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.City</p>
-            </div>
-            <div class="col border-0">
                 <p class="small mb-0 text-muted">Distanz</p>
                 <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetDistanceAsText()</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Höhenzunahme</p>
+                <p class="small mb-0 text-muted">Hm</p>
                 <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.Elevation.ToString("N0")<text>m</text></p>
             </div>
             <div class="col border-0">
@@ -43,12 +39,22 @@
                 <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.AverageGrade.ToString("N2")%</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Max. Steigung</p>
+                <p class="small mb-0 text-muted">Max.</p>
                 <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.MaximumGrade.ToString("N2")%</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Bergkategorie</p>
+                <p class="small mb-0 text-muted">Kategorie</p>
                 <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetClimbCategoryLabel()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Ort/Strecke</p>
+                <p class="h5 mb-0 mt-0">
+                    @SegmentWithEfforts.StravaSegment.City<text>&nbsp;</text>
+                    @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
+                    {
+                        <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                    }
+                </p>
             </div>
         </div>
         <hr />

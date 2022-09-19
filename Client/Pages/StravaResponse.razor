@@ -9,13 +9,12 @@
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 @if (null != _stravaAccount)
 {
-    <div>
-        <p>Vorname: @_stravaAccount.FirstName</p>
-        <p>Nachname: @_stravaAccount.LastName</p>
-        <p>Id: @_stravaAccount.AthleteId</p>
-        <p>RefreshToken: @_stravaAccount.RefreshToken</p>
-        <p>AccessToken: @_stravaAccount.AccessToken</p>
-    </div>
+    <p>
+        Bergfest ist jetzt mit deinem Strava-Account verbunden und deine Segment-Zeiten werden in die Ranglisten aufgenommen.
+        Falls du nicht mehr dabei sein möchtest, kannst du ganz einfach bei Strava über den Menüpunkt "Einstellungen/Meine Apps" die Berechtigungen
+        für Bergfest zurück nehmen. Dann werden alle Daten gelöscht und keine Daten mehr aufgenzeichnet.
+    </p>
+    <a class="btn btn-primary" role="button" href="/">Zu den Segmenten</a>
 }
 
 @code {
@@ -38,7 +37,7 @@
                 StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code);
                 if (null == stravaAccount)
                 {
-                    throw new Exception("No strava response received.");
+                    throw new Exception("No Strava response received.");
                 }
                 _stravaAccount = stravaAccount;
             } else

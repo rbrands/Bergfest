@@ -42,7 +42,7 @@ namespace Bergfest_Webhook
         }
 
         [FunctionName("StravaEventTrigger")]
-        public async Task Run([QueueTrigger("stravaeventqueue", Connection = "AzureWebJobsStorage")]string myQueueItem)
+        public async Task Run([QueueTrigger("%STRAVA_EVENT_QUEUE%", Connection = "AzureWebJobsStorage")]string myQueueItem)
         {
             try
             {

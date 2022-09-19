@@ -6,7 +6,7 @@ namespace BlazorApp.Api.Utils
 {
     public class Constants
     {
-        public const string VERSION = "2022-09-16";
+        public const string VERSION = "2022-09-19";
         public const int TTL_STRAVA_ACCESS = 3 * 30 * 24 * 3600; // 3 month TTL for Strava Access
 
     }
