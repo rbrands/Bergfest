@@ -71,6 +71,12 @@ namespace BlazorApp.Api
                     MaximumGrade = response.maximum_grade
                 };
                 stravaSegment.LogicalKey = stravaSegment.SegmentId.ToString();
+                // Seems to be a bug/data missing in Strava: If elevation is too low get a calculation
+                double calculatedElevation = response.elevation_high - response.elevation_low;
+                if (stravaSegment.Elevation < calculatedElevation)
+                {
+                    stravaSegment.Elevation = calculatedElevation;
+                }
                 if (response.hazardous)
                 {
                     throw new Exception("Segment is marked as hazardous.");

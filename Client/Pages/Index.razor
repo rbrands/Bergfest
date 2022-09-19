@@ -31,6 +31,7 @@ else
                 <a class="btn btn-primary" href=@($"editsegment") title="Segment anlegen">Segment anlegen</a>
             </Authorized>
         </AuthorizeView>
+        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
     <div class="row">
         @foreach (StravaSegmentWithEfforts segment in _segments)
