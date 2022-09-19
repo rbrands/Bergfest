@@ -114,7 +114,14 @@
             <label for="level">Tags</label>
             <InputText id="tags" aria-describedby="tagsHelp" class="form-control" @bind-Value="_segmentToEdit.Tags" autocomplete="on" placeholder="Tags" />
             <small id="tagsHelp" class="form-text text-muted">
-                Mit Komma getrennte Liste von Hash-Tags wie #sprint, #klassiker usw.
+                Mit Komma getrennte Liste von Tags wie scuderia, dsd usw.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="level">Labels</label>
+            <InputText id="labels" aria-describedby="labelsHelp" class="form-control" @bind-Value="_segmentToEdit.Labels" autocomplete="on" placeholder="Label" />
+            <small id="labelsHelp" class="form-text text-muted">
+                Mit Komma getrennte Liste von Label wie Sprint, Berg usw.
             </small>
         </div>
         <div class="form-group">

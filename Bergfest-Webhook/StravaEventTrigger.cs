@@ -108,6 +108,7 @@ namespace Bergfest_Webhook
                         SegmentName = segmentEffort.segment.name,
                         AthleteId = stravaEvent.AthleteId,
                         AthleteName = stravaAccess.GetFullName(),
+                        AthleteSex = stravaAccess.Sex,
                         ActivityId = stravaEvent.ObjectId,
                         ElapsedTime = segmentEffort.elapsed_time,
                         StartDateLocal = segmentEffort.start_date_local,

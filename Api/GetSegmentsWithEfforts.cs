@@ -48,14 +48,20 @@ namespace BlazorApp.Api
                 List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>();
                 foreach (StravaSegment s in segments)
                 {
+                    // Get all efforts corresponding to the segment and order them date, elapsed time (desc)
                     StravaSegmentWithEfforts segmentWithEfforts = new StravaSegmentWithEfforts(s);
                     List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.SegmentId));
-                    segmentWithEfforts.Efforts = efforts.OrderBy(e => e.ElapsedTime);
+                    segmentWithEfforts.Efforts = efforts.OrderByDescending(e => e.StartDateLocal.DayOfYear).ThenBy(e => e.ElapsedTime);
 
+                    StravaSegmentEffort mostRecentEffort = segmentWithEfforts.Efforts.FirstOrDefault();
+                    if (null != mostRecentEffort)
+                    {
+                        segmentWithEfforts.MostRecentEffort = mostRecentEffort.StartDateLocal;
+                    }
                     segmentsWithEfforts.Add(segmentWithEfforts);
                 }
-
-                return new OkObjectResult(segmentsWithEfforts);
+                // Order segments to get segment with most recent efforts on top 
+                return new OkObjectResult(segmentsWithEfforts.OrderByDescending(s => s.MostRecentEffort));
             }
             catch (Exception ex)
             {

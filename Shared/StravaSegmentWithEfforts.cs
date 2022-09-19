@@ -10,6 +10,8 @@ namespace BlazorApp.Shared
     {
         [JsonPropertyName("stravaSegment")]
         public StravaSegment StravaSegment { get; set; }
+        [JsonPropertyName("mostRecentEffort")]
+        public DateTime MostRecentEffort { get; set; } = DateTime.MinValue;
         [JsonPropertyName("efforts")]
         public IEnumerable<StravaSegmentEffort> Efforts { get; set; }
 

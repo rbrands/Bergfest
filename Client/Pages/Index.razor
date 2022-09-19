@@ -31,7 +31,6 @@ else
                 <a class="btn btn-primary" href=@($"editsegment") title="Segment anlegen">Segment anlegen</a>
             </Authorized>
         </AuthorizeView>
-        <a class="btn btn-primary" title="Hilfe" href="https://docs.meetuproutes.de" target="_blank"><span class="oi oi-question-mark"></span></a>
     </p>
     <div class="row">
         @foreach (StravaSegmentWithEfforts segment in _segments)
