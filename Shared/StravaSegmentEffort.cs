@@ -16,6 +16,8 @@ namespace BlazorApp.Shared
         public string SegmentName { get; set; }
         [JsonPropertyName("athleteId")]
         public ulong AthleteId { get; set; }
+        [JsonPropertyName("athleteSex")]
+        public string AthleteSex { get; set; }
         [JsonPropertyName("athleteName")]
         public string AthleteName { get; set; }
         [JsonPropertyName("activityId")]

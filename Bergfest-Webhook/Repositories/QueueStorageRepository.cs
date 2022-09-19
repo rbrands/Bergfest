@@ -33,6 +33,7 @@ namespace Bergfest_Webhook.Repositories
             _config = config;
             _logger = logger;
             string connectionString = _config["AzureWebJobsStorage"];
+            string _queueName = _config["STRAVA_EVENT_QUEUE"];
             if (String.IsNullOrEmpty(connectionString))
             {
                 throw new Exception("Config value AzureWebJobsStorage not found.");
@@ -42,7 +43,7 @@ namespace Bergfest_Webhook.Repositories
                 MessageEncoding = QueueMessageEncoding.Base64,
                 Retry = { MaxRetries = 2 }
             };
-            _queueClient = new QueueClient(connectionString, Constants.QUEUE_NAME, queueClientOptions);
+            _queueClient = new QueueClient(connectionString, _queueName, queueClientOptions);
             // Create the queue
             _queueClient.CreateIfNotExists();
         }

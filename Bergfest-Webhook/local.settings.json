@@ -1,10 +1,11 @@
 {
     "IsEncrypted": false,
-    "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "COSMOS_DB_CONNECTION_STRING": "connectionstring",
-        "COSMOS_DB_DATABASE": "website",
-        "COSMOS_DB_CONTAINER": "bergfest"
-    }
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "COSMOS_DB_CONNECTION_STRING": "connectionstring",
+    "COSMOS_DB_DATABASE": "website",
+    "COSMOS_DB_CONTAINER": "bergfest",
+    "STRAVA_EVENT_QUEUE": "stravaeventqueue-dev"
+  }
 }

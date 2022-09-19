@@ -1,5 +1,7 @@
-﻿@using BlazorApp.Client.Utils
+﻿@using System.Linq
+@using System.Collections.Generic
 @using BlazorApp.Shared
+@using BlazorApp.Client.Utils
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
@@ -11,7 +13,7 @@
             @SegmentWithEfforts.StravaSegment.SegmentName
             <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank"><span class="oi oi-link-intact"></span></a>
         </em>
-        @foreach (string tag in SegmentWithEfforts.StravaSegment.GetTags())
+        @foreach (string tag in SegmentWithEfforts.StravaSegment.GetLabels())
         {
             <span class="badge bg-info text-dark p-2 m-1">
                 @tag
@@ -27,28 +29,34 @@
     <div class="card-body">
         <div class="row">
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Ort</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.City</p>
-            </div>
-            <div class="col border-0">
                 <p class="small mb-0 text-muted">Distanz</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetDistanceAsText()</p>
+                <p class="h6 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetDistanceAsText()</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Höhenzunahme</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.Elevation.ToString("N0")<text>m</text></p>
+                <p class="small mb-0 text-muted">Hm</p>
+                <p class="h6 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.Elevation.ToString("N0")<text>m</text></p>
             </div>
             <div class="col border-0">
                 <p class="small mb-0 text-muted">Steigung</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.AverageGrade.ToString("N2")%</p>
+                <p class="h6 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.AverageGrade.ToString("N2")%</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Max. Steigung</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.MaximumGrade.ToString("N2")%</p>
+                <p class="small mb-0 text-muted">Max.</p>
+                <p class="h6 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.MaximumGrade.ToString("N2")%</p>
             </div>
             <div class="col border-0">
-                <p class="small mb-0 text-muted">Bergkategorie</p>
-                <p class="h5 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetClimbCategoryLabel()</p>
+                <p class="small mb-0 text-muted">Kategorie</p>
+                <p class="h6 mb-0 mt-0">@SegmentWithEfforts.StravaSegment.GetClimbCategoryLabel()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Ort/Strecke</p>
+                <p class="h6 mb-0 mt-0">
+                    @SegmentWithEfforts.StravaSegment.City<text>&nbsp;</text>
+                    @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
+                    {
+                        <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                    }
+                </p>
             </div>
         </div>
         <hr />
@@ -58,17 +66,43 @@
             </div>
         </p>
         <hr />
-            <ul class="list-group list-group-numbered list-group-flush">
-                @foreach(StravaSegmentEffort e in SegmentWithEfforts.Efforts)
+            <ul class="list-group list-group-flush">
+                @foreach (var d in _daySections)
                 {
-                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">@e.AthleteName</div>
-                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung">@e.StartDateLocal.ToString("dd.MM. HH:mm") Uhr</a>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span>
-                     </li>
-                }
+                    <li class="list-group-item">
+                        <div class="fw-bold">@d.Day.ToString("dd.MM.yyyy")</div>
+                        <ul class="list-group list-group-numbered">
+                            @foreach(StravaSegmentEffort e in d.Efforts)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div>@e.AthleteName</div>
+                                    </div>
+                                    <h6>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                    </h6>
+                                </li>
+                            }
+                        </ul>
+                    @if (d.EffortsWomen.Count() > 1)
+                    {
+                        <div class="fst-italic">Frauen</div>
+                        <ul class="list-group list-group-numbered">
+                            @foreach (StravaSegmentEffort e in d.EffortsWomen)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div>@e.AthleteName</div>
+                                    </div>
+                                    <h6>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                    </h6>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
             </ul>
     </div>
     <div class="card-footer">
@@ -80,6 +114,12 @@
                     </div>
                 </Authorized>
             </AuthorizeView>
+            @foreach (string tag in SegmentWithEfforts.StravaSegment.GetTags())
+            {
+                <span class="badge bg-light text-dark p-2 m-1">
+                    #@tag
+                </span>
+            }
         </div>
     </div>
 </div>
@@ -91,8 +131,24 @@
     public EventCallback OnReload { get; set; }
     [CascadingParameter]
     public IModalService? Modal { get; set; }
+    private List<StravaSegmentEffort> _efforts = new List<StravaSegmentEffort>(50);
+    private IEnumerable<DaySection> _daySections = new List<DaySection>();
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        _efforts = new List<StravaSegmentEffort>(SegmentWithEfforts.Efforts);
+        _daySections = _efforts.GroupBy(
+            e => e.StartDateLocal.Date,
+            e => e,
+            (day, efforts) => new DaySection
+                {
+                    Day = day,
+                    Count = efforts.Count(),
+                    Efforts = efforts,
+                    EffortsWomen = efforts.Where(e => e.AthleteSex == "F")
+                }
+        ).Where(d => d.Count > 0);
+    }
     protected void EditItem(ulong itemId)
     {
         NavigationManager.NavigateTo($"/editsegment/{itemId}");
@@ -122,5 +178,13 @@
     private async Task Reload()
     {
         await OnReload.InvokeAsync();
+    }
+
+    internal class DaySection
+    {
+        public DateTime Day;
+        public int Count;
+        public IEnumerable<StravaSegmentEffort> Efforts = new List<StravaSegmentEffort>();
+        public IEnumerable<StravaSegmentEffort> EffortsWomen = new List<StravaSegmentEffort>();
     }
 }

@@ -47,7 +47,7 @@ namespace BlazorApp.Shared
         // Comma-separated list of tags to filter segments for presentation. E.g. "scuderia,dsd"
         [JsonPropertyName("tags")]
         public string Tags { get; set; }
-        // Comma-separated list of labels to used for display labels when presenting the results. E.g. "Sprint,Cat1" 
+        // Comma-separated list of labels to be used for display when presenting the results. E.g. "Sprint,Cat1" 
         [JsonPropertyName("labels")]
         public string Labels { get; set; }
         [JsonPropertyName("scope")]
@@ -163,6 +163,15 @@ namespace BlazorApp.Shared
                 tagsAsArray = this.Tags.Split(',');
             }
             return tagsAsArray;
+        }
+        public string[] GetLabels()
+        {
+            string[] labelsAsArray = { };
+            if (!String.IsNullOrEmpty(Labels))
+            {
+                labelsAsArray = this.Labels.Split(',');
+            }
+            return labelsAsArray;
         }
     }
 }
