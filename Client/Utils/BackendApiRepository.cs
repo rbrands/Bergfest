@@ -85,6 +85,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegment>();
         }
+        public async Task PostStravaEvent(StravaEvent stravaEvent)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaEvent>($"/api/PostStravaEvent", stravaEvent);
+            response.EnsureSuccessStatusCode();
+            return ;
+        }
         public async Task<StravaSegment?> GetSegment(ulong segmentId)
         {
             this.PrepareHttpClient();

@@ -23,7 +23,7 @@ else
                 <th scope="col">Segment-Name</th>
                 <th scope="col">Sportler:in</th>
                 <th scope="col">Geschlecht</th>
-                <th scope="col">Zeit (s)</th>
+                <th scope="col">Zeit (m)</th>
                 <th scope="col">Link</th>
             </tr>
         </thead>
@@ -38,7 +38,7 @@ else
                     <td>@effort.SegmentName</td>
                     <td>@effort.AthleteName</td>
                     <td>@effort.AthleteSex</td>
-                    <td>@effort.ElapsedTime</td>
+                    <td>@TimeSpan.FromSeconds(effort.ElapsedTime).ToString(@"hh\:mm\:ss")</td>
                     <td><a href="@effort.GetActivitySegmentLink()" target="_blank" alt="Strava-Link">@effort.GetActivitySegmentLink()</a></td>
                 </tr>
             }

@@ -25,6 +25,10 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/PostStravaEvent",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/GetSegment/*",
       "allowedRoles": [ "anonymous" ]
     },

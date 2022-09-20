@@ -1,0 +1,85 @@
+@page "/postactivity"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Strava-Aktivität eintragen</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+@if (null != _members)
+{
+    <EditForm Model="@_stravaEvent" OnValidSubmit="OnPost">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <InputSelect @bind-Value="_athleteIdInput">
+                <option value="0">Teilnehmer ...</option>
+                    @foreach (StravaAccess m in _members)
+                    {
+                        <option value="@m.AthleteId">@m.GetFullName()</option>
+                    }        
+            </InputSelect>
+        </div>
+        <div class="form-group">
+             <label for="activityId">Activity-Id</label>
+             <InputText id="activityId" aria-describedby="activityIdHelp" class="form-control" @bind-Value="_activityIdInput" autocomplete="on" placeholder="Activity-Id"></InputText>
+             <small id="activityIdHelp" class="form-text text-muted">
+                Id der Aktivität, die ausgewertet werden soll.
+            </small>
+        </div>
+        <ValidationSummary />
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
+        <button type="submit" id="BtnSave" class="btn btn-primary">Abschicken</button>
+ 
+    </EditForm>
+}
+
+@code {
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+
+    private IEnumerable<StravaAccess>? _members;
+    private int _athleteIdInput = 0;
+    private string _activityIdInput = String.Empty;
+    private StravaEvent _stravaEvent = new StravaEvent();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _members = await Api.GetUsers();
+
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    private async Task OnPost()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            _stravaEvent.EventType = StravaEvent.ObjectType.Activity;
+            _stravaEvent.Aspect = StravaEvent.AspectType.Update;
+            _stravaEvent.AthleteId = (ulong)_athleteIdInput;
+            _stravaEvent.ObjectId = Convert.ToUInt64(_activityIdInput);
+            await Api.PostStravaEvent(_stravaEvent);
+            _notificationMessage?.ShowInfo("Aktivität geschickt.");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+}

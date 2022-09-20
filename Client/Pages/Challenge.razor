@@ -1,0 +1,18 @@
+@page "/{Scope}"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    Bergfest - Challenge
+</PageTitle>
+<p>
+    @Scope
+</p>
+@code {
+    [Parameter]
+    public string Scope { get; set; } = String.Empty;
+
+}
