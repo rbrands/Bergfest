@@ -31,8 +31,11 @@
     {
       "route": "/api/GetSegmentsWithEfforts",
       "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetUsers",
+      "allowedRoles": [ "admin" ]
     }
-
   ],
   "navigationFallback": {
         "rewrite": "index.html",
