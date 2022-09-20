@@ -114,6 +114,11 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
+        public async Task<IEnumerable<StravaAccess>?> GetUsers()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<StravaAccess>?>($"/api/GetUsers");
+        }
         public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts()
         {
             this.PrepareHttpClient();
