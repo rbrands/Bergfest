@@ -16,7 +16,6 @@ namespace BlazorApp.Client.Utils
 
         private void PrepareHttpClient()
         {
-            // _http.DefaultRequestHeaders.Remove("x-meetup-tenant");
         }
         public BackendApiRepository(HttpClient http)
         {
