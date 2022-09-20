@@ -35,6 +35,10 @@
     {
       "route": "/api/GetUsers",
       "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetSegmentsEfforts",
+      "allowedRoles": [ "admin" ]
     }
   ],
   "navigationFallback": {
