@@ -19,6 +19,12 @@
                 @tag
             </span>
         }
+        @if (!SegmentWithEfforts.StravaSegment.IsEnabled)
+        {
+            <span class="badge bg-warning text-dark p-2 m-1">
+                inaktiv
+            </span>
+        }
     </div>
     @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.ImageLink))
     {
@@ -75,7 +81,7 @@
                                         <div>@e.AthleteName</div>
                                     </div>
                                     <h6>
-                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
                                     </h6>
                                 </li>
                             }
@@ -132,6 +138,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Task.Run(() => ReadData());
+    }
+    protected void ReadData()
+    {
         _efforts = new List<StravaSegmentEffort>(SegmentWithEfforts.Efforts);
         _daySections = _efforts.GroupBy(
             e => e.StartDateLocal.Date,
@@ -170,6 +180,7 @@
     private async Task OnSaveComment()
     {
         await OnReload.InvokeAsync();
+        ReadData();
     }
     private async Task Reload()
     {
