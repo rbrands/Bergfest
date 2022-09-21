@@ -73,6 +73,10 @@
             _stravaEvent.Aspect = StravaEvent.AspectType.Update;
             _stravaEvent.AthleteId = (ulong)_athleteIdInput;
             _stravaEvent.ObjectId = Convert.ToUInt64(_activityIdInput);
+            if (_stravaEvent.ObjectId == 0)
+            {
+                throw new Exception("Id einer Aktivität eingeben!");
+            }
             await Api.PostStravaEvent(_stravaEvent);
             _notificationMessage?.ShowInfo("Aktivität geschickt.");
         }

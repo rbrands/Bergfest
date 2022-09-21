@@ -32,11 +32,15 @@ namespace BlazorApp.Api.Repositories
         {
             _config = config;
             _logger = logger;
-            string connectionString = _config["AzureWebJobsStorage"];
+            string connectionString = _config["STRAVA_EVENT_QUEUE_ACCOUNT"];
             string _queueName = _config["STRAVA_EVENT_QUEUE"];
             if (String.IsNullOrEmpty(connectionString))
             {
-                throw new Exception("Config value AzureWebJobsStorage not found.");
+                throw new Exception("Config value STRAVA_EVENT_QUEUE_ACCOUNT not found.");
+            }
+            if (String.IsNullOrEmpty(_queueName))
+            {
+                throw new Exception("Config value STRAVA_EVENT_QUEUE not found.");
             }
             QueueClientOptions queueClientOptions = new QueueClientOptions()
             {
