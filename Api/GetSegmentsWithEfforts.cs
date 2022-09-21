@@ -61,7 +61,7 @@ namespace BlazorApp.Api
                     segmentsWithEfforts.Add(segmentWithEfforts);
                 }
                 // Order segments to get segment with most recent efforts on top 
-                return new OkObjectResult(segmentsWithEfforts.OrderByDescending(s => s.MostRecentEffort));
+                return new OkObjectResult(segmentsWithEfforts.OrderByDescending(s => s.MostRecentEffort).ThenBy(s => s.StravaSegment.Distance));
             }
             catch (Exception ex)
             {
