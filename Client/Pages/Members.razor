@@ -71,7 +71,7 @@ else
             {
                 return;
             }
-            // await Api.DeleteUser(user);
+            await Api.DeleteUser(user);
             _members = await Api.GetUsers();
         }
     }

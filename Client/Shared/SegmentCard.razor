@@ -113,6 +113,7 @@
                 <Authorized>
                     <div class="btn-group mr-2" role="group" aria-label="Ändern">
                         <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(SegmentWithEfforts.StravaSegment.SegmentId))"><span class="oi oi-pencil"></span></button>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())"><span class="oi oi-trash"></span></button>
                     </div>
                 </Authorized>
             </AuthorizeView>
@@ -173,6 +174,7 @@
             {
                 return;
             }
+            await Api.DeleteSegment(SegmentWithEfforts.StravaSegment);
             NavigationManager.NavigateTo($"/", true);
         }
     }

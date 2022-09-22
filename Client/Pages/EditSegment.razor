@@ -19,7 +19,7 @@
     {
         <div class="form-row">
             <div class="form-group col-md-10">
-                <InputNumber id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
+                <InputText id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
                 <small id="segmentIdHelp" class="form-text text-muted">
                     Die Id des Segments aus der URL der Form https://www.strava.com/segments/id
                 </small>
@@ -182,7 +182,7 @@
     private NotificationMessage? _saveMessage;
     private StravaSegment _segmentToEdit = new StravaSegment();
     private StravaSegment? _segmentOnStrava = new StravaSegment();
-    private int _segmentId = 0;
+    private string _segmentId = String.Empty;
     private BlazoredTextEditor? _htmlDescription;
 
 
@@ -197,7 +197,7 @@
                 {
                     _segmentToEdit = _segmentFromDb;
                     _segmentOnStrava = _segmentToEdit;
-                    _segmentId = (int)_segmentToEdit.SegmentId;
+                    _segmentId = _segmentToEdit.SegmentId.ToString();
                 }
             }
         }
@@ -212,7 +212,7 @@
     {
         try
         {
-            _segmentOnStrava = await Api.GetSegmentFromStrava((ulong)_segmentId);
+            _segmentOnStrava = await Api.GetSegmentFromStrava(Convert.ToUInt64(_segmentId));
             if (null != _segmentOnStrava)
             {
                 _segmentToEdit.SegmentId = _segmentOnStrava.SegmentId;

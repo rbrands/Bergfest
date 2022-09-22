@@ -25,6 +25,18 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/DeleteSegment",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/DeleteSegmentEffort",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/DeleteUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
       "route": "/api/PostStravaEvent",
       "allowedRoles": [ "anonymous" ]
     },

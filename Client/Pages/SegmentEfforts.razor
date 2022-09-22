@@ -75,7 +75,7 @@ else
             {
                 return;
             }
-            // await Api.DeleteUser(user);
+            await Api.DeleteSegmentEffort(effort);
             _efforts = await Api.GetSegmentsEfforts();
         }
     }
