@@ -1,5 +1,4 @@
-@page "/postactivity"
-@attribute [Authorize(Roles = "admin,segmentadmin")]
+﻿@page "/myactivity"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @using Blazored.TextEditor
@@ -20,26 +19,21 @@
             Die Aktivität muss zu der oben ausgewählten Sportler:in passen.
         </p>
     </EditArticle>
+    <p>
+        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)myactivity&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
+    </p>
+
 </div>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-@if (null != _members)
+@if (null != _stravaAccount)
 {
     <EditForm Model="@_stravaEvent" OnValidSubmit="OnPost">
         <DataAnnotationsValidator />
         <div class="form-group">
-            <InputSelect @bind-Value="_athleteIdInput">
-                <option value="0">Teilnehmer ...</option>
-                    @foreach (StravaAccess m in _members)
-                    {
-                        <option value="@m.AthleteId">@m.GetFullName()</option>
-                    }        
-            </InputSelect>
-        </div>
-        <div class="form-group">
-             <label for="activityId">Activity-Id</label>
-             <InputText id="activityId" aria-describedby="activityIdHelp" class="form-control" @bind-Value="_activityIdInput" autocomplete="on" placeholder="Activity-Id"></InputText>
-             <small id="activityIdHelp" class="form-text text-muted">
+            <label for="activityId">Activity-Id</label>
+            <InputText id="activityId" aria-describedby="activityIdHelp" class="form-control" @bind-Value="_activityIdInput" autocomplete="on" placeholder="Activity-Id"></InputText>
+            <small id="activityIdHelp" class="form-text text-muted">
                 Id der Aktivität, die ausgewertet werden soll.
             </small>
         </div>
@@ -47,24 +41,43 @@
         <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
 
         <button type="submit" id="BtnSave" class="btn btn-primary">Abschicken</button>
- 
+
     </EditForm>
 }
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string Error { get; set; } = String.Empty;
+
     private NotificationMessage? _notificationMessage;
     private NotificationMessage? _saveMessage;
-
-    private IEnumerable<StravaAccess>? _members;
-    private int _athleteIdInput = 0;
+    private StravaAccess? _stravaAccount = null;
+    private long _athleteIdInput = 0;
     private string _activityIdInput = String.Empty;
     private StravaEvent _stravaEvent = new StravaEvent();
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _members = await Api.GetUsers();
-
+            if (!String.IsNullOrEmpty(Code))
+            {
+                StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code);
+                if (null == stravaAccount)
+                {
+                    throw new Exception("No Strava response received.");
+                }
+                _stravaAccount = stravaAccount;
+                _athleteIdInput = _stravaAccount.AthleteId;
+            }
+            else if (!String.IsNullOrEmpty(Error))
+            {
+                await Api.GetFunctionsVersion();
+                throw new Exception(Error);
+            }
         }
         catch (Exception ex)
         {
