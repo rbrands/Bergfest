@@ -49,12 +49,20 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetSegmentsEffortsForUser/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetUsers",
       "allowedRoles": [ "admin" ]
     },
     {
       "route": "/api/GetSegmentsEfforts",
       "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetSegmentsEffortsForUser/*",
+      "allowedRoles": [ "anonymous" ]
     }
   ],
   "navigationFallback": {
