@@ -36,7 +36,9 @@ else
                     </td>
                     <td>@effort.StartDateLocal</td>
                     <td>@effort.SegmentName</td>
-                    <td>@effort.AthleteName</td>
+                    <td>
+                        <a href="@effort.GetAhtleteLink()" target="_blank" alt="Sportlerlink">@effort.AthleteName</a>
+                    </td>
                     <td>@effort.AthleteSex</td>
                     <td>@TimeSpan.FromSeconds(effort.ElapsedTime).ToString(@"hh\:mm\:ss")</td>
                     <td><a href="@effort.GetActivitySegmentLink()" target="_blank" alt="Strava-Link">@(effort.ActivityName ?? effort.GetActivitySegmentLink())</a></td>
