@@ -1,0 +1,66 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+@if (AppStateStore.IsConnectedWithStrava)
+{
+    <p>
+        Mit Strava verbunden als <a href="@AppStateStore.AthleteLink" target="_blank" alt="Strava">@AppStateStore.AhtleteName</a>
+    </p>
+}
+else
+{
+    <p>
+        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.Uri)&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
+    </p>
+}
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    public string Error { get; set; } = String.Empty;
+    [Parameter]
+    public EventCallback OnConnectedCallback { get; set; }
+
+
+    private NotificationMessage? _notificationMessage;
+    private StravaAccess? _stravaAccount = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!String.IsNullOrEmpty(Code))
+            {
+                StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code);
+                if (null == stravaAccount)
+                {
+                    throw new Exception("No Strava response received.");
+                }
+                _stravaAccount = stravaAccount;
+                AppStateStore.AhtleteName = _stravaAccount.GetFullName();
+                AppStateStore.AthleteLink = _stravaAccount.GetAhtleteLink();
+                AppStateStore.AthleteId = _stravaAccount.AthleteId;
+                await OnConnectedCallback.InvokeAsync();
+            }
+            else if (!String.IsNullOrEmpty(Error))
+            {
+                await Api.GetFunctionsVersion();
+                throw new Exception(Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+}

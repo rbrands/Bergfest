@@ -3,6 +3,7 @@
 @using BlazorApp.Shared
 @using Blazored.TextEditor
 @using System.Text
+@implements IDisposable
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
@@ -19,48 +20,39 @@
             Für die Anzeige der Einträge musst du dich über "Connect with Strava" bei Strava anmelden.
         </p>
     </EditArticle>
-    <p>
-        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)myefforts&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
-    </p>
-
+    <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="ReadEfforts"></StravaConnect>
 </div>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-@if (null != _stravaAccount)
+@if (null != _efforts)
 {
-    <p>
-        <a href="@_stravaAccount.GetAhtleteLink()" target="_blank" title="@_stravaAccount.GetFullName()" alt="Name auf Strava">@_stravaAccount.GetFullName()</a>
-    </p>
-    @if (null != _efforts)
-    {
-        <table class="table table-sm table-striped table-bordered">
-            <thead class="thead-dark">
+    <table class="table table-sm table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Aktion</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Segment-Name</th>
+                <th scope="col">Zeit (m)</th>
+                <th scope="col">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (StravaSegmentEffort effort in _efforts)
+            {
                 <tr>
-                    <th scope="col">Aktion</th>
-                    <th scope="col">Datum</th>
-                    <th scope="col">Segment-Name</th>
-                    <th scope="col">Zeit (m)</th>
-                    <th scope="col">Link</th>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(effort))"><span class="oi oi-trash"></span></button>
+                    </td>
+                    <td>@effort.StartDateLocal</td>
+                    <td>@effort.SegmentName</td>
+                    <td>@TimeSpan.FromSeconds(effort.ElapsedTime).ToString(@"hh\:mm\:ss")</td>
+                    <td><a href="@effort.GetActivitySegmentLink()" target="_blank" alt="Strava-Link">@(
+                effort.ActivityName ?? effort.GetActivitySegmentLink()
+                )</a></td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (StravaSegmentEffort effort in _efforts)
-                {
-                    <tr>
-                        <td>
-                            <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(effort))"><span class="oi oi-trash"></span></button>
-                        </td>
-                        <td>@effort.StartDateLocal</td>
-                        <td>@effort.SegmentName</td>
-                        <td>@TimeSpan.FromSeconds(effort.ElapsedTime).ToString(@"hh\:mm\:ss")</td>
-                        <td><a href="@effort.GetActivitySegmentLink()" target="_blank" alt="Strava-Link">@(
-                    effort.ActivityName ?? effort.GetActivitySegmentLink()
-                    )</a></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+            }
+        </tbody>
+    </table>
 }
 
 @code {
@@ -74,35 +66,9 @@
     public string Error { get; set; } = String.Empty;
 
     private NotificationMessage? _notificationMessage;
-    private StravaAccess? _stravaAccount = null;
     private IEnumerable<StravaSegmentEffort>? _efforts = null;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            if (!String.IsNullOrEmpty(Code))
-            {
-                StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code);
-                if (null == stravaAccount)
-                {
-                    throw new Exception("No Strava response received.");
-                }
-                _stravaAccount = stravaAccount;
-                _efforts = await Api.GetSegmentsEffortsForUser((ulong)_stravaAccount.AthleteId);
-            }
-            else if (!String.IsNullOrEmpty(Error))
-            {
-                await Api.GetFunctionsVersion();
-                throw new Exception(Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
-            return;
-        }
-    }
+
     protected async Task DeleteItem(StravaSegmentEffort effort)
     {
         if (null != Modal)
@@ -113,10 +79,21 @@
                 return;
             }
             await Api.DeleteSegmentEffort(effort);
-            if (null != _stravaAccount)
+            if (AppStateStore.IsConnectedWithStrava)
             {
-                _efforts = await Api.GetSegmentsEffortsForUser((ulong)_stravaAccount.AthleteId);
+                _efforts = await Api.GetSegmentsEffortsForUser((ulong)AppStateStore.AthleteId);
             }
         }
+    }
+    protected async void ReadEfforts()
+    {
+        if (AppStateStore.IsConnectedWithStrava)
+        {
+            _efforts = await Api.GetSegmentsEffortsForUser((ulong)AppStateStore.AthleteId);
+            StateHasChanged();
+        }
+    }
+    public void Dispose()
+    {
     }
 }
