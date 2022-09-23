@@ -8,17 +8,40 @@
 <PageTitle>Bergfest - Strava Login</PageTitle>
 
 <div class="m-2 p-4 bg-light border">
-    <EditArticle ArticleKey="Authorize">
-        <h2>Mit Strava verbinden</h2>
-        <p>
-            Damit "Bergfest" deine Segmentleistungen auswerten kann, musst du "Bergfest" als Anwendung mit deinem Strava-Account verbinden.
-        </p>
-    </EditArticle>
-    <p>
-        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)stravaresponse&approval_prompt=force&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
-    </p>
+    @if (!AppStateStore.IsConnectedWithStrava)
+    {
+        <EditArticle ArticleKey="Authorize">
+            <h2>Mit Strava verbinden</h2>
+            <p>
+                Damit "Bergfest" deine Segmentleistungen auswerten kann, musst du "Bergfest" als Anwendung mit deinem Strava-Account verbinden.
+            </p>
+        </EditArticle>
+    }
+    else
+    {
+        <EditArticle ArticleKey="AuthorizeResponse">
+            <h2>Mit Strava verbunden</h2>
+            <p>
+                Bergfest ist jetzt mit deinem Strava-Account verbunden und deine Segment-Zeiten werden ab jetzt in die Ranglisten aufgenommen.
+                Falls du nicht mehr dabei sein möchtest, kannst du ganz einfach bei Strava über den Menüpunkt "Einstellungen/Meine Apps" die Berechtigungen
+                für Bergfest zurück nehmen. Dann werden alle Daten gelöscht und keine Daten mehr aufgenzeichnet.
+            </p>
+        </EditArticle>
+        <a class="btn btn-primary" role="button" href="/">Zu den Segmenten</a>
+    }
+    <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="StateHasChanged"></StravaConnect>
+
 </div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string Error { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+
 }

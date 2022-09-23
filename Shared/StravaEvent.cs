@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BlazorApp.Shared
 {
@@ -18,10 +20,13 @@ namespace BlazorApp.Shared
                 Delete,
                 Deauthorize
         }
-
+        [JsonPropertyName("EventType")]
         public ObjectType EventType { get; set; }
+        [JsonPropertyName("Aspect")]
         public AspectType Aspect { get; set; }
+        [JsonPropertyName("ObjectId")]
         public ulong ObjectId { get; set; }
+        [JsonPropertyName("AthleteId")]
         public ulong AthleteId { get; set; }
 
     }

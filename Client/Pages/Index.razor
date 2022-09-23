@@ -26,12 +26,15 @@
 else
 {
     <p>
+        <a class="btn-link" title="Strava Connect" href="/authorize"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" alt="Strava Connect Button" /></a>
+        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
+        <a class="btn btn-primary" title="Meine Segment-Leistungen" alt="Segment-Leistungen" href="/myefforts"><span class="oi oi-bar-chart"></span></a>
+        <a class="btn btn-primary" title="Aktivität nachreichen" alt="Aktivität nachreichen" href="/myactivity"><span class="oi oi-envelope-open"></span></a>
         <AuthorizeView Roles="admin,segmentadmin">
             <Authorized>
                 <a class="btn btn-primary" href=@($"editsegment") title="Segment anlegen">Segment anlegen</a>
             </Authorized>
         </AuthorizeView>
-        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
     </p>
     <div class="row">
         @foreach (StravaSegmentWithEfforts segment in _segments)
@@ -42,17 +45,37 @@ else
         }
     </div>
 }
+<AuthorizeView Roles="admin,segmentadmin">
+    <Authorized>
+        @if (null != _hiddenSegments && _hiddenSegments.Any())
+        {
+            <hr />
+            <h4>Segmentbibliothek</h4>
+            <p>Die folgenden Segmente werden momentan nicht angezeigt.</p>
+            <div class="row">
+                @foreach (StravaSegmentWithEfforts segment in _hiddenSegments)
+                {
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                        <SegmentCard SegmentWithEfforts="@segment" OnReload="Reload"></SegmentCard>
+                    </div>
+                }
+            </div>
+        }
+    </Authorized>
+</AuthorizeView>
+
 
 
 @code {
     private NotificationMessage? _notificationMessage;
     IEnumerable<StravaSegmentWithEfforts>? _segments = null;
+    IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _segments = await Api.GetSegmentsWithEfforts();
+            await Reload();
         }
         catch (Exception ex)
         {
@@ -66,7 +89,9 @@ else
         try
         {
             _notificationMessage?.Hide();
-            _segments = await Api.GetSegmentsWithEfforts();
+            List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts());
+            _segments = segmentsWithEfforts.Where(s => s.StravaSegment.DisplayEnabled);
+            _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);    
         }
         catch (Exception ex)
         {

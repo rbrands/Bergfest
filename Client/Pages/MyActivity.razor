@@ -1,0 +1,84 @@
+﻿@page "/myactivity"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    Bergfest - Aktivität nachreichen
+</PageTitle>
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="PostActivity">
+        <h2>Aktivität nachreichen</h2>
+        <p>
+            Aktivität manuell für ein angemeldetes Mitglied "nachreichen". Dazu aus der Auswahlbox die Sportler:in auswählen und im Feld
+            darunter eine Aktivitäts-Id eintragen. Die Id sieht man in Strava (Web-Version) in der URL zu einer Aktivität.
+            Die Aktivität muss zu der oben ausgewählten Sportler:in passen.
+        </p>
+    </EditArticle>
+    <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="StateHasChanged"></StravaConnect>
+
+</div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+@if (AppStateStore.IsConnectedWithStrava)
+{
+    <EditForm Model="@_stravaEvent" OnValidSubmit="OnPost">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="activityId">Activity-Id</label>
+            <InputText id="activityId" aria-describedby="activityIdHelp" class="form-control" @bind-Value="_activityIdInput" autocomplete="on" placeholder="Activity-Id"></InputText>
+            <small id="activityIdHelp" class="form-text text-muted">
+                Id der Aktivität, die ausgewertet werden soll.
+            </small>
+        </div>
+        <ValidationSummary />
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
+        <button type="submit" id="BtnSave" class="btn btn-primary">Abschicken</button>
+
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string Error { get; set; } = String.Empty;
+
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+    private string _activityIdInput = String.Empty;
+    private StravaEvent _stravaEvent = new StravaEvent();
+
+    private async Task OnPost()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            _stravaEvent.EventType = StravaEvent.ObjectType.Activity;
+            _stravaEvent.Aspect = StravaEvent.AspectType.Update;
+            _stravaEvent.AthleteId = (ulong)AppStateStore.AthleteId;
+            _stravaEvent.ObjectId = Convert.ToUInt64(_activityIdInput);
+            if (_stravaEvent.ObjectId == 0)
+            {
+                throw new Exception("Id einer Aktivität eingeben!");
+            }
+            await Api.PostStravaEvent(_stravaEvent);
+            _notificationMessage?.ShowInfo("Aktivität geschickt.");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+}

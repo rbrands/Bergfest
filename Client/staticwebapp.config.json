@@ -25,6 +25,22 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/DeleteSegment",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/DeleteSegmentEffort",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/DeleteUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/PostStravaEvent",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetSegment/*",
       "allowedRoles": [ "anonymous" ]
     },
@@ -33,7 +49,15 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetSegmentsEffortsForUser/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetUsers",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetSegmentsEfforts",
       "allowedRoles": [ "admin" ]
     }
   ],

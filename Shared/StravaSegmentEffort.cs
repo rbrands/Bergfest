@@ -22,6 +22,8 @@ namespace BlazorApp.Shared
         public string AthleteName { get; set; }
         [JsonPropertyName("activityId")]
         public ulong ActivityId { get; set; }
+        [JsonPropertyName("activityName")]
+        public string ActivityName { get; set; }
         [JsonPropertyName("elapsedTime")]
         public long ElapsedTime { get; set; }
         [JsonPropertyName("startDateLocal")]

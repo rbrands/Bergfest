@@ -6,7 +6,7 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<h3>Mitgliederverwaltung</h3>
+<h3>Teilnehmer</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 
 @if (null == _members)
@@ -71,7 +71,7 @@ else
             {
                 return;
             }
-            // await Api.DeleteUser(user);
+            await Api.DeleteUser(user);
             _members = await Api.GetUsers();
         }
     }

@@ -1,0 +1,102 @@
+﻿@page "/myefforts"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@implements IDisposable
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    Bergfest - Aktivität nachreichen
+</PageTitle>
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="MyEfforts">
+        <h2>Deine Segment-Zeiten</h2>
+        <p>
+            Hier siehst du alle Zeiten, die momentan von Bergfest zur Auswertung gespeichert wurden. Du kannst Einträge einzeln löschen, 
+            wenn du nicht möchtest, dass sie in den Ranglisten auftauchen.
+            Für die Anzeige der Einträge musst du dich über "Connect with Strava" bei Strava anmelden.
+        </p>
+    </EditArticle>
+    <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="ReadEfforts"></StravaConnect>
+</div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+@if (null != _efforts)
+{
+    <table class="table table-sm table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Aktion</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Segment-Name</th>
+                <th scope="col">Zeit (m)</th>
+                <th scope="col">Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (StravaSegmentEffort effort in _efforts)
+            {
+                <tr>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(effort))"><span class="oi oi-trash"></span></button>
+                    </td>
+                    <td>@effort.StartDateLocal</td>
+                    <td>@effort.SegmentName</td>
+                    <td>@TimeSpan.FromSeconds(effort.ElapsedTime).ToString(@"hh\:mm\:ss")</td>
+                    <td><a href="@effort.GetActivitySegmentLink()" target="_blank" alt="Strava-Link">@(
+                effort.ActivityName ?? effort.GetActivitySegmentLink()
+                )</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string Error { get; set; } = String.Empty;
+
+    private NotificationMessage? _notificationMessage;
+    private IEnumerable<StravaSegmentEffort>? _efforts = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() => ReadEfforts());
+    }
+    protected async Task DeleteItem(StravaSegmentEffort effort)
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Segment-Leistung löschen?", "Soll die Segmentleistung wirklich gelöscht werden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            await Api.DeleteSegmentEffort(effort);
+            if (AppStateStore.IsConnectedWithStrava)
+            {
+                _efforts = await Api.GetSegmentsEffortsForUser((ulong)AppStateStore.AthleteId);
+            }
+        }
+    }
+    protected async void ReadEfforts()
+    {
+        if (AppStateStore.IsConnectedWithStrava)
+        {
+            _efforts = await Api.GetSegmentsEffortsForUser((ulong)AppStateStore.AthleteId);
+            StateHasChanged();
+        }
+    }
+    public void Dispose()
+    {
+    }
+}

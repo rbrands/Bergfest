@@ -25,8 +25,18 @@
                 <span class="oi oi-link-intact" aria-hidden="true"></span> Strava Connect
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="MyActivity">
+                <span class="oi oi-envelope-open" aria-hidden="true"></span> Nachreichen
+            </NavLink>
+        </div>
         <AuthorizeView Roles="admin,segmentadmin">
             <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="PostActivity">
+                        <span class="oi oi-envelope-closed" aria-hidden="true"></span> Aktivität
+                    </NavLink>
+                </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="EditSegment">
                         <span class="oi oi-document" aria-hidden="true"></span> Neues Segment
@@ -41,8 +51,18 @@
                         <span class="oi oi-people" aria-hidden="true"></span> Teilnehmer
                     </NavLink>
                 </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="SegmentEfforts">
+                        <span class="oi oi-bar-chart" aria-hidden="true"></span> Leistungen
+                    </NavLink>
+                </div>
             </Authorized>
         </AuthorizeView>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="MyEfforts">
+                <span class="oi oi-bar-chart" aria-hidden="true"></span> Meine Segmente
+            </NavLink>
+        </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="About">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Über ...

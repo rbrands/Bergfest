@@ -16,7 +16,6 @@ namespace BlazorApp.Client.Utils
 
         private void PrepareHttpClient()
         {
-            // _http.DefaultRequestHeaders.Remove("x-meetup-tenant");
         }
         public BackendApiRepository(HttpClient http)
         {
@@ -85,6 +84,31 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegment>();
         }
+        public async Task DeleteSegment(StravaSegment segment)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegment>($"/api/DeleteSegment", segment);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task DeleteSegmentEffort(StravaSegmentEffort segmentEffort)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentEffort>($"/api/DeleteSegmentEffort", segmentEffort);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task DeleteUser(StravaAccess user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/DeleteUser", user);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task PostStravaEvent(StravaEvent stravaEvent)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaEvent>($"/api/PostStravaEvent", stravaEvent);
+            response.EnsureSuccessStatusCode();
+            return ;
+        }
         public async Task<StravaSegment?> GetSegment(ulong segmentId)
         {
             this.PrepareHttpClient();
@@ -119,6 +143,11 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<StravaAccess>?>($"/api/GetUsers");
         }
+        public async Task<IEnumerable<StravaSegmentEffort>?> GetSegmentsEfforts()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<StravaSegmentEffort>?>($"/api/GetSegmentsEfforts");
+        }
         public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts()
         {
             this.PrepareHttpClient();
@@ -127,6 +156,41 @@ namespace BlazorApp.Client.Utils
             {
                 IEnumerable<StravaSegmentWithEfforts> returnList = new List<StravaSegmentWithEfforts>();
                 IEnumerable<StravaSegmentWithEfforts>? segmentsWithEfforts = await response.Content.ReadFromJsonAsync<IEnumerable<StravaSegmentWithEfforts>>();
+                if (null != segmentsWithEfforts)
+                {
+                    returnList = segmentsWithEfforts;
+                }
+                return returnList;
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<IEnumerable<StravaSegmentEffort>> GetSegmentsEffortsForUser(ulong athleteId)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetSegmentsEffortsForUser/{athleteId}");
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<StravaSegmentEffort> returnList = new List<StravaSegmentEffort>();
+                IEnumerable<StravaSegmentEffort>? segmentsWithEfforts = await response.Content.ReadFromJsonAsync<IEnumerable<StravaSegmentEffort>>();
                 if (null != segmentsWithEfforts)
                 {
                     returnList = segmentsWithEfforts;
