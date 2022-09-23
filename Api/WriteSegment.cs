@@ -47,6 +47,11 @@ namespace BlazorApp.Api
                 {
                     segment.Scope = segment.GetUrlFriendlyTitle();
                 }
+                if (String.IsNullOrEmpty(segment.Tags))
+                {
+                    // Tags should only by in lowercase
+                    segment.Tags = segment.Tags.ToLowerInvariant();
+                }
                 segment.LogicalKey = segment.SegmentId.ToString();
                 StravaSegment updatedSegment = await _cosmosRepository.UpsertItem(segment);
 

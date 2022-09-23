@@ -148,10 +148,10 @@ namespace BlazorApp.Client.Utils
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<StravaSegmentEffort>?>($"/api/GetSegmentsEfforts");
         }
-        public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts()
+        public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts(string? tag)
         {
             this.PrepareHttpClient();
-            var response = await _http.GetAsync($"/api/GetSegmentsWithEfforts");
+            var response = await _http.GetAsync($"/api/GetSegmentsWithEfforts/{tag??"*"}");
             if (response.IsSuccessStatusCode)
             {
                 IEnumerable<StravaSegmentWithEfforts> returnList = new List<StravaSegmentWithEfforts>();

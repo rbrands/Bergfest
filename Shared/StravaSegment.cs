@@ -158,9 +158,10 @@ namespace BlazorApp.Shared
         public string[] GetTags()
         {
             string[] tagsAsArray = { };
+            char[] charSeparators = new char[] { ',', ';' };
             if (!String.IsNullOrEmpty(Tags))
             {
-                tagsAsArray = this.Tags.Split(',');
+                tagsAsArray = this.Tags.Split(charSeparators, StringSplitOptions.RemoveEmptyEntries );
             }
             return tagsAsArray;
         }

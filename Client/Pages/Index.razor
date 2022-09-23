@@ -1,4 +1,5 @@
 ﻿@page "/"
+@page "/tagged/{Tag}"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -67,6 +68,8 @@ else
 
 
 @code {
+    [Parameter]
+    public string? Tag { get; set; }
     private NotificationMessage? _notificationMessage;
     IEnumerable<StravaSegmentWithEfforts>? _segments = null;
     IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;
@@ -89,7 +92,7 @@ else
         try
         {
             _notificationMessage?.Hide();
-            List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts());
+            List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts(Tag));
             _segments = segmentsWithEfforts.Where(s => s.StravaSegment.DisplayEnabled);
             _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);    
         }
