@@ -19,14 +19,12 @@
             Die Aktivität muss zu der oben ausgewählten Sportler:in passen.
         </p>
     </EditArticle>
-    <p>
-        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.BaseUri)myactivity&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
-    </p>
+    <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="StateHasChanged"></StravaConnect>
 
 </div>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
-@if (null != _stravaAccount)
+@if (AppStateStore.IsConnectedWithStrava)
 {
     <EditForm Model="@_stravaEvent" OnValidSubmit="OnPost">
         <DataAnnotationsValidator />
@@ -55,36 +53,8 @@
 
     private NotificationMessage? _notificationMessage;
     private NotificationMessage? _saveMessage;
-    private StravaAccess? _stravaAccount = null;
-    private long _athleteIdInput = 0;
     private string _activityIdInput = String.Empty;
     private StravaEvent _stravaEvent = new StravaEvent();
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            if (!String.IsNullOrEmpty(Code))
-            {
-                StravaAccess? stravaAccount = await Api.AuthorizeBergfestOnStrava(Code);
-                if (null == stravaAccount)
-                {
-                    throw new Exception("No Strava response received.");
-                }
-                _stravaAccount = stravaAccount;
-                _athleteIdInput = _stravaAccount.AthleteId;
-            }
-            else if (!String.IsNullOrEmpty(Error))
-            {
-                await Api.GetFunctionsVersion();
-                throw new Exception(Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
-            return;
-        }
-    }
 
     private async Task OnPost()
     {
@@ -96,7 +66,7 @@
             StateHasChanged();
             _stravaEvent.EventType = StravaEvent.ObjectType.Activity;
             _stravaEvent.Aspect = StravaEvent.AspectType.Update;
-            _stravaEvent.AthleteId = (ulong)_athleteIdInput;
+            _stravaEvent.AthleteId = (ulong)AppStateStore.AthleteId;
             _stravaEvent.ObjectId = Convert.ToUInt64(_activityIdInput);
             if (_stravaEvent.ObjectId == 0)
             {

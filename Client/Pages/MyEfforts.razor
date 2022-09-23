@@ -68,7 +68,10 @@
     private NotificationMessage? _notificationMessage;
     private IEnumerable<StravaSegmentEffort>? _efforts = null;
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Run(() => ReadEfforts());
+    }
     protected async Task DeleteItem(StravaSegmentEffort effort)
     {
         if (null != Modal)
