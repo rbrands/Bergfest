@@ -58,7 +58,14 @@ namespace Bergfest_Webhook
                         }
                         else
                         {
-                            await ScanSegmentsInActivity(stravaEvent);
+                            if (stravaEvent.Aspect == StravaEvent.AspectType.UpdateTitle)
+                            {
+                                await UpdateActivityTitle(stravaEvent);
+                            }
+                            else
+                            { 
+                                await ScanSegmentsInActivity(stravaEvent);
+                            }
                         }
                         break;
                     case StravaEvent.ObjectType.Athlete:
@@ -119,6 +126,15 @@ namespace Bergfest_Webhook
                     await _segmentEffortsRepository.UpsertItem(stravaSegmentEffort);
                     _logger.LogInformation($"SegmentEffort {stravaSegmentEffort.Id} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
                 }
+            }
+        }
+        public async Task UpdateActivityTitle(StravaEvent stravaEvent)
+        {
+            _logger.LogInformation($"UpdateActivityTitle >{stravaEvent.ActivityName}< athleteId {stravaEvent.AthleteId}");
+            IEnumerable<StravaSegmentEffort> segmentEfforts = await _segmentEffortsRepository.GetItems(s => s.ActivityId == stravaEvent.ObjectId);
+            foreach (StravaSegmentEffort segmentEffort in segmentEfforts)
+            {
+                await _segmentEffortsRepository.PatchField(segmentEffort.Id, "ActivityName", stravaEvent.ActivityName);
             }
         }
 

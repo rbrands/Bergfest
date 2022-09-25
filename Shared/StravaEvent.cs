@@ -18,7 +18,8 @@ namespace BlazorApp.Shared
                 Create,
                 Update,
                 Delete,
-                Deauthorize
+                Deauthorize,
+                UpdateTitle
         }
         [JsonPropertyName("EventType")]
         public ObjectType EventType { get; set; }
@@ -28,6 +29,7 @@ namespace BlazorApp.Shared
         public ulong ObjectId { get; set; }
         [JsonPropertyName("AthleteId")]
         public ulong AthleteId { get; set; }
+        public string ActivityName { get; set; }
 
     }
 

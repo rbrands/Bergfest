@@ -39,15 +39,25 @@ namespace BlazorApp.Api
 
         [FunctionName(nameof(GetSegmentsWithEfforts))]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSegmentsWithEfforts")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSegmentsWithEfforts/{tag}")] HttpRequest req, string tag)
         {
             try
             {
-                _logger.LogInformation("GetSegmentsWithEfforts()");
+                _logger.LogInformation($"GetSegmentsWithEfforts({tag})");
                 IEnumerable<StravaSegment> segments = await _cosmosRepository.GetItems();
                 List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>();
                 foreach (StravaSegment s in segments)
                 {
+                    if (!String.IsNullOrEmpty(tag) && tag != "*")
+                    {
+                        string[] tags = s.GetTags();
+                        tag = tag.ToLowerInvariant();
+                        if (String.IsNullOrEmpty(s.Tags) || !s.Tags.Contains(tag) )
+                        {
+                            // If the given tag is not found in the list of tags skip this segment
+                            continue;
+                        }
+                    }
                     // Get all efforts corresponding to the segment and order them date, elapsed time (desc)
                     StravaSegmentWithEfforts segmentWithEfforts = new StravaSegmentWithEfforts(s);
                     List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.SegmentId && e.StartDateLocal > DateTime.UtcNow.AddDays(-Constants.DAYS_IN_PAST_FOR_EFFORTS)));

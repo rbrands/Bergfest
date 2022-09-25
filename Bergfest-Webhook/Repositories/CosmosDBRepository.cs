@@ -173,6 +173,33 @@ namespace Bergfest_Webhook.Repositories
 
             return response.Resource;
         }
+        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations)
+        {
+            Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
+            PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
+
+            if (String.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException("id");
+            }
+
+            ItemResponse<T> response = await container.PatchItemAsync<T>(
+                id: id,
+                partitionKey: partitionKey,
+                patchOperations: patchOperations
+            );
+
+            return response.Resource;
+        }
+        public async Task<T> PatchField(string id, string fieldName, object value)
+        {
+            List<PatchOperation> patchOperations = new ()
+            {
+                PatchOperation.Add($"/{fieldName}", value)
+            };
+
+            return await PatchItem(id, patchOperations);
+        }
 
     }
 }

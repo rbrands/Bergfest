@@ -45,7 +45,7 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
-      "route": "/api/GetSegmentsWithEfforts",
+      "route": "/api/GetSegmentsWithEfforts/*",
       "allowedRoles": [ "anonymous" ]
     },
     {
