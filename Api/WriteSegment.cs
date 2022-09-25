@@ -12,7 +12,7 @@ using System.Web.Http;
 using BlazorApp.Api.Repositories;
 using BlazorApp.Api.Utils;
 using Microsoft.AspNetCore.Routing;
-
+using System.Linq;
 
 namespace BlazorApp.Api
 {
@@ -51,6 +51,8 @@ namespace BlazorApp.Api
                 {
                     // Tags should only by in lowercase
                     segment.Tags = segment.Tags.ToLowerInvariant();
+                    char[] separatorChars = { ',', ';'};
+                    string[] tags = segment.Tags.Split(separatorChars, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 }
                 segment.LogicalKey = segment.SegmentId.ToString();
                 StravaSegment updatedSegment = await _cosmosRepository.UpsertItem(segment);

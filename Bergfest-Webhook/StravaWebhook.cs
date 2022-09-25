@@ -51,6 +51,7 @@ namespace Bergfest_Webhook
                 else if (req.Method == "POST")
                 {
                     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                    _logger.LogInformation($"StravaWebHook Post Request received: {requestBody}");
                     dynamic postRequest = JsonSerializer.Deserialize<ExpandoObject>(requestBody);
                     await HandleWebhookPost(postRequest);
                     return new OkResult();
@@ -115,6 +116,11 @@ namespace Bergfest_Webhook
                     {
                         stravaEvent.Aspect = StravaEvent.AspectType.Deauthorize;
                     }
+                }
+                if (updates.ContainsKey("title"))
+                {
+                    stravaEvent.ActivityName = updates["title"];
+                    stravaEvent.Aspect = StravaEvent.AspectType.UpdateTitle;
                 }
             }
             if (stravaEvent.EventType == StravaEvent.ObjectType.Athlete && updates.ContainsKey("authorized"))
