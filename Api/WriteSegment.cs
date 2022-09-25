@@ -47,7 +47,7 @@ namespace BlazorApp.Api
                 {
                     segment.Scope = segment.GetUrlFriendlyTitle();
                 }
-                if (String.IsNullOrEmpty(segment.Tags))
+                if (!String.IsNullOrEmpty(segment.Tags))
                 {
                     // Tags should only by in lowercase
                     segment.Tags = segment.Tags.ToLowerInvariant();
