@@ -53,6 +53,7 @@ namespace BlazorApp.Api
                     segment.Tags = segment.Tags.ToLowerInvariant();
                     char[] separatorChars = { ',', ';'};
                     string[] tags = segment.Tags.Split(separatorChars, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    segment.Tags = String.Join(',', tags);
                 }
                 segment.LogicalKey = segment.SegmentId.ToString();
                 StravaSegment updatedSegment = await _cosmosRepository.UpsertItem(segment);
