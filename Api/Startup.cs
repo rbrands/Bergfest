@@ -33,16 +33,7 @@ namespace BlazorApp.Api
                 loggingBuilder.AddFilter(level => true);
             });
 
-
-
-            IConfiguration config = new ConfigurationBuilder()
-                           .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                           .AddUserSecrets(Assembly.GetExecutingAssembly())
-                           .AddEnvironmentVariables()
-                           .Build();
-
-            builder.Services.AddSingleton(config);
-            CosmosClient cosmosClient = new CosmosClient(config["COSMOS_DB_CONNECTION_STRING"]);
+            CosmosClient cosmosClient = new CosmosClient(builder.GetContext().Configuration["COSMOS_DB_CONNECTION_STRING"]);
             builder.Services.AddSingleton(cosmosClient);
             builder.Services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
             builder.Services.AddSingleton<StravaRepository>();
@@ -50,6 +41,19 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton<CosmosDBRepository<Article>>();
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegment>>();
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentEffort>>();
+            builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentChallenge>>();
+            builder.Services.AddSingleton<CosmosDBRepository<ChallengeParticipant>>();
         }
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            FunctionsHostBuilderContext context = builder.GetContext();
+
+            builder.ConfigurationBuilder
+                           .SetBasePath(context.ApplicationRootPath)
+                           .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                           .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true, reloadOnChange: true)
+                           .AddEnvironmentVariables();
+        }
+
     }
 }

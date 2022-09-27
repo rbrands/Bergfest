@@ -84,10 +84,23 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegment>();
         }
+        public async Task<StravaSegmentChallenge?> WriteChallenge(StravaSegmentChallenge challenge)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge>($"/api/WriteChallenge", challenge);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
         public async Task DeleteSegment(StravaSegment segment)
         {
             this.PrepareHttpClient();
             HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegment>($"/api/DeleteSegment", segment);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task DeleteChallenge(StravaSegmentChallenge challenge)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge>($"/api/DeleteChallenge", challenge);
             response.EnsureSuccessStatusCode();
         }
         public async Task DeleteSegmentEffort(StravaSegmentEffort segmentEffort)

@@ -25,7 +25,15 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/WriteChallenge",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/DeleteSegment",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/DeleteChallenge",
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
