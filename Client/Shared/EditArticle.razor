@@ -93,6 +93,14 @@ else
             <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => InsertImage())">Bild einfügen</button>
         </div>
      </div>
+    @if (null != _article)
+    {
+        <div class="row">
+            <div class="col-md-10">
+            <input class="form-control" @bind="@_article.ImageLink" placeholder="Link zu einem Header-Bild" title="Header-Bild"></input>
+            </div>
+        </div>
+     }
 }
 
 @code {
