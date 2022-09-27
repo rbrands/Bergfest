@@ -6,14 +6,14 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Bergfest_Webhook.Utils;
 
-namespace Bergfest_Webhook
+namespace BlazorApp.Api
 {
     public static class GetVersion
     {
         const string functionsVersion = Constants.VERSION;
+
         [FunctionName("GetVersion")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
