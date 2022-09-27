@@ -9,7 +9,11 @@
 {
     @if (!String.IsNullOrEmpty(_article?.ArticleText))
     {
-            @((MarkupString)_article.ArticleText)
+        @if (!String.IsNullOrEmpty(_article.ImageLink))
+        {
+            <img src="@_article.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:@ImageMaxHeight" />
+        }
+        @((MarkupString)_article.ArticleText)
     }
     else
     {
@@ -85,9 +89,12 @@ else
     </BlazoredTextEditor>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
-    <div class="row">
-        <div class="col-md-10">
+    <div class="form-row">
+        <div class="form-group col-md-10">
            <input class="form-control" @bind="@_imageLink" placeholder="Link zu einem Bild" title="Bildlink"></input>
+            <small id="imageInlineLinkHelp" class="form-text text-muted">
+                Optional: Image in Text einfügen.
+            </small>
         </div>
         <div class="col-md-2">
             <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => InsertImage())">Bild einfügen</button>
@@ -95,9 +102,12 @@ else
      </div>
     @if (null != _article)
     {
-        <div class="row">
-            <div class="col-md-10">
-            <input class="form-control" @bind="@_article.ImageLink" placeholder="Link zu einem Header-Bild" title="Header-Bild"></input>
+        <div class="form-row">
+            <div class="form-group col-md-10">
+                <input class="form-control" @bind="@_article.ImageLink" placeholder="Link zu einem Header-Bild" title="Header-Bild"></input>
+                <small id="imageLinkHelp" class="form-text text-muted">
+                    Optional: Link zu einem Image das rechts oben angezeigt werden soll.
+                </small>
             </div>
         </div>
      }
@@ -106,6 +116,8 @@ else
 @code {
     [Parameter]
     public string ArticleKey { get; set; } = String.Empty;
+    [Parameter]
+    public string ImageMaxHeight { get; set; } = "100%";
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
     private Article? _article = new Article();
