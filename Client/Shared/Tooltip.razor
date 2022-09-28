@@ -1,5 +1,33 @@
 ﻿<div class="tooltip-wrapper">
-    <span>@Text</span>
+    <span>
+        @if(!String.IsNullOrEmpty(ImageLink))
+        {
+            @if(!String.IsNullOrEmpty(Link))
+            {
+                <a href="@Link" target="_blank" alt="@Text" title="@Text">
+                    <img src="@ImageLink" class="img-fluid" style="max-height:@ImageHeight" />
+                </a>
+            }
+            else
+            {
+                <img src="@ImageLink" class="img-fluid" style="max-height:@ImageHeight" />
+                @Text
+            }
+        }
+        else
+        {
+            @if(!String.IsNullOrEmpty(Link))
+            {
+                <a href="@Link" target="_blank" alt="@Text" title="@Text">
+                    @Text
+                </a>
+            }
+            else
+            {
+                @Text
+            }
+        }
+    </span>
     @ChildContent
 </div>
 
