@@ -78,7 +78,16 @@
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div class="ms-2 me-auto">
-                                        <div>@e.AthleteName</div>
+                                        <div>
+                                            @if(!String.IsNullOrEmpty(e.ProfileImageLink))
+                                            {
+                                                <Tooltip ImageLink="@e.ProfileImageLink" ImageHeight="124px">@e.AthleteName</Tooltip>
+                                            }
+                                            else
+                                            {
+                                                <Tooltip Text="Tooltip-Test">@e.AthleteName</Tooltip>
+                                            }
+                                        </div>
                                     </div>
                                     <h6>
                                         <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>

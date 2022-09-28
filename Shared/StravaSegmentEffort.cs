@@ -20,6 +20,8 @@ namespace BlazorApp.Shared
         public string AthleteSex { get; set; }
         [JsonPropertyName("athleteName")]
         public string AthleteName { get; set; }
+        [JsonPropertyName("profileImageLink")]
+        public string ProfileImageLink { get; set; }
         [JsonPropertyName("activityId")]
         public ulong ActivityId { get; set; }
         [JsonPropertyName("activityName")]

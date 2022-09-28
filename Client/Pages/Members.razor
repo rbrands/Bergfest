@@ -36,7 +36,15 @@ else
                     <td>@member.FirstName</td>
                     <td>@member.LastName</td>
                     <td>@member.Sex</td>
-                    <td><a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link">@member.GetAhtleteLink()</a></td>
+                    <td>
+                        <a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link">
+                            @if(!String.IsNullOrEmpty(member.ProfileSmallImageLink))
+                            {
+                                <img src="@member.ProfileSmallImageLink" class="img-fluid" style="height:32px" alt="Provile" />
+                            }
+                            @member.GetAhtleteLink()
+                        </a>
+                    </td>
                     <td>@member.ExpirationAt</td>
                 </tr>
             }

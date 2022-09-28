@@ -113,6 +113,8 @@ namespace BlazorApp.Api.Repositories
                 stravaAccess.FirstName = response.athlete.firstname;
                 stravaAccess.LastName = response.athlete.lastname;
                 stravaAccess.Sex = response.athlete.sex;
+                stravaAccess.ProfileImageLink = response.athlete.profile;
+                stravaAccess.ProfileSmallImageLink = response.athlete.profile_medium;
                 stravaAccess.TimeToLive = Constants.TTL_STRAVA_ACCESS;
                 _logger.LogInformation($"Athlete: LogicalKey {stravaAccess.LogicalKey} Name {stravaAccess.FirstName} {stravaAccess.LastName} ");
 
