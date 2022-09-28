@@ -91,7 +91,7 @@ namespace BlazorApp.Api.Repositories
             string id = typeof(T).Name + "-" + key;
             return await GetItem(id);
         }
-        public async Task<IEnumerable<T>> GetItems(Expression<Func<T, bool>> predicate, int maxItemCount = -1)
+        public async Task<IList<T>> GetItems(Expression<Func<T, bool>> predicate, int maxItemCount = -1)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -129,7 +129,7 @@ namespace BlazorApp.Api.Repositories
             T firstItem = results.FirstOrDefault();
             return firstItem;
         }
-        public async Task<IEnumerable<T>> GetItems()
+        public async Task<IList<T>> GetItems()
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -162,6 +162,34 @@ namespace BlazorApp.Api.Repositories
 
             return response.Resource;
         }
+        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations)
+        {
+            Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
+            PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
+
+            if (String.IsNullOrEmpty(id))
+            {
+                throw new ArgumentNullException("id");
+            }
+
+            ItemResponse<T> response = await container.PatchItemAsync<T>(
+                id: id,
+                partitionKey: partitionKey,
+                patchOperations: patchOperations
+            );
+
+            return response.Resource;
+        }
+        public async Task<T> PatchField(string id, string fieldName, object value)
+        {
+            List<PatchOperation> patchOperations = new ()
+            {
+                PatchOperation.Add($"/{fieldName}", value)
+            };
+
+            return await PatchItem(id, patchOperations);
+        }
+
 
     }
 }

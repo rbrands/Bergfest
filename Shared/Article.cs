@@ -15,5 +15,7 @@ namespace BlazorApp.Shared
         public string Title { get; set; }
         [JsonPropertyName("articleText"), Display(Name = "Text"), MaxLength(10000, ErrorMessage = "Der Text ist zu lang.")]
         public string ArticleText { get; set; }
+        [JsonPropertyName("imageLink"), Display(Name = "Image"), MaxLength(512, ErrorMessage = "Der Link ist zu lang.")]
+        public string ImageLink { get; set; }
     }
 }

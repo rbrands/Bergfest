@@ -22,7 +22,7 @@ else
                 <th scope="col">Vorname</th>
                 <th scope="col">Name</th>
                 <th scope="col">Geschlecht</th>
-                <th scope="col">Link</th>
+                <th scope="col">Strava-Profil</th>
                 <th scope="col">Token-Expiration</th>
             </tr>
         </thead>
@@ -36,7 +36,18 @@ else
                     <td>@member.FirstName</td>
                     <td>@member.LastName</td>
                     <td>@member.Sex</td>
-                    <td><a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link">@member.GetAhtleteLink()</a></td>
+                    <td>
+                        <a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @member.GetFullName()">
+                            @if(!String.IsNullOrEmpty(member.ProfileImageLink))
+                            {
+                                <img src="@member.ProfileSmallImageLink" class="img-fluid" alt="Strava-Profil @member.GetFullName()" />
+                            }
+                            else
+                            {
+                                @member.GetAhtleteLink()
+                            }
+                        </a>
+                    </td>
                     <td>@member.ExpirationAt</td>
                 </tr>
             }

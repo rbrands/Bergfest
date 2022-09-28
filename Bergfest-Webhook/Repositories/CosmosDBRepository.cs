@@ -102,7 +102,7 @@ namespace Bergfest_Webhook.Repositories
             string id = typeof(T).Name + "-" + key;
             return await GetItem(id);
         }
-        public async Task<IEnumerable<T>> GetItems(Expression<Func<T, bool>> predicate, int maxItemCount = -1)
+        public async Task<IList<T>> GetItems(Expression<Func<T, bool>> predicate, int maxItemCount = -1)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -140,7 +140,7 @@ namespace Bergfest_Webhook.Repositories
             T firstItem = results.FirstOrDefault();
             return firstItem;
         }
-        public async Task<IEnumerable<T>> GetItems()
+        public async Task<IList<T>> GetItems()
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);

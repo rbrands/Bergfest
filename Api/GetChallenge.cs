@@ -19,15 +19,15 @@ using BlazorApp.Api.Utils;
 
 namespace BlazorApp.Api
 {
-    public class GetSegment
+    public class GetChallenge
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        private CosmosDBRepository<StravaSegment> _cosmosRepository;
+        private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
 
-        public GetSegment(ILogger<GetSegment> logger,
+        public GetChallenge(ILogger<GetChallenge> logger,
                         IConfiguration config,
-                        CosmosDBRepository<StravaSegment> cosmosRepository
+                        CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
         )
         {
             _logger = logger;
@@ -35,23 +35,23 @@ namespace BlazorApp.Api
             _cosmosRepository = cosmosRepository;
         }
 
-        [FunctionName(nameof(GetSegment))]
+        [FunctionName(nameof(GetChallenge))]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSegment/{segmentId}")] HttpRequest req, ulong segmentId)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetChallenge/{challengeId}")] HttpRequest req, string challengeId)
         {
             try
             {
-                if (0 == segmentId)
+                if (String.IsNullOrEmpty(challengeId))
                 {
-                    throw new Exception("Missing segmentId for call GetSegment()");
+                    throw new Exception("Missing challengeId for call GetChallenge()");
                 }
-                StravaSegment segment = await _cosmosRepository.GetItemByKey(segmentId.ToString());
-                _logger.LogInformation($"GetSegment(SegmentId = {segmentId}, SegmentName = {segment.SegmentName})", segmentId);
-                return new OkObjectResult(segment);
+                StravaSegmentChallenge challenge = await _cosmosRepository.GetItem(challengeId.ToString());
+                _logger.LogInformation($"GetChallenge(ChallengeId = {challengeId} Title = {challenge.ChallengeTitle}");
+                return new OkObjectResult(challenge);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"GetSegment(segmentId = {segmentId}) failed.");
+                _logger.LogError(ex, $"GetChallenge(challengeId = {challengeId}) failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }
