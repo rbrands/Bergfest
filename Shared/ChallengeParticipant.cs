@@ -6,10 +6,8 @@ using System.Text.Json.Serialization;
 
 namespace BlazorApp.Shared
 {
-    public class ChallengeParticipant : CosmosDBEntity
+    public class ChallengeParticipant
     {
-        [JsonPropertyName("challengeId")]
-        public string ChallengeId { get; set; }
         [JsonPropertyName("athleteId")]
         public ulong AthleteId { get; set; }
         [JsonPropertyName("athleteSex")]

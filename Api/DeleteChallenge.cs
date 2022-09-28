@@ -20,14 +20,11 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
-        private CosmosDBRepository<ChallengeParticipant> _cosmosParticipantRepository;
 
         public DeleteChallenge(ILogger<DeleteChallenge> logger,
-                         CosmosDBRepository<ChallengeParticipant> cosmosParticipantRepository,
                          CosmosDBRepository<StravaSegmentChallenge> cosmosRepository)
         {
             _logger = logger;
-            _cosmosParticipantRepository = cosmosParticipantRepository;
             _cosmosRepository = cosmosRepository;
         }
 
@@ -46,12 +43,6 @@ namespace BlazorApp.Api
                     return new BadRequestErrorMessageResult("Id of StravaSegmentChallenge to be deleted is missing.");
                 }
                 await _cosmosRepository.DeleteItemAsync(challenge.Id);
-                // Delete all participants
-                IEnumerable<ChallengeParticipant> participants = await _cosmosParticipantRepository.GetItems(p => p.ChallengeId == challenge.Id);
-                foreach (ChallengeParticipant p in participants)
-                {
-                    await _cosmosParticipantRepository.DeleteItemAsync(p.Id);
-                }
                 return new OkResult();
             }
             catch (Exception ex)

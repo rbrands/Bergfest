@@ -26,7 +26,11 @@ namespace BlazorApp.Shared
         public bool InvitationRequired { get; set; } = false;
         [JsonPropertyName("invitationLink")]
         public string InvitationLink { get; set; }
-        public IList<StravaSegment> Segments { get; set; }
+        [JsonPropertyName("segments")]
+        public IDictionary<string, StravaSegment> Segments { get; set; }
+        [JsonPropertyName("participants")]
+        public IDictionary<string, ChallengeParticipant> Participants { get; set; }
+
         public string GetUrlFriendlyTitle()
         {
             string urlFriendlyTitle = null;
