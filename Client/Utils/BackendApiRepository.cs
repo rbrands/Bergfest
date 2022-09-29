@@ -91,6 +91,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
         }
+        public async Task<StravaSegmentChallenge?> UpdateChallenge(StravaSegmentChallenge challenge)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge>($"/api/UpdateChallenge", challenge);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
         public async Task DeleteSegment(StravaSegment segment)
         {
             this.PrepareHttpClient();
@@ -155,6 +162,35 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             var response = await _http.GetAsync($"/api/GetChallenge/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<StravaSegmentChallenge?> GetChallengeByTitle(string urlTitle)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallengeByTitle/{urlTitle}");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();

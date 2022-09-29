@@ -8,11 +8,43 @@
 <PageTitle>
     Bergfest - Challenge
 </PageTitle>
-<p>
-    @Scope
-</p>
+
+@if (null == _challenge)
+{
+    <p><em>Daten werden geladen...</em></p>
+}
+else
+{
+    <div class="m-2 p-4 bg-light border">
+        <h2>@_challenge.ChallengeTitle</h2>
+        <p>
+            @_challenge.ChallengeTitle
+        </p>
+    </div>
+}
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
 @code {
     [Parameter]
     public string Scope { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+    private StravaSegmentChallenge? _challenge;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _challenge = await Api.GetChallengeByTitle(Scope);
+            if (null == _challenge)
+            {
+                _notificationMessage!.ShowError($"Ups, es gibt keine Challenge mit dem Titel {Scope}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage!.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
 
 }

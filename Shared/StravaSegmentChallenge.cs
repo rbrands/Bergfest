@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorApp.Shared
 {
     public class StravaSegmentChallenge : CosmosDBEntity
     {
-        [JsonPropertyName("challengeTitle")]
+        [JsonPropertyName("challengeTitle"), Required(ErrorMessage = "Bitte einen Titel für die Challenge angeben."), MaxLength(252, ErrorMessage = "Titel zu lang")]
         public string ChallengeTitle { get; set; }
         [JsonPropertyName("imageLink")]
         public string ImageLink { get; set; }
         [JsonPropertyName("description")]
         public string Description { get; set; }
         [JsonPropertyName("urlTitle")]
+        [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Titel-Link eingeben.")]
+        [MaxLength(160, ErrorMessage = "Url-Titel zu lang")]
         public string UrlTitle { get; set; }
         [JsonPropertyName("startDateUTC")]
         public DateTime StartDateUTC { get; set; } = DateTime.Now.Date.AddDays(7.0);
@@ -27,6 +30,8 @@ namespace BlazorApp.Shared
         [JsonPropertyName("registrationIsOpen")]
         public bool RegistrationIsOpen { get; set; } = true;
         [JsonPropertyName("invitationLink")]
+        [RegularExpression("[a-z0-9-_]*", ErrorMessage = "Bitte nur Kleinbuchstaben und Zahlen für den Einladunges-Link eingeben.")]
+        [MaxLength(160, ErrorMessage = "Einladungslink zu lang")]
         public string InvitationLink { get; set; }
         [JsonPropertyName("segments")]
         public IDictionary<string, StravaSegment> Segments { get; set; }

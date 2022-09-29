@@ -29,6 +29,10 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/UpdateChallenge",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/DeleteSegment",
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
@@ -54,6 +58,10 @@
     },
     {
       "route": "/api/GetChallenge/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetChallengeByTitle/*",
       "allowedRoles": [ "anonymous" ]
     },
     {
