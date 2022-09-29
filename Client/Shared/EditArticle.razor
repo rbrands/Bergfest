@@ -180,9 +180,9 @@ else
     }
     public async Task InsertImage()
     {
-        if (null != _htmlArticle && !String.IsNullOrEmpty(_imageLink))
+        if (!String.IsNullOrEmpty(_imageLink))
         {
-            await _htmlArticle.InsertImage(_imageLink); 
+            await _htmlArticle!.InsertImage(_imageLink); 
         }
     }
     public void Dispose()

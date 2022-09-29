@@ -1,0 +1,78 @@
+﻿@page "/editchallenge"
+@page "/editchallenge/{Id}"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Challenge editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+    private BlazoredTextEditor? _htmlDescription;
+    private StravaSegmentChallenge _challenge = new StravaSegmentChallenge();
+    private Boolean _inUpdateMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!String.IsNullOrEmpty(Id))
+            {
+                StravaSegmentChallenge? _challengeFromDb = await Api.GetChallenge(Id);
+                if (null != _challengeFromDb)
+                {
+                    _challenge = _challengeFromDb;
+                    _inUpdateMode = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+    private string? StripEmptyHtml(string htmlContent)
+    {
+        return (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+    }
+
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            if (null != _htmlDescription)
+            {
+                _challenge.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
+            }
+            await Api.WriteChallenge(_challenge);
+            NavigationManager.NavigateTo($"/");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+
+
+
+}

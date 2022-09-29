@@ -11,7 +11,7 @@
     <div class="card-header">
         <em>
             @SegmentWithEfforts.StravaSegment.SegmentName
-            <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank"><span class="oi oi-link-intact"></span></a>
+            <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank" title="Segment auf Strava" alt="Segment auf Strava"><span class="oi oi-link-intact"></span></a>
         </em>
         @foreach (string tag in SegmentWithEfforts.StravaSegment.GetLabels())
         {
@@ -163,10 +163,6 @@
     protected void EditItem(ulong itemId)
     {
         NavigationManager.NavigateTo($"/editsegment/{itemId}");
-    }
-    protected void DeleteItem(string itemId)
-    {
-
     }
 
     protected async Task DeleteItem()

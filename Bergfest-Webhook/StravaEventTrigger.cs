@@ -95,7 +95,7 @@ namespace Bergfest_Webhook
                                                 .SetQueryParam("include_all_efforts", "true")
                                                 .WithOAuthBearerToken(stravaAccess.AccessToken)
                                                 .GetJsonAsync();
-                _logger.LogInformation($"ScanSegmentsInActivity >{response.name}< athleteId {stravaEvent.AthleteId}");
+                _logger.LogInformation($"ScanSegmentsInActivity >{response.name}< athleteId {stravaEvent.AthleteId} - {stravaAccess.GetFullName()}");
                 IList<Object> segmentEfforts = response.segment_efforts;
                 // Get all defined segments and load them into a dictionary for faster lookup
                 // TODO: Store dictionary and refresh regularly e.g. every 30 minutes
