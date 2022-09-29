@@ -12,6 +12,93 @@
 <h3>Challenge editieren</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
+<EditForm Model="@_challenge" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_challenge.ChallengeTitle" autocomplete="on" placeholder="Titel" />
+            <small id="titleHelp" class="form-text text-muted">
+                Titel der Challenge
+            </small>
+        </div>
+        <div class="form-group mt-3">
+            <label for="description">Beschreibung</label>
+            <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung des Segments">
+                <ToolbarContent>
+                    <span class="ql-formats">
+                        <select class="ql-font">
+                            <option selected=""></option>
+                            <option value="serif"></option>
+                            <option value="monospace"></option>
+                        </select>
+                        <select class="ql-size">
+                            <option value="small"></option>
+                            <option selected=""></option>
+                            <option value="large"></option>
+                            <option value="huge"></option>
+                        </select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-link"></button>
+                    </span>
+                </ToolbarContent>
+                <EditorContent>
+                    @if (null != _challenge.Description)
+                    {
+                        @((MarkupString)_challenge.Description)
+                    }
+                </EditorContent>
+            </BlazoredTextEditor>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <InputText id="image" aria-describedby="imageHelp" class="form-control" @bind-Value="_challenge.ImageLink" autocomplete="on" placeholder="Image-Link" />
+            <small id="imageHelp" class="form-text text-muted">
+                Optional: Link zu einem Image, das im in der Headline angezeigt werden soll.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="urlTitle">Url-Titel</label>
+            <InputText id="urlTitle" aria-describedby="urlTitleHelp" class="form-control" @bind-Value="_challenge.UrlTitle" autocomplete="on" placeholder="Url-Titel" />
+            <small id="imageHelp" class="form-text text-muted">
+                Optional: Titel für URL zum direkten Aufruf.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start-Datum</label>
+            <InputDate id="startDate" aria-describedby="startDateHelp" class="form-control" @bind-Value="_challenge.StartDateUTC" autocomplete="on" placeholder="Startdatum" />
+            <small id="startDateHelp" class="form-text text-muted">
+                Startdatum der Challenge.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="endDate">Enddatum</label>
+            <InputDate id="endDate" aria-describedby="endDateHelp" class="form-control" @bind-Value="_challenge.EndDateUTC" autocomplete="on" placeholder="Enddatum" />
+            <small id="endDateHelp" class="form-text text-muted">
+                Enddatum der Challenge.
+            </small>
+        </div>
+
+
+        <ValidationSummary />
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
+        <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+        <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
 
 @code {
     [Parameter]
@@ -59,11 +146,10 @@
         {
             _saveMessage?.Hide();
             StateHasChanged();
-            if (null != _htmlDescription)
-            {
-                _challenge.Description = StripEmptyHtml(await _htmlDescription.GetHTML());
-            }
-            await Api.WriteChallenge(_challenge);
+            _challenge.Description = StripEmptyHtml(await _htmlDescription!.GetHTML());
+            _challenge.StartDateUTC = _challenge.StartDateUTC.ToUniversalTime();
+            _challenge.EndDateUTC = _challenge.EndDateUTC.ToUniversalTime();
+            //await Api.WriteChallenge(_challenge);
             NavigationManager.NavigateTo($"/");
         }
         catch (Exception ex)

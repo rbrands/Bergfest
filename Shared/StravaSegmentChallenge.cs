@@ -17,13 +17,15 @@ namespace BlazorApp.Shared
         [JsonPropertyName("urlTitle")]
         public string UrlTitle { get; set; }
         [JsonPropertyName("startDateUTC")]
-        public DateTime StartDateUTC { get; set; }
+        public DateTime StartDateUTC { get; set; } = DateTime.Now.Date.AddDays(7.0);
         [JsonPropertyName("endDateUTC")]
-        public DateTime EndDateUTC { get; set; }
+        public DateTime EndDateUTC { get; set; } = DateTime.Now.Date.AddDays(37.0);
         [JsonPropertyName("isPublicVisible")]
         public bool IsPublicVisible { get; set; } = true;
         [JsonPropertyName("invitationRequired")]
         public bool InvitationRequired { get; set; } = false;
+        [JsonPropertyName("registrationIsOpen")]
+        public bool RegistrationIsOpen { get; set; } = true;
         [JsonPropertyName("invitationLink")]
         public string InvitationLink { get; set; }
         [JsonPropertyName("segments")]
