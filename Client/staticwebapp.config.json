@@ -69,6 +69,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetSegments",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetSegmentsEffortsForUser/*",
       "allowedRoles": [ "anonymous" ]
     },

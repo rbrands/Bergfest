@@ -136,9 +136,9 @@ namespace BlazorApp.Shared
         [MaxLength(160, ErrorMessage = "Einladungslink zu lang")]
         public string InvitationLink { get; set; }
         [JsonPropertyName("segments")]
-        public IDictionary<string, Segment> Segments { get; set; }
+        public IDictionary<string, Segment> Segments { get; set; } = new Dictionary<string, Segment>();
         [JsonPropertyName("participants")]
-        public IDictionary<string, Participant> Participants { get; set; }
+        public IDictionary<string, Participant> Participants { get; set; } = new Dictionary<string, Participant>();
         public double[] PointLookup = new double[]
         {
             100.0, 90.0, 81.5, 74.0, 67.0, 60.5, 55.0, 49.5, 45.0, 40.5, 37.0, 33.5, 30.0, 27.5, 24.5, 22.5, 20.0, 18.5,

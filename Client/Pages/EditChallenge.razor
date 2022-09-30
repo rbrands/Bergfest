@@ -140,6 +140,24 @@
         <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
 </EditForm>
 
+<hr />
+<TabControl>
+    <TabPage Text="Segmente">
+        <h4>Auswahl der Segmente</h4>
+        <ul>
+            @foreach(KeyValuePair<string, StravaSegmentChallenge.Segment> s in _challenge.Segments)
+            {
+                <li>
+                    @s.Key - @s.Value.SegmentName
+                </li>
+            }
+        </ul>
+    </TabPage>
+    <TabPage Text="Teilnehmer">
+        <h4>Teilnehmer auswählen</h4>
+    </TabPage>
+</TabControl>
+
 @code {
     [Parameter]
     public string Id { get; set; } = String.Empty;
