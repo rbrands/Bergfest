@@ -57,10 +57,16 @@ namespace BlazorApp.Api
                     PatchOperation.Add("/IsPublicVisible", challenge.IsPublicVisible),
                     PatchOperation.Add("/InvitationRequired", challenge.InvitationRequired),
                     PatchOperation.Add("/RegistrationIsOpen", challenge.RegistrationIsOpen),
-                    PatchOperation.Add("/InvitationLink", challenge.InvitationLink),
+                    PatchOperation.Add("/InvitationLink", challenge.InvitationLink)
+                };
+                // Only up to 10 operations in one batch ==> create a second one
+                List<PatchOperation> patchOperationsSecondBatch = new()
+                {
                     PatchOperation.Add("/PointLookup", challenge.PointLookup)
                 };
+
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challenge.Id, patchOperations);
+                updatedChallenge = await _cosmosRepository.PatchItem(challenge.Id, patchOperationsSecondBatch);
 
                 return new OkObjectResult(updatedChallenge);
             }

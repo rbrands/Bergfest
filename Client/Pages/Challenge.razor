@@ -20,6 +20,16 @@ else
         <div class="overflow-auto" style="max-height: 800px">
             @((MarkupString)_challenge.Description)
         </div>
+        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+            <AuthorizeView Roles="admin,segmentadmin">
+                <Authorized>
+                    <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                        <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"/editchallenge/{_challenge.Id}")><span class="oi oi-pencil"></span></a>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen"><span class="oi oi-trash"></span></button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        </div>
     </div>
 }
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />

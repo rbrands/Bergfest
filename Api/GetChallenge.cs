@@ -45,7 +45,11 @@ namespace BlazorApp.Api
                 {
                     throw new Exception("Missing challengeId for call GetChallenge()");
                 }
-                StravaSegmentChallenge challenge = await _cosmosRepository.GetItem(challengeId.ToString());
+                StravaSegmentChallenge challenge = await _cosmosRepository.GetItem(challengeId);
+                if (null == challenge)
+                {
+                    throw new Exception($"GetChallenge(ChallengeId = >{challengeId}< not found.");
+                }
                 _logger.LogInformation($"GetChallenge(ChallengeId = {challengeId} Title = {challenge.ChallengeTitle}");
                 return new OkObjectResult(challenge);
             }
