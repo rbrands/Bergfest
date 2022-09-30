@@ -23,7 +23,7 @@
         </div>
         <div class="form-group mt-3">
             <label for="description">Beschreibung</label>
-            <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung des Segments">
+            <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung der Challenge">
                 <ToolbarContent>
                     <span class="ql-formats">
                         <select class="ql-font">
@@ -93,11 +93,44 @@
         </div>
         <div class="form-group">
             <label for="invitationLink">Einladungs-Link</label>
-        <InputText id="invitationLink" aria-describedby="invitationLinkHelp" class="form-control" @bind-Value="_challenge.InvitationLink" autocomplete="on" placeholder="Einladungs-Link" />
-        <small id="invitationLinkHelp" class="form-text text-muted">
-            Optional: Einladungslink. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>invitation/'Einladungslink'</text>
+            <InputText id="invitationLink" aria-describedby="invitationLinkHelp" class="form-control" @bind-Value="_challenge.InvitationLink" autocomplete="on" placeholder="Einladungs-Link" />
+            <small id="invitationLinkHelp" class="form-text text-muted">
+                Optional: Einladungslink. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>invitation/'Einladungslink'</text>
             </small>
         </div>
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="public" aria-describedby="publicHelp" class="form-check-input" @bind-Value="_challenge.IsPublicVisible" />
+                <label for="public" class="form-checklabel">
+                    Öffentlich sichtbar?
+                </label>
+            </div>
+            <small id="publicHelp" class="form-text text-muted">
+                Soll die Challenge öffentlich sichtbar sein?
+            </small>
+        </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="invitation" aria-describedby="invitationHelp" class="form-check-input" @bind-Value="_challenge.InvitationRequired" />
+            <label for="invitation" class="form-checklabel">
+                Teilnahme nur per Einladungslink?
+            </label>
+        </div>
+        <small id="invitationHelp" class="form-text text-muted">
+            Kann man sich zur Challenge nur über den Einladungslink anmelden?
+        </small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="registrationOpen" aria-describedby="registrationOpenHelp" class="form-check-input" @bind-Value="_challenge.RegistrationIsOpen" />
+            <label for="registrationOpen" class="form-checklabel">
+                Anmeldung offen?
+            </label>
+        </div>
+        <small id="registrationOpenHelp" class="form-text text-muted">
+            Ist die Challenge offen für Anmeldungen?
+        </small>
+    </div>
 
 
         <ValidationSummary />

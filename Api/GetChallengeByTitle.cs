@@ -46,8 +46,12 @@ namespace BlazorApp.Api
                     throw new Exception("Missing challengeTitle for call GetChallenge()");
                 }
                 string challengeTitleLowerCase = challengeTitle.ToLowerInvariant();
-                StravaSegmentChallenge challenge = await _cosmosRepository.GetFirstItemOrDefault(c => c.UrlTitle == challengeTitleLowerCase);
                 _logger.LogInformation($"GetChallengeByTitle(ChallengeTitle = {challengeTitleLowerCase}");
+                StravaSegmentChallenge challenge = await _cosmosRepository.GetFirstItemOrDefault(c => c.UrlTitle == challengeTitleLowerCase);
+                if (null == challenge)
+                {
+                    throw new Exception($"Challenge {challengeTitleLowerCase} not found.");
+                }
                 return new OkObjectResult(challenge);
             }
             catch (Exception ex)

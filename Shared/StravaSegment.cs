@@ -8,6 +8,18 @@ namespace BlazorApp.Shared
 {
     public class StravaSegment : CosmosDBEntity
     {
+        public class Challenge
+        {
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+            [JsonPropertyName("challengeTitle")]
+            public string ChallengeTitle { get; set; }
+            [JsonPropertyName("startDateUTC")]
+            public DateTime StartDateUTC { get; set; }
+            [JsonPropertyName("endDateUTC")]
+            public DateTime EndDateUTC { get; set; }
+
+        }
         [JsonPropertyName("segmentId")]
         public ulong SegmentId { get; set; }
         // If enabled segment efforts are recorded for this segment

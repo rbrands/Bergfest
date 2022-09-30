@@ -17,9 +17,9 @@ else
 {
     <div class="m-2 p-4 bg-light border">
         <h2>@_challenge.ChallengeTitle</h2>
-        <p>
-            @_challenge.ChallengeTitle
-        </p>
+        <div class="overflow-auto" style="max-height: 800px">
+            @((MarkupString)_challenge.Description)
+        </div>
     </div>
 }
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />

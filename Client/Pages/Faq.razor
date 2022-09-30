@@ -1,0 +1,20 @@
+﻿@page "/faq"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    Bergfest - FAQ
+</PageTitle>
+<EditArticle ArticleKey="Faq" ImageMaxHeight="8em">
+    <h2>Fragen und Antworten</h2>
+    <p>
+        Die häufigsten Fragen rund um Bergfest.
+    </p>
+</EditArticle>
+
+@code {
+
+}
