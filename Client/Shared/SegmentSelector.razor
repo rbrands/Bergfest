@@ -1,0 +1,62 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<div>
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+    @if (null != _segments)
+    {
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Auswahl</th>
+                    <th scope="col">Segment</th>
+                    <th scope="col">Distanz</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(StravaSegment s in _segments)
+                {
+                    <tr>
+                        <td>
+                            check
+                        </td>
+                        <td>
+                            @s.SegmentName
+                        </td>
+                        <td>
+                            @s.GetDistanceAsText()
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private NotificationMessage? _notificationMessage;
+    IEnumerable<StravaSegment>? _segments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _segments = await Api.GetSegments();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+
+}
