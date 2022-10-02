@@ -22,7 +22,7 @@
                 {
                     <tr>
                         <td>
-                            check
+                           <input type="checkbox" checked="@IsSelected(s)" @oninput="@(() => CheckSegment(s))">
                         </td>
                         <td>
                             @s.SegmentName
@@ -43,19 +43,76 @@
     [CascadingParameter]
     public IModalService? Modal { get; set; }
     private NotificationMessage? _notificationMessage;
-    IEnumerable<StravaSegment>? _segments;
+    private IEnumerable<StravaSegment>? _segments;
+    private IDictionary<ulong, StravaSegment> _segmentLookup = new Dictionary<ulong, StravaSegment>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             _segments = await Api.GetSegments();
+            if (null == Challenge.Segments)
+            {
+                Challenge.Segments = new Dictionary<ulong, StravaSegmentChallenge.Segment>();
+            }
         }
         catch (Exception ex)
         {
             _notificationMessage?.ShowError($"Fehler: {ex.Message}");
             return;
         }
+    }
+
+    protected async void CheckSegment(StravaSegment segment)
+    {
+        try
+        {
+            StravaSegmentChallenge.Segment challengeSegment = new StravaSegmentChallenge.Segment()
+            {
+                SegmentId = segment.SegmentId,
+                SegmentName = segment.SegmentName,
+                Distance = segment.Distance,
+                AverageGrade = segment.AverageGrade,
+                MaximumGrade = segment.MaximumGrade,
+                Elevation = segment.Elevation,
+                ClimbCategory = segment.ClimbCategory,
+                City = segment.City,
+                ImageLink = segment.ImageLink,
+                Description = segment.Description,
+                RouteRecommendation = segment.RouteRecommendation,
+                Tags = segment.Tags,
+                Labels = segment.Labels,
+                Scope = segment.Scope
+            };
+            if (IsSelected(segment))
+            {
+                Challenge.Segments.Remove(segment.SegmentId);
+                StravaSegmentChallenge? updatedChallenge = await Api.RemoveSegmentFromChallenge(challengeSegment, Challenge.Id);
+                if (null != updatedChallenge)
+                {
+                    Challenge.Segments = updatedChallenge.Segments;
+                }
+            }
+            else
+            {
+                Challenge.Segments.Add(segment.SegmentId, challengeSegment);
+                StravaSegmentChallenge? updatedChallenge = await Api.AddSegmentToChallenge(challengeSegment, Challenge.Id);
+                if (null != updatedChallenge)
+                {
+                    Challenge.Segments = updatedChallenge.Segments;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected bool IsSelected(StravaSegment segment)
+    {
+        return Challenge.Segments.ContainsKey(segment.SegmentId);
     }
 
 

@@ -17,6 +17,7 @@ namespace Bergfest_Webhook.Repositories
         private CosmosClient _cosmosClient;
         string _cosmosDbDatabase;
         string _cosmosDbContainer;
+        const int MAX_PATCH_OPERATIONS = 10;
 
         /// <summary>
         /// Create repository, typically as singleton. Create CosmosClient before.
@@ -173,7 +174,7 @@ namespace Bergfest_Webhook.Repositories
 
             return response.Resource;
         }
-        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations)
+        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations, string timestamp = null)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -182,12 +183,28 @@ namespace Bergfest_Webhook.Repositories
             {
                 throw new ArgumentNullException("id");
             }
+            PatchItemRequestOptions patchOption = new PatchItemRequestOptions();
+            if (null != timestamp)
+            {
+                patchOption.FilterPredicate = $"from c where c._ts = {timestamp}";
+            }
+            // PatchItem only supports up to 10 operations. If there are more than that given, create more batches and 
+            // patch the document several times.
+            List<PatchOperation> po = new List<PatchOperation>(patchOperations);
+            ItemResponse<T> response = null;
+            do
+            {
+                po = new List<PatchOperation>(po.Take(MAX_PATCH_OPERATIONS));
+                response = await container.PatchItemAsync<T>(
+                    id: id,
+                    partitionKey: partitionKey,
+                    patchOperations: po,
+                    requestOptions: patchOption
 
-            ItemResponse<T> response = await container.PatchItemAsync<T>(
-                id: id,
-                partitionKey: partitionKey,
-                patchOperations: patchOperations
-            );
+                );
+                po = new List<PatchOperation>(po.Skip(MAX_PATCH_OPERATIONS));
+            }
+            while (po.Count > 0);
 
             return response.Resource;
         }

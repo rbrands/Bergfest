@@ -46,10 +46,6 @@ namespace BlazorApp.Shared
             public long ClimbCategory { get; set; }
             [JsonPropertyName("city")]
             public string City { get; set; }
-            [JsonPropertyName("effortCount")]
-            public long EffortCount { get; set; }
-            [JsonPropertyName("athleteCount")]
-            public long AthleteCount { get; set; }
             // Optional link to be used as header
             [JsonPropertyName("imageLink")]
             public string ImageLink { get; set; }
@@ -136,7 +132,7 @@ namespace BlazorApp.Shared
         [MaxLength(160, ErrorMessage = "Einladungslink zu lang")]
         public string InvitationLink { get; set; }
         [JsonPropertyName("segments")]
-        public IDictionary<string, Segment> Segments { get; set; } = new Dictionary<string, Segment>();
+        public IDictionary<ulong, Segment> Segments { get; set; } = new Dictionary<ulong, Segment>();
         [JsonPropertyName("participants")]
         public IDictionary<string, Participant> Participants { get; set; } = new Dictionary<string, Participant>();
         public double[] PointLookup = new double[]
