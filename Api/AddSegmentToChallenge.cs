@@ -23,13 +23,16 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private CosmosDBRepository<StravaSegment> _cosmosSegmentRepository;
 
         public AddSegmentToChallenge(ILogger<AddSegmentToChallenge> logger,
-                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository,
+                         CosmosDBRepository<StravaSegment> cosmosSegmentRepoitory
                          )
         {
             _logger = logger;
             _cosmosRepository = cosmosRepository;
+            _cosmosSegmentRepository = cosmosSegmentRepoitory;
         }
 
         [FunctionName("AddSegmentToChallenge")]
@@ -55,12 +58,26 @@ namespace BlazorApp.Api
                 // Patch operations are only allowed for value fields or arrays but not dictionaries. Therefore write the whole
                 // list/dictionary of segments. But check if the timestamp has not changed to avoid the "race" condition that
                 // the dictionary was updated from another one since challenge was read
-                List<PatchOperation> patchOperations = new()
+                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchField(challengeId, "Segments", challenge.Segments, challenge.TimeStamp);
+                // Add challenge to segment for faster scanning for segment efforts
+                StravaSegment stravaSegment = await _cosmosSegmentRepository.GetItemByKey(segment.SegmentId.ToString());
+                if (null == stravaSegment)
                 {
-                    PatchOperation.Add($"/Segments", challenge.Segments)
+                    throw new Exception($"AddSegmentToChallenge: Strava-Segment {segment.SegmentId} not found.");
+                }
+                if (null == stravaSegment.Challenges)
+                {
+                    stravaSegment.Challenges = new Dictionary<string, StravaSegment.Challenge>();
+                }
+                StravaSegment.Challenge challengeInSegment = new StravaSegment.Challenge()
+                {
+                    Id = challengeId,
+                    ChallengeTitle = challenge.ChallengeTitle,
+                    StartDateUTC = challenge.StartDateUTC,
+                    EndDateUTC = challenge.EndDateUTC
                 };
-
-                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
+                stravaSegment.Challenges.Add(challengeId, challengeInSegment);
+                await _cosmosSegmentRepository.PatchField(stravaSegment.Id, "Challenges", stravaSegment.Challenges, stravaSegment.TimeStamp);
 
                 return new OkObjectResult(updatedChallenge);
             }

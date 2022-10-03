@@ -197,14 +197,14 @@ namespace BlazorApp.Api.Repositories
 
             return response.Resource;
         }
-        public async Task<T> PatchField(string id, string fieldName, object value)
+        public async Task<T> PatchField(string id, string fieldName, object value, string timestamp = null)
         {
             List<PatchOperation> patchOperations = new ()
             {
                 PatchOperation.Add($"/{fieldName}", value)
             };
 
-            return await PatchItem(id, patchOperations);
+            return await PatchItem(id, patchOperations, timestamp);
         }
 
 

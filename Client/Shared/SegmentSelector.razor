@@ -26,6 +26,26 @@
                         </td>
                         <td>
                             @s.SegmentName
+                            @foreach (string tag in s.GetLabels())
+                            {
+                                <span class="badge bg-info text-dark p-1 m-1">
+                                    @tag
+                                </span>
+                            }
+                            @if (!s.IsEnabled)
+                            {
+                                <span class="badge bg-warning text-dark p-1 m-1">
+                                    inaktiv
+                                </span>
+                            }
+                            <br />
+                            @foreach (string tag in s.GetTags())
+                            {
+                                <span class="badge bg-light text-dark p-1 m-0 mt-2">
+                                    #@tag
+                                </span>
+                            }
+
                         </td>
                         <td>
                             @s.GetDistanceAsText()

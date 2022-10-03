@@ -64,6 +64,9 @@ namespace BlazorApp.Shared
         public string Labels { get; set; }
         [JsonPropertyName("scope")]
         public string Scope { get; set; }
+        // Dictionary with the challenges the segment is part of.
+        [JsonPropertyName("challenges")]
+        public IDictionary<string, Challenge> Challenges { get; set; }
         public string GetSegmentLink()
         {
             string segmentLink = $"https://www.strava.com/segments/{SegmentId}";

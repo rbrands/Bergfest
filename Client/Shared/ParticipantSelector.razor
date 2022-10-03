@@ -1,0 +1,108 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<div>
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+    @if (null != _users)
+    {
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Auswahl</th>
+                    <th scope="col">Teilnehmer</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (StravaAccess u in _users)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" checked="@IsSelected(u)" @oninput="@(() => CheckParticipant(u))">
+                        </td>
+                        <td>
+                            <a href="@u.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @u.GetFullName()">
+                                @if (!String.IsNullOrEmpty(u.ProfileImageLink))
+                                {
+                                    <img src="@u.ProfileSmallImageLink" class="img-fluid p-1" alt="Strava-Profil @u.GetFullName()" />
+                                }
+                                @u.GetFullName()
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private NotificationMessage? _notificationMessage;
+    private IEnumerable<StravaAccess>? _users;
+    private IDictionary<ulong, StravaAccess> _userLookup = new Dictionary<ulong, StravaAccess>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _users = await Api.GetUsers();
+            if (null == Challenge.Participants)
+            {
+                Challenge.Participants = new Dictionary<ulong, StravaSegmentChallenge.Participant>();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected async void CheckParticipant(StravaAccess participant)
+    {
+        try
+        {
+            StravaSegmentChallenge.Participant challengeParticipant = new StravaSegmentChallenge.Participant()
+            {
+                AthleteId = (ulong)participant.AthleteId,
+                AthleteName = participant.GetFullName(),
+                AthleteSex = participant.Sex,
+                ProfileImage = participant.ProfileImageLink
+            };
+            StravaSegmentChallenge? updatedChallenge;
+            if (IsSelected(participant))
+            {
+                Challenge.Participants.Remove(challengeParticipant.AthleteId);
+                updatedChallenge = await Api.RemoveParticipantFromChallenge(challengeParticipant, Challenge.Id);
+            }
+            else
+            {
+                Challenge.Participants.Add(challengeParticipant.AthleteId, challengeParticipant);
+                updatedChallenge = await Api.AddParticipantToChallenge(challengeParticipant, Challenge.Id);
+            }
+            if (null != updatedChallenge)
+            {
+                Challenge.Participants = updatedChallenge.Participants;
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected bool IsSelected(StravaAccess participant)
+    {
+        return Challenge.Participants.ContainsKey((ulong)participant.AthleteId);
+    }
+
+
+}

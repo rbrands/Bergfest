@@ -140,16 +140,20 @@
         <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
 </EditForm>
 
-<hr />
-<TabControl>
-    <TabPage Text="Segmente">
-        <h4>Auswahl der Segmente</h4>
-        <SegmentSelector Challenge="_challenge"></SegmentSelector>
-    </TabPage>
-    <TabPage Text="Teilnehmer">
-        <h4>Teilnehmer auswählen</h4>
-    </TabPage>
-</TabControl>
+@if (_inUpdateMode)
+{
+    <hr />
+    <TabControl>
+        <TabPage Text="Segmente">
+            <h4>Auswahl der Segmente</h4>
+            <SegmentSelector Challenge="_challenge"></SegmentSelector>
+        </TabPage>
+        <TabPage Text="Teilnehmer">
+            <h4>Teilnehmer auswählen</h4>
+            <ParticipantSelector Challenge="_challenge"></ParticipantSelector>
+        </TabPage>
+    </TabControl>
+}
 
 @code {
     [Parameter]

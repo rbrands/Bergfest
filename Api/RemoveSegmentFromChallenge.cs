@@ -23,13 +23,16 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private CosmosDBRepository<StravaSegment> _cosmosSegmentRepository;
 
         public RemoveSegmentFromChallenge(ILogger<RemoveSegmentFromChallenge> logger,
-                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository,
+                         CosmosDBRepository<StravaSegment> cosmosSegmentRepository
                          )
         {
             _logger = logger;
             _cosmosRepository = cosmosRepository;
+            _cosmosSegmentRepository = cosmosSegmentRepository;
         }
 
         [FunctionName("RemoveSegmentFromChallenge")]
@@ -55,12 +58,20 @@ namespace BlazorApp.Api
                 // Patch operations are only allowed for value fields or arrays but not dictionaries. Therefore write the whole
                 // list/dictionary of segments. But check if the timestamp has not changed to avoid the "race" condition that
                 // the dictionary was updated from another one since challenge was read
-                List<PatchOperation> patchOperations = new()
-                {
-                    PatchOperation.Add($"/Segments", challenge.Segments)
-                };
+                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchField(challengeId, "Segments", challenge.Segments, challenge.TimeStamp);
 
-                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
+                // Add challenge to segment for faster scanning for segment efforts
+                StravaSegment stravaSegment = await _cosmosSegmentRepository.GetItemByKey(segment.SegmentId.ToString());
+                if (null == stravaSegment)
+                {
+                    throw new Exception($"AddSegmentToChallenge: Strava-Segment {segment.SegmentId} not found.");
+                }
+                if (null == stravaSegment.Challenges)
+                {
+                    stravaSegment.Challenges = new Dictionary<string, StravaSegment.Challenge>();
+                }
+                stravaSegment.Challenges.Remove(challengeId);
+                await _cosmosSegmentRepository.PatchField(stravaSegment.Id, "Challenges", stravaSegment.Challenges, stravaSegment.TimeStamp);
 
                 return new OkObjectResult(updatedChallenge);
             }
