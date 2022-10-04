@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using BlazorApp.Shared;
 
-namespace Bergfest_Webhook.Repositories
+namespace BackendLibrary
 {
     public class CosmosDBRepository<T> where T : CosmosDBEntity, new()
     {
@@ -60,7 +55,7 @@ namespace Bergfest_Webhook.Repositories
                                .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
         }
 
-        public async Task<T> GetItem(string id)
+        public async Task<T?> GetItem(string id)
         {
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
             if (String.IsNullOrEmpty(id))
@@ -94,7 +89,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<T> GetItemByKey(string key)
+        public async Task<T?> GetItemByKey(string key)
         {
             if (String.IsNullOrEmpty(key))
             {
@@ -124,7 +119,7 @@ namespace Bergfest_Webhook.Repositories
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public async Task<T> GetFirstItemOrDefault(Expression<Func<T, bool>> predicate)
+        public async Task<T?> GetFirstItemOrDefault(Expression<Func<T, bool>> predicate)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -138,7 +133,7 @@ namespace Bergfest_Webhook.Repositories
             {
                 results.AddRange(await itemIterator.ReadNextAsync());
             }
-            T firstItem = results.FirstOrDefault();
+            T? firstItem = results.FirstOrDefault();
             return firstItem;
         }
         public async Task<IList<T>> GetItems()
@@ -174,7 +169,7 @@ namespace Bergfest_Webhook.Repositories
 
             return response.Resource;
         }
-        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations, string timestamp = null)
+        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations, string? timestamp = null)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -191,7 +186,7 @@ namespace Bergfest_Webhook.Repositories
             // PatchItem only supports up to 10 operations. If there are more than that given, create more batches and 
             // patch the document several times.
             List<PatchOperation> po = new List<PatchOperation>(patchOperations);
-            ItemResponse<T> response = null;
+            ItemResponse<T>? response = null;
             do
             {
                 po = new List<PatchOperation>(po.Take(MAX_PATCH_OPERATIONS));
@@ -208,15 +203,16 @@ namespace Bergfest_Webhook.Repositories
 
             return response.Resource;
         }
-        public async Task<T> PatchField(string id, string fieldName, object value)
+        public async Task<T> PatchField(string id, string fieldName, object value, string? timestamp = null)
         {
-            List<PatchOperation> patchOperations = new ()
+            List<PatchOperation> patchOperations = new()
             {
                 PatchOperation.Add($"/{fieldName}", value)
             };
 
-            return await PatchItem(id, patchOperations);
+            return await PatchItem(id, patchOperations, timestamp);
         }
+
 
     }
 }

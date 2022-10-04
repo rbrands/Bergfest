@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
-using Bergfest_Webhook.Repositories;
 using BlazorApp.Shared;
-using Microsoft.AspNetCore.Routing;
-using System.Xml.Linq;
 using System.Reflection;
-using Flurl;
 using Flurl.Http.Configuration;
-using Microsoft.Extensions.Azure;
+using BackendLibrary;
+
 
 [assembly: FunctionsStartup(typeof(BlazorApp.Api.Startup))]
 namespace BlazorApp.Api

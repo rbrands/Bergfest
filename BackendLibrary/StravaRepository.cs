@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using BlazorApp.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
-using System.Web.Http;
-using BlazorApp.Api.Utils;
+using Microsoft.VisualBasic;
 
-namespace BlazorApp.Api.Repositories
+namespace BackendLibrary
 {
     /// <summary>
     /// Interface to Strava API. For Strava API see https://developers.strava.com/ 
@@ -21,10 +15,14 @@ namespace BlazorApp.Api.Repositories
     public class StravaRepository : CosmosDBRepository<StravaAccess>
     {
         private const string STRAVA_API_ENDPOINT = "https://www.strava.com/api/v3";
+        public const int STRAVA_TTL_ACCESS = 3 * 30 * 24 * 3600; // 3 month TTL for Strava Access
+        public const int STRAVA_TTL_SEGMENT_EFFORT = 7 * 24 * 3600; // 7 days TTL for segment efforts
+        public const string STRAVA_WEBHOOK_VERIFY_TOKEN = "Bergfest-Webhook";
+        public const int STRAVA_MESSAGE_VISIBILITY_TIMEOUT = 9;
         private readonly IFlurlClient _flurlClient;
         private readonly ILogger _logger;
         private IConfiguration _config;
-        private ulong _adminAthleteId = 0; 
+        private ulong _adminAthleteId = 0;
 
         public StravaRepository(ILogger<StravaRepository> logger, IConfiguration config, CosmosClient cosmosClient, IFlurlClientFactory flurlClientFactory) : base(config, cosmosClient)
         {
@@ -41,11 +39,11 @@ namespace BlazorApp.Api.Repositories
         /// </summary>
         /// <param name="athleteId"></param>
         /// <returns></returns>
-        public async Task<string> GetAccessToken(ulong athleteId)
+        public async Task<StravaAccess> GetAccessToken(ulong athleteId)
         {
             try
-            { 
-                StravaAccess stravaAccess = await this.GetItemByKey(athleteId.ToString());
+            {
+                StravaAccess? stravaAccess = await this.GetItemByKey(athleteId.ToString());
                 if (null == stravaAccess)
                 {
                     throw new Exception($"No access token found for athlete {athleteId}.");
@@ -53,7 +51,8 @@ namespace BlazorApp.Api.Repositories
                 if (stravaAccess.ExpirationAt < DateTime.UtcNow)
                 {
                     dynamic response = await _flurlClient.Request("oauth/token")
-                                                            .SetQueryParams(new {
+                                                            .SetQueryParams(new
+                                                            {
                                                                 client_id = _config["STRAVA_CLIENT_ID"],
                                                                 client_secret = _config["STRAVA_CLIENT_SECRET"],
                                                                 grant_type = "refresh_token",
@@ -66,7 +65,7 @@ namespace BlazorApp.Api.Repositories
                     stravaAccess.ExpirationAt = DateTime.UtcNow.AddSeconds(response.expires_in);
                     await this.UpsertItem(stravaAccess);
                 }
-                return stravaAccess.AccessToken;
+                return stravaAccess;
             }
             catch (Exception ex)
             {
@@ -80,8 +79,29 @@ namespace BlazorApp.Api.Repositories
             {
                 throw new Exception("STRAVA_ADMIN_ATHLETE_ID not configured.");
             }
-            return await GetAccessToken(_adminAthleteId);
+            StravaAccess stravaAccess = await GetAccessToken(_adminAthleteId);
+            return stravaAccess.AccessToken;
         }
+        /// <summary>
+        /// Gets the StravaAccess item for the given athlete id. If not found null is returned.
+        /// </summary>
+        /// <param name="athleteId"></param>
+        /// <returns></returns>
+        public async Task<StravaAccess?> GetStravaAccess(ulong athleteId)
+        {
+            try
+            {
+                StravaAccess? stravaAccess = await this.GetItemByKey(athleteId.ToString());
+                return stravaAccess;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetStravaAccess failed.");
+                throw;
+            }
+
+        }
+
         /// <summary>
         /// Authorize application "Bergfest" on Strava.
         /// See https://developers.strava.com/docs/authentication/ for details.
@@ -96,11 +116,11 @@ namespace BlazorApp.Api.Repositories
                 dynamic response = await _flurlClient.Request("oauth/token")
                                                      .SetQueryParams(new
                                                      {
-                                                       client_id = _config["STRAVA_CLIENT_ID"],
-                                                       client_secret = _config["STRAVA_CLIENT_SECRET"],
-                                                       code = code,
-                                                       grant_type = "authorization_code"
-                                                      })
+                                                         client_id = _config["STRAVA_CLIENT_ID"],
+                                                         client_secret = _config["STRAVA_CLIENT_SECRET"],
+                                                         code = code,
+                                                         grant_type = "authorization_code"
+                                                     })
                                                       .PostJsonAsync(null)
                                                       .ReceiveJson();
                 _logger.LogInformation($"Authorize returned {response.ToString()}");
@@ -115,7 +135,7 @@ namespace BlazorApp.Api.Repositories
                 stravaAccess.Sex = response.athlete.sex;
                 stravaAccess.ProfileImageLink = response.athlete.profile;
                 stravaAccess.ProfileSmallImageLink = response.athlete.profile_medium;
-                stravaAccess.TimeToLive = Constants.TTL_STRAVA_ACCESS;
+                stravaAccess.TimeToLive = STRAVA_TTL_ACCESS;
                 _logger.LogInformation($"Athlete: LogicalKey {stravaAccess.LogicalKey} Name {stravaAccess.FirstName} {stravaAccess.LastName} ");
 
                 await this.UpsertItem(stravaAccess);
@@ -127,5 +147,15 @@ namespace BlazorApp.Api.Repositories
                 throw;
             }
         }
+        /// <summary>
+        /// User deauthorized application "Bergfest" on Strava ==> delete athlete
+        /// See https://developers.strava.com/docs/authentication/ for details.
+        /// </summary>
+        /// <param name="athleteId">Id of athlete</param>
+        public async Task DeAuthorize(ulong athleteId)
+        {
+            await this.DeleteItemByKeyAsync(athleteId.ToString());
+        }
+
     }
 }

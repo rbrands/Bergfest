@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -10,9 +9,8 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using BlazorApp.Shared;
 using System.Web.Http;
-using BlazorApp.Api.Repositories;
-using BlazorApp.Api.Utils;
-using Microsoft.AspNetCore.Routing;
+using BackendLibrary;
+
 
 namespace BlazorApp.Api
 {

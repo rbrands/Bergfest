@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,17 +8,15 @@ using Azure.Storage.Queues; // Namespace for Queue storage types
 using Azure.Storage.Queues.Models; // Namespace for PeekedMessage
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using BlazorApp.Api.Utils;
-using Microsoft.VisualBasic;
 using System.Text.Json;
-using Constants = BlazorApp.Api.Utils.Constants;
 using BlazorApp.Shared;
 using Microsoft.Extensions.Logging;
 
-namespace BlazorApp.Api.Repositories
+namespace BackendLibrary
 {
     public class QueueStorageRepository
     {
+        public const int STRAVA_MESSAGE_VISIBILITY_TIMEOUT = 9;
         private IConfiguration _config;
         private QueueClient _queueClient;
         private ILogger _logger;
@@ -51,7 +49,7 @@ namespace BlazorApp.Api.Repositories
             // Create the queue
             _queueClient.CreateIfNotExists();
         }
-        public int DecrementMessageCounter() 
+        public int DecrementMessageCounter()
         {
             Interlocked.Decrement(ref _messageCounter);
             return _messageCounter;
@@ -68,12 +66,12 @@ namespace BlazorApp.Api.Repositories
             IncrementMessageCounter();
             if (_messageCounter < 0)
             {
-                lock(this)
-                { 
+                lock (this)
+                {
                     _messageCounter = 0;
                 }
             }
-            TimeSpan visibilityTimeout = new TimeSpan(0, 0, _messageCounter * Constants.STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
+            TimeSpan visibilityTimeout = new TimeSpan(0, 0, _messageCounter * STRAVA_MESSAGE_VISIBILITY_TIMEOUT);
             _logger.LogDebug($"QueueStorageRepository.InsertMessage({messageSerialized})");
             await _queueClient.SendMessageAsync(messageSerialized, visibilityTimeout);
         }

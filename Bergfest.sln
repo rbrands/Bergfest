@@ -14,6 +14,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bergfest-Webhook", "Bergfes
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendLibrary", "BackendLibrary\BackendLibrary.csproj", "{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +41,10 @@ Global
 		{AB79612A-8378-472A-81B9-8644F30D3321}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB79612A-8378-472A-81B9-8644F30D3321}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB79612A-8378-472A-81B9-8644F30D3321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

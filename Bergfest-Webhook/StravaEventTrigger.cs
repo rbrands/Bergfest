@@ -1,17 +1,15 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using BlazorApp.Shared;
-using Bergfest_Webhook.Repositories;
 using Bergfest_Webhook.Utils;
 using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
-using System.Linq;
+using BackendLibrary;
 
 namespace Bergfest_Webhook
 {
