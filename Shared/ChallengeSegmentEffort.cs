@@ -26,6 +26,8 @@ namespace BlazorApp.Shared
         public ulong ActivityId { get; set; }
         [JsonPropertyName("activityName")]
         public string ActivityName { get; set; }
+        [JsonPropertyName("segmentTitle")]
+        public string SegmentTitle { get; set; }
         [JsonPropertyName("elapsedTime")]
         public long ElapsedTime { get; set; }
         [JsonPropertyName("startDateLocal")]

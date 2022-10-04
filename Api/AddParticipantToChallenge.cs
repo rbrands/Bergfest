@@ -11,7 +11,7 @@ using BlazorApp.Shared;
 using System.Web.Http;
 using System.Collections.Generic;
 using BackendLibrary;
-
+using Microsoft.Azure.Cosmos;
 
 namespace BlazorApp.Api
 {
@@ -47,11 +47,24 @@ namespace BlazorApp.Api
                 {
                     challenge.Participants = new Dictionary<ulong, StravaSegmentChallenge.Participant>();
                 }
+                if (null == challenge.ParticipantsFemale)
+                {
+                    challenge.ParticipantsFemale = new Dictionary<ulong, StravaSegmentChallenge.Participant>();
+                }
                 challenge.Participants.Add(participant.AthleteId, participant);
+                if (participant.AthleteSex == "F")
+                {
+                    challenge.ParticipantsFemale.Add(participant.AthleteId, participant);
+                }
                 // Patch operations are only allowed for value fields or arrays but not dictionaries. Therefore write the whole
                 // list/dictionary of segments. But check if the timestamp has not changed to avoid the "race" condition that
                 // the dictionary was updated from another one since challenge was read
-                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchField(challengeId, "Participants", challenge.Participants, challenge.TimeStamp);
+                IReadOnlyList<PatchOperation> patchOperations = new List<PatchOperation>()
+                {
+                    PatchOperation.Add("/Participants", challenge.Participants),
+                    PatchOperation.Add("/ParticipantsFemale", challenge.Participants)
+                };
+                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
 
                 return new OkObjectResult(updatedChallenge);
             }

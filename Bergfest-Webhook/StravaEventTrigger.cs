@@ -10,6 +10,7 @@ using Flurl;
 using Flurl.Http.Configuration;
 using Flurl.Http;
 using BackendLibrary;
+using System.Linq;
 
 namespace Bergfest_Webhook
 {
@@ -20,6 +21,7 @@ namespace Bergfest_Webhook
         private QueueStorageRepository _queueStorageRepository;
         private CosmosDBRepository<StravaSegmentEffort> _segmentEffortsRepository;
         private CosmosDBRepository<StravaSegment> _segmentRepository;
+        private ChallengeRepository _challengeRepository;
         private const string STRAVA_API_ENDPOINT = "https://www.strava.com/api/v3";
         private readonly IFlurlClient _flurlClient;
 
@@ -28,6 +30,7 @@ namespace Bergfest_Webhook
                              QueueStorageRepository queueRepository,
                              CosmosDBRepository<StravaSegmentEffort> segmentEffortsRepository,
                              CosmosDBRepository<StravaSegment> segmentRepository,
+                             ChallengeRepository challengeRepository,
                              IFlurlClientFactory flurlClientFactory
                             )
         {
@@ -36,6 +39,7 @@ namespace Bergfest_Webhook
             _queueStorageRepository = queueRepository;
             _segmentEffortsRepository = segmentEffortsRepository;
             _segmentRepository = segmentRepository;
+            _challengeRepository = challengeRepository;
             _flurlClient = flurlClientFactory.Get(STRAVA_API_ENDPOINT);
         }
 
@@ -130,6 +134,8 @@ namespace Bergfest_Webhook
                         stravaSegmentEffort.LogicalKey = stravaSegmentEffort.SegmentEffortId.ToString();
                         await _segmentEffortsRepository.UpsertItem(stravaSegmentEffort);
                         _logger.LogInformation($"SegmentEffort {stravaSegmentEffort.Id} - {stravaSegmentEffort.SegmentName} - {stravaSegmentEffort.StartDateLocal} - {stravaSegmentEffort.ElapsedTime}s");
+                        // Check if there are improvements for segments in challenges
+                        await ScanForChallenges(stravaSegment, stravaSegmentEffort);
                     }
                 }
             }
@@ -147,6 +153,37 @@ namespace Bergfest_Webhook
                     throw;
                 }
             }
+        }
+        public async Task ScanForChallenges(StravaSegment segment, StravaSegmentEffort effort)
+        {
+            if (null == segment.Challenges)
+            {
+                return;
+            }
+            foreach(KeyValuePair<string, StravaSegment.Challenge> challenge in segment.Challenges)
+            {
+                var stravaChallenge = challenge.Value;
+                ChallengeSegmentEffort challengeSegmentEffort = new ChallengeSegmentEffort()
+                {
+                    ChallengeId = stravaChallenge.Id,
+                    AthleteId = effort.AthleteId,
+                    SegmentEffortId = effort.SegmentEffortId,
+                    SegmentId = segment.SegmentId,
+                    AthleteSex = effort.AthleteSex,
+                    AthleteName = effort.AthleteName,
+                    ProfileImageLink = effort.ProfileImageLink,
+                    ActivityId = effort.ActivityId,
+                    ActivityName = effort.ActivityName,
+                    SegmentTitle = effort.SegmentName,
+                    ElapsedTime = effort.ElapsedTime,
+                    StartDateLocal = effort.StartDateLocal
+                };
+                if (effort.StartDateLocal.ToUniversalTime() >= stravaChallenge.StartDateUTC && effort.StartDateLocal.ToUniversalTime() <= stravaChallenge.EndDateUTC)
+                {
+                    await _challengeRepository.UpdateSegmentEffortImprovement(challengeSegmentEffort);
+                }
+            }
+                    
         }
         public async Task UpdateAthlete(StravaEvent stravaEvent)
         {

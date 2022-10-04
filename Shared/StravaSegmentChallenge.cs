@@ -137,6 +137,8 @@ namespace BlazorApp.Shared
         public IDictionary<ulong, Segment> Segments { get; set; } = new Dictionary<ulong, Segment>();
         [JsonPropertyName("participants")]
         public IDictionary<ulong, Participant> Participants { get; set; } = new Dictionary<ulong, Participant>();
+        [JsonPropertyName("participantsFemale")]
+        public IDictionary<ulong, Participant> ParticipantsFemale { get; set; } = new Dictionary<ulong, Participant>();
         public double[] PointLookup = new double[]
         {
             100.0, 90.0, 81.5, 74.0, 67.0, 60.5, 55.0, 49.5, 45.0, 40.5, 37.0, 33.5, 30.0, 27.5, 24.5, 22.5, 20.0, 18.5,
