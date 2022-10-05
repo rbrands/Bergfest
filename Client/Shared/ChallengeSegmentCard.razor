@@ -1,0 +1,187 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<div class="card">
+    <div class="card-header fst-italic">
+        @Segment.SegmentName
+        <text>&nbsp;</text><a href="@Segment.GetSegmentLink()" target="_blank" title="Segment auf Strava" alt="Segment auf Strava"><span class="oi oi-link-intact"></span></a>
+        @foreach (string tag in Segment.GetLabels())
+        {
+            <span class="badge bg-info text-dark p-2 m-1">
+                @tag
+            </span>
+        }
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Distanz</p>
+                <p class="h6 mb-0 mt-0">@Segment.GetDistanceAsText()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Hm</p>
+                <p class="h6 mb-0 mt-0">@Segment.Elevation.ToString("N0")<text>m</text></p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Steigung</p>
+                <p class="h6 mb-0 mt-0">@Segment.AverageGrade.ToString("N2")%</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Kategorie</p>
+                <p class="h6 mb-0 mt-0">@Segment.GetClimbCategoryLabel()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Ort/Strecke</p>
+                <p class="h6 mb-0 mt-0">
+                    @Segment.City<text>&nbsp;</text>
+                    @if (!String.IsNullOrEmpty(Segment.RouteRecommendation))
+                    {
+                        <a href="@Segment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                    }
+                </p>
+            </div>
+        </div>
+        <hr />
+        <p class="card-text">
+            <div class="overflow-auto" style="max-height: 500px">
+                @((MarkupString)Segment.Description)
+            </div>
+        </p>
+        <hr />
+        <ul class="list-group list-group-flush">
+            @foreach (var e in _effortsWithRanking)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <h6>
+                        <span class="badge bg-secondary rounded-pill">Rang @e.Rank</span>
+                    </h6>
+                    <div class="ms-2 me-auto">
+                        <div>
+                            <Tooltip Text="Strava Profil" ImageLink="@e.Effort.ProfileImageLink" ImageHeight="124px" Link="@e.Effort.GetAhtleteLink()">@e.Effort.AthleteName</Tooltip>
+                        </div>
+                    </div>
+                    <h6>
+                        <span class="badge bg-secondary rounded-pill">Punkte @e.Points</span>
+                    </h6>
+                    <h6>
+                        <a href="@e.Effort.GetActivitySegmentLink()" target="_blank" title="@(e.Effort.ActivityName ?? e.Effort.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.Effort.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                    </h6>
+                </li>
+            }
+        </ul>
+        @if (_effortsFemaleWithRanking.Count > 0)
+        {
+            <div class="fw-bold">Frauen</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var e in _effortsFemaleWithRanking)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <h6>
+                            <span class="badge bg-secondary rounded-pill">Rang @e.Rank</span>
+                        </h6>
+                        <div class="ms-2 me-auto">
+                            <div>
+                                <Tooltip Text="Strava Profil" ImageLink="@e.Effort.ProfileImageLink" ImageHeight="124px" Link="@e.Effort.GetAhtleteLink()">@e.Effort.AthleteName</Tooltip>
+                            </div>
+                        </div>
+                        <h6>
+                            <span class="badge bg-secondary rounded-pill">Punkte @e.Points</span>
+                        </h6>
+                        <h6>
+                            <a href="@e.Effort.GetActivitySegmentLink()" target="_blank" title="@(e.Effort.ActivityName ?? e.Effort.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.Effort.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                        </h6>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    <div class="card-footer">
+        @foreach (string tag in Segment.GetTags())
+        {
+            <span class="badge bg-light text-dark p-1 m-0 mt-2">
+                #@tag
+            </span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
+    [Parameter]
+    public EventCallback OnReload { get; set; }
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [Parameter]
+    public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private IList<SegmentEffortWithRanking> _effortsWithRanking = new List<SegmentEffortWithRanking>();
+    private IList<SegmentEffortWithRanking> _effortsFemaleWithRanking = new List<SegmentEffortWithRanking>();
+
+    internal class SegmentEffortWithRanking
+    {
+        public ChallengeSegmentEffort Effort { get; set; }
+        public int Rank { get; set; }
+        public double Points { get; set; }
+        public SegmentEffortWithRanking(ChallengeSegmentEffort effort)
+        {
+            Effort = effort;
+        }
+    }
+    protected override void OnInitialized()
+    {
+        // Load efforts with ranking
+        foreach(var e in Efforts.Where(e => e.SegmentId == Segment.SegmentId))
+        {
+            _effortsWithRanking.Add(new SegmentEffortWithRanking(e));
+            if (e.AthleteSex == "F")
+            {
+                _effortsFemaleWithRanking.Add(new SegmentEffortWithRanking(e));
+            }
+        }
+        // Calculate ranking/points
+        int ranking = 0;
+        int counter = 0;
+        long elapsedTimePred = 0;
+        foreach (var e in _effortsWithRanking)
+        {
+            ++counter;
+            if (e.Effort.ElapsedTime > elapsedTimePred)
+            {
+                ranking = counter;
+            }
+            elapsedTimePred = e.Effort.ElapsedTime;
+            e.Rank = ranking;
+            e.Points = Challenge.MapRankingToPoints(e.Rank);
+        }
+        // Calculate ranking/points for women
+        ranking = 0;
+        counter = 0;
+        elapsedTimePred = 0;
+        foreach (var e in _effortsFemaleWithRanking)
+        {
+            ++counter;
+            if (e.Effort.ElapsedTime > elapsedTimePred)
+            {
+                ranking = counter;
+            }
+            elapsedTimePred = e.Effort.ElapsedTime;
+            e.Rank = ranking;
+            e.Points = Challenge.MapRankingToPoints(e.Rank);
+        }
+
+
+    }
+    private async Task Reload()
+    {
+        await OnReload.InvokeAsync();
+    }
+
+}

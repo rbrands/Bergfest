@@ -7,8 +7,8 @@
 
 
 <div class="card">
-    <div class="card-header fw-bold">
-         @Challenge.ChallengeTitle - Gesamtergebnis
+    <div class="card-header fst-italic">
+        Gesamtergebnis
     </div>
     <div class="card-body overflow-auto" style="max-height:500px">
         <ul class="list-group list-group-flush">
@@ -26,7 +26,7 @@
                 </li>
              }
          </ul>
-        <div class="fst-italic">Frauen</div>
+        <div class="fw-bold">Frauen</div>
         <ul class="list-group list-group-flush">
             @foreach (var p in Challenge.ParticipantsFemale)
             {
