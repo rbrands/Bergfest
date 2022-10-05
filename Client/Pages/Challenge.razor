@@ -34,11 +34,21 @@ else
 }
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
+@if (null != _challenge)
+{
+    <div class="row">
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+            <ChallengSummaryCard Challenge="_challenge"></ChallengSummaryCard>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public string Scope { get; set; } = String.Empty;
     private NotificationMessage? _notificationMessage;
     private StravaSegmentChallenge? _challenge;
+    private IEnumerable<ChallengeSegmentEffort>? _challengeEfforts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -47,8 +57,9 @@ else
             _challenge = await Api.GetChallengeByTitle(Scope);
             if (null == _challenge)
             {
-                _notificationMessage!.ShowError($"Ups, es gibt keine Challenge mit dem Titel {Scope}");
+                throw new Exception($"Ups, es gibt keine Challenge mit dem Titel {Scope}");
             }
+            _challengeEfforts = await Api.GetChallengeSegmentEfforts(_challenge.Id);
         }
         catch (Exception ex)
         {

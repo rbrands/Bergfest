@@ -19,10 +19,10 @@ namespace BlazorApp.Api
     public class UpdateChallenge
     {
         private readonly ILogger _logger;
-        private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private ChallengeRepository _cosmosRepository;
 
         public UpdateChallenge(ILogger<UpdateChallenge> logger,
-                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                         ChallengeRepository cosmosRepository
                          )
         {
             _logger = logger;
@@ -38,27 +38,8 @@ namespace BlazorApp.Api
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 StravaSegmentChallenge challenge = JsonSerializer.Deserialize<StravaSegmentChallenge>(requestBody);
-                _logger.LogInformation($"UpdateChallenge(Title = {challenge.ChallengeTitle})");
-                if (String.IsNullOrEmpty(challenge.UrlTitle))
-                {
-                    challenge.UrlTitle = challenge.GetUrlFriendlyTitle();
-                }
-                List<PatchOperation> patchOperations = new()
-                {
-                    PatchOperation.Add("/ChallengeTitle", challenge.ChallengeTitle),
-                    PatchOperation.Add("/Description", challenge.Description),
-                    PatchOperation.Add("/ImageLink", challenge.ImageLink),
-                    PatchOperation.Add("/UrlTitle", challenge.UrlTitle),
-                    PatchOperation.Add("/StartDateUTC", challenge.StartDateUTC),
-                    PatchOperation.Add("/EndDateUTC", challenge.EndDateUTC),
-                    PatchOperation.Add("/IsPublicVisible", challenge.IsPublicVisible),
-                    PatchOperation.Add("/InvitationRequired", challenge.InvitationRequired),
-                    PatchOperation.Add("/RegistrationIsOpen", challenge.RegistrationIsOpen),
-                    PatchOperation.Add("/InvitationLink", challenge.InvitationLink),
-                    PatchOperation.Add("/PointLookup", challenge.PointLookup)
-                };
 
-                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challenge.Id, patchOperations);
+                StravaSegmentChallenge updatedChallenge = await _cosmosRepository.UpdateChallenge(challenge);
 
                 return new OkObjectResult(updatedChallenge);
             }

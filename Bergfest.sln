@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bergfest-Webhook", "Bergfes
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendLibrary", "BackendLibrary\BackendLibrary.csproj", "{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackendLibrary", "BackendLibrary\BackendLibrary.csproj", "{C3B64DE7-3643-46D4-BE3B-D25D7C34FF0E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948} = {DA2371A3-4788-4B2A-A0F0-0FF8EBB4C948}
 	EndProjectSection

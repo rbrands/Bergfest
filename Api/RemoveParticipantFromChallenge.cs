@@ -60,7 +60,7 @@ namespace BlazorApp.Api
                 IReadOnlyList<PatchOperation> patchOperations = new List<PatchOperation>()
                 {
                     PatchOperation.Add("/Participants", challenge.Participants),
-                    PatchOperation.Add("/ParticipantsFemale", challenge.Participants)
+                    PatchOperation.Add("/ParticipantsFemale", challenge.ParticipantsFemale)
                 };
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
 

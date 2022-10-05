@@ -85,6 +85,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetChallengeSegmentEfforts/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetSegments",
       "allowedRoles": [ "anonymous" ]
     },

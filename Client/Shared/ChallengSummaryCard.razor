@@ -1,0 +1,54 @@
+﻿@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<div class="card">
+    <div class="card-header fw-bold">
+         @Challenge.ChallengeTitle - Gesamtergebnis
+    </div>
+    <div class="card-body overflow-auto" style="max-height:500px">
+        <ul class="list-group list-group-flush">
+            @foreach (var p in Challenge.Participants)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div>
+                            <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
+                        </div>
+                    </div>
+                    <h6>
+                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints</span>
+                    </h6>
+                </li>
+             }
+         </ul>
+        <div class="fst-italic">Frauen</div>
+        <ul class="list-group list-group-flush">
+            @foreach (var p in Challenge.ParticipantsFemale)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div>
+                            <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
+                        </div>
+                    </div>
+                    <h6>
+                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints</span>
+                    </h6>
+                </li>
+            }
+        </ul>
+
+    </div>
+    <div class="card-footer">
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+}

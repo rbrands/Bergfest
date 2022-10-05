@@ -56,7 +56,7 @@ namespace BlazorApp.Api
                 // the dictionary was updated from another one since challenge was read
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchField(challengeId, "Segments", challenge.Segments, challenge.TimeStamp);
 
-                // Add challenge to segment for faster scanning for segment efforts
+                // Remove challenge from segment
                 StravaSegment stravaSegment = await _cosmosSegmentRepository.GetItemByKey(segment.SegmentId.ToString());
                 if (null == stravaSegment)
                 {

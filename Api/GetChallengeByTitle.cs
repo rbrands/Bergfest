@@ -16,11 +16,11 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private ChallengeRepository _cosmosRepository;
 
         public GetChallengeByTitle(ILogger<GetChallengeByTitle> logger,
                         IConfiguration config,
-                        CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                        ChallengeRepository cosmosRepository
         )
         {
             _logger = logger;
@@ -38,13 +38,7 @@ namespace BlazorApp.Api
                 {
                     throw new Exception("Missing challengeTitle for call GetChallenge()");
                 }
-                string challengeTitleLowerCase = challengeTitle.ToLowerInvariant();
-                _logger.LogInformation($"GetChallengeByTitle(ChallengeTitle = {challengeTitleLowerCase}");
-                StravaSegmentChallenge challenge = await _cosmosRepository.GetFirstItemOrDefault(c => c.UrlTitle == challengeTitleLowerCase);
-                if (null == challenge)
-                {
-                    throw new Exception($"Challenge {challengeTitleLowerCase} not found.");
-                }
+                StravaSegmentChallenge challenge = await _cosmosRepository.GetChallengeByTitle(challengeTitle);
                 return new OkObjectResult(challenge);
             }
             catch (Exception ex)

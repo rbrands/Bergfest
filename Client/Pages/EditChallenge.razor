@@ -79,14 +79,14 @@
         </div>
         <div class="form-group">
             <label for="startDate">Start-Datum</label>
-            <InputDate id="startDate" aria-describedby="startDateHelp" class="form-control" @bind-Value="_challenge.StartDateUTC" autocomplete="on" placeholder="Startdatum" />
+            <InputDate id="startDate" aria-describedby="startDateHelp" class="form-control" @bind-Value="_startDateLocal" autocomplete="on" placeholder="Startdatum" />
             <small id="startDateHelp" class="form-text text-muted">
                 Startdatum der Challenge.
             </small>
         </div>
         <div class="form-group">
             <label for="endDate">Enddatum</label>
-            <InputDate id="endDate" aria-describedby="endDateHelp" class="form-control" @bind-Value="_challenge.EndDateUTC" autocomplete="on" placeholder="Enddatum" />
+            <InputDate id="endDate" aria-describedby="endDateHelp" class="form-control" @bind-Value="_endDateLocal" autocomplete="on" placeholder="Enddatum" />
             <small id="endDateHelp" class="form-text text-muted">
                 Enddatum der Challenge.
             </small>
@@ -163,6 +163,8 @@
     private BlazoredTextEditor? _htmlDescription;
     private StravaSegmentChallenge _challenge = new StravaSegmentChallenge();
     private Boolean _inUpdateMode = false;
+    private DateTime _startDateLocal;
+    private DateTime _endDateLocal;
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,6 +179,8 @@
                     _inUpdateMode = true;
                 }
             }
+            _startDateLocal = _challenge.StartDateUTC.ToLocalTime();
+            _endDateLocal = _challenge.EndDateUTC.ToLocalTime();
         }
         catch (Exception ex)
         {
@@ -202,8 +206,8 @@
             _saveMessage?.Hide();
             StateHasChanged();
             _challenge.Description = StripEmptyHtml(await _htmlDescription!.GetHTML());
-            _challenge.StartDateUTC = _challenge.StartDateUTC.ToUniversalTime();
-            _challenge.EndDateUTC = _challenge.EndDateUTC.ToUniversalTime();
+            _challenge.StartDateUTC = _startDateLocal.ToUniversalTime();
+            _challenge.EndDateUTC = _endDateLocal.ToUniversalTime();
             if (_inUpdateMode)
             {
                 await Api.UpdateChallenge(_challenge);

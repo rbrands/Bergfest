@@ -120,9 +120,9 @@ namespace BlazorApp.Shared
         [MaxLength(160, ErrorMessage = "Url-Titel zu lang")]
         public string UrlTitle { get; set; }
         [JsonPropertyName("startDateUTC")]
-        public DateTime StartDateUTC { get; set; } = DateTime.Now.Date.AddDays(7.0);
+        public DateTime StartDateUTC { get; set; } = DateTime.Now.Date.AddDays(7.0).ToUniversalTime();
         [JsonPropertyName("endDateUTC")]
-        public DateTime EndDateUTC { get; set; } = DateTime.Now.Date.AddDays(37.0);
+        public DateTime EndDateUTC { get; set; } = DateTime.Now.Date.AddDays(37.0).ToUniversalTime();
         [JsonPropertyName("isPublicVisible")]
         public bool IsPublicVisible { get; set; } = true;
         [JsonPropertyName("invitationRequired")]
