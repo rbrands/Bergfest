@@ -137,6 +137,52 @@ namespace BackendLibrary
             {
                 IList<ChallengeSegmentEffort> efforts = await this.GetItems(se => se.ChallengeId == challengeId);
                 _logger.LogInformation($"GetSegmentEfforts: challengeId = >challengeId<, efforts count = >{efforts.Count}<");
+                efforts = efforts.OrderBy(s => s.SegmentId).ThenBy(s => s.ElapsedTime).ToList();
+                // Calculate ranking/points
+                int ranking = 0;
+                int counter = 0;
+                long elapsedTimePred = 0;
+                ulong segmentIdPred = 0;
+                foreach (var e in efforts)
+                {
+                    if (segmentIdPred != 0 && segmentIdPred != e.SegmentId)
+                    {
+                        ranking = 0;
+                        counter = 0;
+                        elapsedTimePred = 0;
+                    }
+                    segmentIdPred = e.SegmentId;
+                    ++counter;
+                    if (e.ElapsedTime > elapsedTimePred)
+                    {
+                        ranking = counter;
+                    }
+                    elapsedTimePred = e.ElapsedTime;
+                    e.Rank = ranking;
+                }
+                // Calculate ranking/points for women
+                ranking = 0;
+                counter = 0;
+                elapsedTimePred = 0;
+                segmentIdPred = 0;
+                foreach (var e in efforts.Where(se => se.AthleteSex == "F"))
+                {
+                    if (segmentIdPred != 0 && segmentIdPred != e.SegmentId)
+                    {
+                        ranking = 0;
+                        counter = 0;
+                        elapsedTimePred = 0;
+                    }
+                    segmentIdPred = e.SegmentId;
+                    ++counter;
+                    if (e.ElapsedTime > elapsedTimePred)
+                    {
+                        ranking = counter;
+                    }
+                    elapsedTimePred = e.ElapsedTime;
+                    e.RankFemale = ranking;
+                }
+
                 return efforts;
             }
             catch (Exception ex)

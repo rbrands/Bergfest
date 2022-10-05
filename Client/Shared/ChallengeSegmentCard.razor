@@ -55,7 +55,7 @@
         </p>
         <hr />
         <ul class="list-group list-group-flush">
-            @foreach (var e in _effortsWithRanking)
+            @foreach (var e in _effortsForSegment)
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <h6>
@@ -63,38 +63,38 @@
                     </h6>
                     <div class="ms-2 me-auto">
                         <div>
-                            <Tooltip Text="Strava Profil" ImageLink="@e.Effort.ProfileImageLink" ImageHeight="124px" Link="@e.Effort.GetAhtleteLink()">@e.Effort.AthleteName</Tooltip>
+                            <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
                         </div>
                     </div>
                     <h6>
-                        <span class="badge bg-secondary rounded-pill">Punkte @e.Points</span>
+                        <span class="badge bg-secondary rounded-pill">Punkte @Challenge.MapRankingToPoints(e.Rank)</span>
                     </h6>
                     <h6>
-                        <a href="@e.Effort.GetActivitySegmentLink()" target="_blank" title="@(e.Effort.ActivityName ?? e.Effort.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.Effort.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
                     </h6>
                 </li>
             }
         </ul>
-        @if (_effortsFemaleWithRanking.Count > 0)
+        @if (_effortsForSegment.Count(e => e.AthleteSex == "F") > 0)
         {
             <div class="fw-bold">Frauen</div>
             <ul class="list-group list-group-flush">
-                @foreach (var e in _effortsFemaleWithRanking)
+                @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <h6>
-                            <span class="badge bg-secondary rounded-pill">Rang @e.Rank</span>
+                            <span class="badge bg-secondary rounded-pill">Rang @e.RankFemale</span>
                         </h6>
                         <div class="ms-2 me-auto">
                             <div>
-                                <Tooltip Text="Strava Profil" ImageLink="@e.Effort.ProfileImageLink" ImageHeight="124px" Link="@e.Effort.GetAhtleteLink()">@e.Effort.AthleteName</Tooltip>
+                                <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
                             </div>
                         </div>
                         <h6>
-                            <span class="badge bg-secondary rounded-pill">Punkte @e.Points</span>
+                            <span class="badge bg-secondary rounded-pill">Punkte @Challenge.MapRankingToPoints(e.RankFemale)</span>
                         </h6>
                         <h6>
-                            <a href="@e.Effort.GetActivitySegmentLink()" target="_blank" title="@(e.Effort.ActivityName ?? e.Effort.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.Effort.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
                         </h6>
                     </li>
                 }
@@ -122,62 +122,11 @@
     public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
     [CascadingParameter]
     public IModalService? Modal { get; set; }
-    private IList<SegmentEffortWithRanking> _effortsWithRanking = new List<SegmentEffortWithRanking>();
-    private IList<SegmentEffortWithRanking> _effortsFemaleWithRanking = new List<SegmentEffortWithRanking>();
+    private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
 
-    internal class SegmentEffortWithRanking
-    {
-        public ChallengeSegmentEffort Effort { get; set; }
-        public int Rank { get; set; }
-        public double Points { get; set; }
-        public SegmentEffortWithRanking(ChallengeSegmentEffort effort)
-        {
-            Effort = effort;
-        }
-    }
     protected override void OnInitialized()
     {
-        // Load efforts with ranking
-        foreach(var e in Efforts.Where(e => e.SegmentId == Segment.SegmentId))
-        {
-            _effortsWithRanking.Add(new SegmentEffortWithRanking(e));
-            if (e.AthleteSex == "F")
-            {
-                _effortsFemaleWithRanking.Add(new SegmentEffortWithRanking(e));
-            }
-        }
-        // Calculate ranking/points
-        int ranking = 0;
-        int counter = 0;
-        long elapsedTimePred = 0;
-        foreach (var e in _effortsWithRanking)
-        {
-            ++counter;
-            if (e.Effort.ElapsedTime > elapsedTimePred)
-            {
-                ranking = counter;
-            }
-            elapsedTimePred = e.Effort.ElapsedTime;
-            e.Rank = ranking;
-            e.Points = Challenge.MapRankingToPoints(e.Rank);
-        }
-        // Calculate ranking/points for women
-        ranking = 0;
-        counter = 0;
-        elapsedTimePred = 0;
-        foreach (var e in _effortsFemaleWithRanking)
-        {
-            ++counter;
-            if (e.Effort.ElapsedTime > elapsedTimePred)
-            {
-                ranking = counter;
-            }
-            elapsedTimePred = e.Effort.ElapsedTime;
-            e.Rank = ranking;
-            e.Points = Challenge.MapRankingToPoints(e.Rank);
-        }
-
-
+        _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
     }
     private async Task Reload()
     {

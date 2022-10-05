@@ -32,8 +32,14 @@ namespace BlazorApp.Shared
         public long ElapsedTime { get; set; }
         [JsonPropertyName("startDateLocal")]
         public DateTime StartDateLocal { get; set; }
+        [JsonPropertyName("rank")]
+        public int Rank { get; set; }
+        [JsonPropertyName("rankFemale")]
+        public int RankFemale { get; set; }
         [JsonPropertyName("rankingPoints")]
         public double RankingPoints { get; set; }
+        [JsonPropertyName("rankingFemalePoints")]
+        public double RankingFemalePoints { get; set; }
         public string GetSegmentLink()
         {
             string segmentLink = $"https://www.strava.com/segments/{SegmentId}";
