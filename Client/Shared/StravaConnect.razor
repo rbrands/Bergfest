@@ -15,10 +15,12 @@
 else
 {
     <p>
-        <a class="btn-link" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.Uri)&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /> </a>
+        <a class="btn-link m-0 p-0" href="https://www.strava.com/oauth/authorize?client_id=92364&redirect_uri=@(NavigationManager.Uri)&approval_prompt=auto&scope=activity:read&response_type=code"><img class="img-fluid p-0 m-0" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" title="Connect with Strava" alt="Connect with Strava" /></a>
     </p>
 }
-<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+<p>
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+</p>
 
 
 @code {
@@ -28,7 +30,6 @@ else
     public string Error { get; set; } = String.Empty;
     [Parameter]
     public EventCallback OnConnectedCallback { get; set; }
-
 
     private NotificationMessage? _notificationMessage;
     private StravaAccess? _stravaAccount = null;
@@ -48,6 +49,8 @@ else
                 AppStateStore.AhtleteName = _stravaAccount.GetFullName();
                 AppStateStore.AthleteLink = _stravaAccount.GetAhtleteLink();
                 AppStateStore.AthleteId = _stravaAccount.AthleteId;
+                AppStateStore.AthleteSex = _stravaAccount.Sex;
+                AppStateStore.AthleteProfileImage = _stravaAccount.ProfileImageLink;
                 await OnConnectedCallback.InvokeAsync();
             }
             else if (!String.IsNullOrEmpty(Error))

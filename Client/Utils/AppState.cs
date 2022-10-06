@@ -19,6 +19,8 @@ namespace BlazorApp.Client.Utils
         public void NotifyStateChanged() => OnChange?.Invoke();
         public string? AhtleteName { get; set; }
         public string? AthleteLink { get; set; }
+        public string? AthleteProfileImage { get; set; }
+        public string? AthleteSex { get; set; }
 
         public AppState()
         {

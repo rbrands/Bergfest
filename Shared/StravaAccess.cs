@@ -15,6 +15,7 @@ namespace BlazorApp.Shared
         public string RefreshToken { get; set; }
         public string ProfileImageLink { get; set; }
         public string ProfileSmallImageLink { get; set; }
+        public bool StravaAuthorizationIsPending { get; set; }
         public string GetAhtleteLink()
         {
             string link = $"https://www.strava.com/athletes/{AthleteId}";

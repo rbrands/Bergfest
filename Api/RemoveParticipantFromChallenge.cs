@@ -20,13 +20,16 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private ChallengeRepository _challengeRepository;
 
         public RemoveParticipantFromChallenge(ILogger<RemoveSegmentFromChallenge> logger,
-                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository,
+                         ChallengeRepository challengeRepository
                          )
         {
             _logger = logger;
             _cosmosRepository = cosmosRepository;
+            _challengeRepository = challengeRepository;
         }
 
         [FunctionName("RemoveParticipantFromChallenge")]
@@ -63,7 +66,12 @@ namespace BlazorApp.Api
                     PatchOperation.Add("/ParticipantsFemale", challenge.ParticipantsFemale)
                 };
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
-
+                // Delete all segment efforts 
+                IEnumerable<ChallengeSegmentEffort> efforts = await _challengeRepository.GetItems(e => e.AthleteId == participant.AthleteId && e.ChallengeId == challengeId);
+                foreach (ChallengeSegmentEffort effort in efforts)
+                {
+                    await _challengeRepository.DeleteSegmentEffort(effort);
+                }
                 return new OkObjectResult(updatedChallenge);
             }
             catch (Exception ex)

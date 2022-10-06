@@ -18,6 +18,12 @@
             </span>
         }
     </div>
+    @if (!String.IsNullOrEmpty(Segment.ImageLink))
+    {
+        <a href="@Segment.GetSegmentLink()" target="_blank">
+            <img class="card-img-top" src="@Segment.ImageLink" alt="@Segment.SegmentName">
+        </a>
+    }
     <div class="card-body">
         <div class="row">
             <div class="col border-0">
