@@ -289,19 +289,19 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
-        public async Task<IEnumerable<ChallengeSegmentEffort>> GetChallengeSegmentEfforts(string challengeId)
+        public async Task<ChallengeWithEfforts> GetChallengeSegmentEfforts(string challengeId)
         {
             this.PrepareHttpClient();
             var response = await _http.GetAsync($"/api/GetChallengeSegmentEfforts/{challengeId}");
             if (response.IsSuccessStatusCode)
             {
                 IEnumerable<ChallengeSegmentEffort> returnList = new List<ChallengeSegmentEffort>();
-                IEnumerable<ChallengeSegmentEffort>? segmentsWithEfforts = await response.Content.ReadFromJsonAsync<IEnumerable<ChallengeSegmentEffort>>();
-                if (null != segmentsWithEfforts)
+                ChallengeWithEfforts? challengeWithEfforts = await response.Content.ReadFromJsonAsync<ChallengeWithEfforts>();
+                if (null == challengeWithEfforts)
                 {
-                    returnList = segmentsWithEfforts;
+                   throw new Exception("Challenge not found.");
                 }
-                return returnList;
+                return challengeWithEfforts;
             }
             else
             {

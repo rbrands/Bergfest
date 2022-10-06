@@ -131,19 +131,30 @@ namespace BackendLibrary
 
         }
 
-        public async Task<IList<ChallengeSegmentEffort>> GetSegmentEfforts(string challengeId)
+        public async Task<ChallengeWithEfforts> CalculateRanking(string challengeId)
         {
             try
             {
-                IList<ChallengeSegmentEffort> efforts = await this.GetItems(se => se.ChallengeId == challengeId);
-                _logger.LogInformation($"GetSegmentEfforts: challengeId = >challengeId<, efforts count = >{efforts.Count}<");
-                efforts = efforts.OrderBy(s => s.SegmentId).ThenBy(s => s.ElapsedTime).ToList();
+                ChallengeWithEfforts challengeWithEfforts = new ChallengeWithEfforts();
+                challengeWithEfforts.Efforts = await this.GetItems(se => se.ChallengeId == challengeId);
+                _logger.LogInformation($"CalculateRanking: challengeId = >{challengeId}<, efforts count = >{challengeWithEfforts.Efforts.Count}<");
+                if (challengeWithEfforts.Efforts.Count > 0)
+                {
+                    challengeWithEfforts.Efforts = challengeWithEfforts.Efforts.OrderBy(s => s.SegmentId).ThenBy(s => s.ElapsedTime).ToList();
+                }
                 // Calculate ranking/points
+                StravaSegmentChallenge? challenge = await _cosmosRepository.GetItem(challengeId);
+                if (null == challenge)
+                {
+                    throw new Exception($"CalculateRanking: No challenge with >{challengeId}< found.");
+                }
+                challengeWithEfforts.Challenge = challenge;
                 int ranking = 0;
                 int counter = 0;
                 long elapsedTimePred = 0;
                 ulong segmentIdPred = 0;
-                foreach (var e in efforts)
+                // Calculate ranking/points for all efforts
+                foreach (var e in challengeWithEfforts.Efforts)
                 {
                     if (segmentIdPred != 0 && segmentIdPred != e.SegmentId)
                     {
@@ -158,14 +169,16 @@ namespace BackendLibrary
                         ranking = counter;
                     }
                     elapsedTimePred = e.ElapsedTime;
+                    _logger.LogDebug($"CalculateRanking: {e.SegmentTitle} for {e.AthleteName} with rank {e.Rank}");
                     e.Rank = ranking;
+                    e.RankingPoints = challenge.MapRankingToPoints(e.Rank);
                 }
                 // Calculate ranking/points for women
                 ranking = 0;
                 counter = 0;
                 elapsedTimePred = 0;
                 segmentIdPred = 0;
-                foreach (var e in efforts.Where(se => se.AthleteSex == "F"))
+                foreach (var e in challengeWithEfforts.Efforts.Where(se => se.AthleteSex == "F"))
                 {
                     if (segmentIdPred != 0 && segmentIdPred != e.SegmentId)
                     {
@@ -180,14 +193,73 @@ namespace BackendLibrary
                         ranking = counter;
                     }
                     elapsedTimePred = e.ElapsedTime;
+                    _logger.LogDebug($"CalculateRanking: {e.SegmentTitle} for {e.AthleteName} with rank {e.RankFemale}");
                     e.RankFemale = ranking;
+                    e.RankingFemalePoints = challenge.MapRankingToPoints(e.RankFemale);
                 }
+                // Calculate totals
+                if (challenge.Participants == null)
+                {
+                    challenge.Participants = new Dictionary<ulong, StravaSegmentChallenge.Participant>();
+                }
+                if (challenge.ParticipantsFemale == null)
+                {
+                    challenge.ParticipantsFemale = new Dictionary<ulong, StravaSegmentChallenge.Participant>();
+                }
+                foreach (var p in challenge.Participants)
+                {
+                    p.Value.TotalPoints = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).Sum(e => e.RankingPoints);
+                }
+                foreach (var p in challenge.ParticipantsFemale)
+                {
+                    p.Value.TotalPoints = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).Sum(e => e.RankingFemalePoints);
+                }
+                var ordered = challenge.Participants.OrderByDescending(e => e.Value.TotalPoints);
+                // Calculate total ranking
+                ranking = 0;
+                counter = 0;
+                double pointsPred = 0.0;
+                foreach (var p in ordered)
+                {
+                    ++counter;
+                    if (p.Value.TotalPoints != pointsPred)
+                    {
+                        ranking = counter;
+                    }
+                    pointsPred = p.Value.TotalPoints;
+                    p.Value.Rank = ranking;
+                }
+                Dictionary<ulong, StravaSegmentChallenge.Participant> orderedDictionary = new Dictionary<ulong, StravaSegmentChallenge.Participant>(ordered);
+                var orderedFemale = challenge.ParticipantsFemale.OrderByDescending(e => e.Value.TotalPoints);
+                // Calculate total ranking for women
+                ranking = 0;
+                counter = 0;
+                pointsPred = 0.0;
+                foreach (var p in orderedFemale)
+                {
+                    ++counter;
+                    if (p.Value.TotalPoints != pointsPred)
+                    {
+                        ranking = counter;
+                    }
+                    pointsPred = p.Value.TotalPoints;
+                    p.Value.Rank = ranking;
+                }
+                Dictionary<ulong, StravaSegmentChallenge.Participant> orderedDictionaryFemale = new Dictionary<ulong, StravaSegmentChallenge.Participant>(orderedFemale);
+                challenge.Participants = orderedDictionary;
+                challenge.ParticipantsFemale = orderedDictionaryFemale;
 
-                return efforts;
+                IReadOnlyList<PatchOperation> patchOperations = new List<PatchOperation>()
+                {
+                    PatchOperation.Add("/Participants", orderedDictionary),
+                    PatchOperation.Add("/ParticipantsFemale", orderedDictionaryFemale)
+                };
+                challengeWithEfforts.Challenge = await _cosmosRepository.PatchItem(challengeId, patchOperations, challenge.TimeStamp);
+                return challengeWithEfforts;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetSegmentEfforts failed.");
+                _logger.LogError(ex, "CalculateRanking failed.");
                 throw;
             }
         }
@@ -202,6 +274,8 @@ namespace BackendLibrary
                 {
                     _logger.LogInformation($"UpdateSegmentEffortImprovement({segmentEffort.SegmentTitle} for {segmentEffort.AthleteName} with time {segmentEffort.ElapsedTime})");
                     ChallengeSegmentEffort updatedEffort = await UpsertItem(segmentEffort);
+                    // Recalculate all rankings
+                    await this.CalculateRanking(segmentEffort.ChallengeId);
                     return updatedEffort;
                 }
                 return segmentEffort;
@@ -231,8 +305,21 @@ namespace BackendLibrary
             try
             {
                 _logger.LogInformation($"DeleteSegmentEffort({segmentEffort.SegmentTitle} for {segmentEffort.AthleteName} with time {segmentEffort.ElapsedTime})");
-                segmentEffort.LogicalKey = $"{segmentEffort.ChallengeId}-{segmentEffort.AthleteId}-{segmentEffort.SegmentId}";
-                await this.DeleteItemAsync(segmentEffort.Id);
+                await this.DeleteSegmentEffort(segmentEffort.ChallengeId, segmentEffort.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpsertSegmentEffort failed.");
+                throw;
+            }
+        }
+        public async Task DeleteSegmentEffort(string challengeId, string segmentEffortId)
+        {
+            try
+            {
+                _logger.LogInformation($"DeleteSegmentEffort({segmentEffortId})");
+                await this.DeleteItemAsync(segmentEffortId);
+                await this.CalculateRanking(challengeId);
             }
             catch (Exception ex)
             {

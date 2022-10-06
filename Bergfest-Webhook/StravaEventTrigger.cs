@@ -230,6 +230,11 @@ namespace Bergfest_Webhook
             {
                 await _segmentEffortsRepository.DeleteItemAsync(se.Id);
             }
+            var challengeEfforts = await _challengeRepository.GetItems(se => se.ActivityId == stravaEvent.ObjectId);
+            foreach(var s in challengeEfforts)
+            {
+                await _challengeRepository.DeleteSegmentEffort(s);
+            }
         }
     }
 }

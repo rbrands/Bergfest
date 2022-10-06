@@ -37,9 +37,8 @@ namespace BlazorApp.Api
             try
             {
                 _logger.LogInformation($"GetChallengeSegmentEfforts({challengeId})");
-                IList<ChallengeSegmentEffort> segmentEfforts = await _cosmosRepository.GetSegmentEfforts(challengeId);
-                List<ChallengeSegmentEffort> orderedList = new List<ChallengeSegmentEffort>(segmentEfforts);
-                return new OkObjectResult(orderedList.OrderBy(e => e.SegmentId).ThenBy(e => e.ElapsedTime));
+                ChallengeWithEfforts challengeWithEfforts = await _cosmosRepository.CalculateRanking(challengeId);
+                return new OkObjectResult(challengeWithEfforts);
             }
             catch (Exception ex)
             {

@@ -15,13 +15,16 @@
             @foreach (var p in Challenge.Participants)
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <h6>
+                        <span class="badge bg-secondary rounded-pill">@p.Value.Rank.</span>
+                    </h6>
                     <div class="ms-2 me-auto">
                         <div>
                             <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
                         </div>
                     </div>
                     <h6>
-                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints</span>
+                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints Punkte</span>
                     </h6>
                 </li>
              }
@@ -31,13 +34,16 @@
             @foreach (var p in Challenge.ParticipantsFemale)
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <h6>
+                        <span class="badge bg-secondary rounded-pill"> @p.Value.Rank.</span>
+                    </h6>
                     <div class="ms-2 me-auto">
                         <div>
                             <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
                         </div>
                     </div>
                     <h6>
-                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints</span>
+                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints Punkte</span>
                     </h6>
                 </li>
             }
