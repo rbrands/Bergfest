@@ -1,5 +1,5 @@
 @page "/{Scope}"
-@page "/{Scope}/{Invitation}"
+@page "/invitedto/{Scope}/withtoken/{Invitation}"
 @using System.Text.RegularExpressions
 @using System.Web
 @using BlazorApp.Client.Utils
@@ -9,89 +9,97 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<PageTitle>
-    Bergfest - @_challenge?.ChallengeTitle
-</PageTitle>
-<HeadContent>
-    <meta property="og:type" content="article" />
-    <meta property="og:title" content="@_challenge?.ChallengeTitle" />
-    <meta property="og:description" content="@StripHTML(_challenge?.Description)" />
-    <meta property="og:image" content="@_challenge?.ImageLink" />
-</HeadContent>
+<ErrorBoundary @ref="_errorBoundary">
+    <ChildContent>
+        <PageTitle>
+            Bergfest - @_challenge?.ChallengeTitle
+        </PageTitle>
+        <HeadContent>
+            <meta property="og:type" content="article" />
+            <meta property="og:title" content="@_challenge?.ChallengeTitle" />
+            <meta property="og:description" content="@StripHTML(_challenge?.Description)" />
+            <meta property="og:image" content="@_challenge?.ImageLink" />
+        </HeadContent>
 
 
-@if (null == _challenge)
-{
-    <p><em>Daten werden geladen...</em></p>
-}
-else
-{
-    <div class="m-2 p-4 bg-light border">
-        <div class="overflow-auto" style="max-height: 800px">
-            @if (!String.IsNullOrEmpty(_challenge.ImageLink))
-            {
-                <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
-            }
-            <h2>@_challenge.ChallengeTitle</h2>
-            <h6 class="fw-light">
-                @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
-            </h6>
-            @((MarkupString)_challenge.Description)
-        </div>
-        @if (_registrationAllowed)
+        @if (null == _challenge)
         {
-            <div class="container m-0 p-0">
-                @if (!AppStateStore.IsConnectedWithStrava)
-                {
-                    <text>Für An/Abmeldung:</text>
-                }
-                <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="CheckRegistration"></StravaConnect>
-            </div>
+            <p><em>Daten werden geladen...</em></p>
         }
-        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
-            <AuthorizeView Roles="admin,segmentadmin">
-                <Authorized>
-                    <div class="btn-group mr-2" role="group" aria-label="Ändern">
-                        <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"/editchallenge/{_challenge.Id}")><span class="oi oi-pencil"></span></a>
-                        <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
-                    </div>
-                </Authorized>
-            </AuthorizeView>
-            @if (_registrationAllowed)
-            {
-                <div class="btn-group mr-2" role="group" aria-label="Anmeldung">
-                    @if(AppStateStore.IsConnectedWithStrava)
+        else
+        {
+            <div class="m-2 p-4 bg-light border">
+                <div class="overflow-auto" style="max-height: 800px">
+                    @if (!String.IsNullOrEmpty(_challenge.ImageLink))
                     {
-                        @if(_userIsRegistered)
+                        <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
+                    }
+                    <h2>@_challenge.ChallengeTitle</h2>
+                    <h6 class="fw-light">
+                        @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
+                    </h6>
+                    @((MarkupString)_challenge.Description)
+                </div>
+                @if (_registrationAllowed)
+                {
+                    <div class="container m-0 p-0">
+                        @if (!AppStateStore.IsConnectedWithStrava)
                         {
-                            <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => UnRegister())" title="Abmelden">Abmelden</button>
+                            <text>Für An/Abmeldung:</text>
                         }
-                        else
-                        {
-                            <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => Register())" title="Anmelden">Anmelden</button>
-                        }
+                        <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="CheckRegistration"></StravaConnect>
+                    </div>
+                }
+                <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+                    <AuthorizeView Roles="admin,segmentadmin">
+                        <Authorized>
+                            <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                                <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"/editchallenge/{_challenge.Id}")><span class="oi oi-pencil"></span></a>
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
+                    @if (_registrationAllowed)
+                    {
+                        <div class="btn-group mr-2" role="group" aria-label="Anmeldung">
+                            @if(AppStateStore.IsConnectedWithStrava)
+                            {
+                                @if(_userIsRegistered)
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => UnRegister())" title="Abmelden">Abmelden</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => Register())" title="Anmelden">Anmelden</button>
+                                }
+                            }
+                        </div>
                     }
                 </div>
-            }
-        </div>
-    </div>
-}
-<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
-
-@if (null != _challenge)
-{
-    <div class="row">
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
-            <ChallengSummaryCard Challenge="_challenge"></ChallengSummaryCard>
-        </div>
-        @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
-        {
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
-                <ChallengeSegmentCard Challenge="_challenge" Segment="s.Value" Efforts="_challengeEfforts"></ChallengeSegmentCard>
             </div>
         }
-    </div>
-}
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+        @if (null != _challenge)
+        {
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2" hidden="@(_challenge.Participants == null || _challenge.Participants.Count == 0)">
+                    <ChallengSummaryCard Challenge="_challenge"></ChallengSummaryCard>
+                </div>
+                @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
+                {
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                        <ChallengeSegmentCard Challenge="_challenge" Segment="s.Value" Efforts="_challengeEfforts"></ChallengeSegmentCard>
+                    </div>
+                }
+            </div>
+        }
+    </ChildContent>
+    <ErrorContent>
+        <p class="blazor-error-boundary">
+            Fehler:
+        </p>
+    </ErrorContent>
+</ErrorBoundary>
 
 @code {
     [CascadingParameter]
@@ -108,6 +116,7 @@ else
     public string Error { get; set; } = String.Empty;
 
     private NotificationMessage? _notificationMessage;
+    private ErrorBoundary? _errorBoundary;
     private StravaSegmentChallenge? _challenge;
     private IEnumerable<ChallengeSegmentEffort>? _challengeEfforts;
     private bool _userIsRegistered = false;
@@ -127,6 +136,7 @@ else
             _challenge = challengeWithEfforts.Challenge;
             bool invitationMatches = !_challenge.InvitationRequired || _challenge.InvitationLink?.ToLowerInvariant() == Invitation?.ToLowerInvariant();
             _registrationAllowed = _challenge.RegistrationIsOpen && invitationMatches;
+            
         }
         catch (Exception ex)
         {

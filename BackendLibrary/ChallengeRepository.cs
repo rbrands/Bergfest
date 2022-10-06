@@ -209,10 +209,12 @@ namespace BackendLibrary
                 foreach (var p in challenge.Participants)
                 {
                     p.Value.TotalPoints = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).Sum(e => e.RankingPoints);
+                    p.Value.SegmentCounter = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).GroupBy(s => s.SegmentId).Count();
                 }
                 foreach (var p in challenge.ParticipantsFemale)
                 {
                     p.Value.TotalPoints = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).Sum(e => e.RankingFemalePoints);
+                    p.Value.SegmentCounter = challengeWithEfforts.Efforts.Where(e => e.AthleteId == p.Value.AthleteId).GroupBy(s => s.SegmentId).Count();
                 }
                 var ordered = challenge.Participants.OrderByDescending(e => e.Value.TotalPoints);
                 // Calculate total ranking

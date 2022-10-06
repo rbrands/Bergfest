@@ -23,6 +23,7 @@ namespace BlazorApp.Shared
             public int Rank { get; set; }
             [JsonPropertyName("totalPoints")]
             public double TotalPoints { get; set; }
+            public int SegmentCounter { get; set; }
             public string GetAhtleteLink()
             {
                 string link = $"https://www.strava.com/athletes/{AthleteId}";
