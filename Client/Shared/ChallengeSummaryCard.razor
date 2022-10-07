@@ -10,7 +10,19 @@
     <div class="card-header fst-italic">
         @Title
     </div>
+    @if (ShowImage && !String.IsNullOrEmpty(Challenge.ImageLink))
+    {
+        <a href="/@Challenge.Id">
+            <img class="card-img-top" src="@Challenge.ImageLink" alt="@Challenge.ChallengeTitle">
+        </a>
+    }
     <div class="card-body overflow-auto" style="max-height:500px">
+        @if (ShowDescription)
+        {
+            <div>
+                @((MarkupString)Challenge.Description)
+            </div>
+        }
         <TabControl>
             <TabPage Text="Gesamt">
                 <ul class="list-group list-group-flush">
@@ -57,6 +69,9 @@
         </TabControl>
     </div>
     <div class="card-footer">
+        <div class="btn-toolbar" role="toolbar" aria-label="Zur Challenge" hidden="@(!ShowFooter)">
+            <a class="btn btn-sm btn-outline-secondary" title="Details" href=@($"/{Challenge.Id}")>Zu den Segmenten</a>
+        </div>
     </div>
 </div>
 
@@ -65,4 +80,10 @@
     public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
     [Parameter]
     public string Title { get; set; } = "Gesamtergebnis";
+    [Parameter]
+    public Boolean ShowDescription { get; set; } = false;
+    [Parameter]
+    public Boolean ShowImage { get; set; } = false;
+    [Parameter]
+    public Boolean ShowFooter { get; set; } = false;
 }

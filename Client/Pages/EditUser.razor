@@ -1,0 +1,48 @@
+﻿@page "/edituser"
+@page "/edituser/{Id}"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>User editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+    private StravaAccess _user = new StravaAccess();
+    private Boolean _inUpdateMode = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!String.IsNullOrEmpty(Id))
+            {
+//                StravaAccess? _userFromDb = await Api.GetUser(Id);
+//                if (null != _challengeFromDb)
+//                {
+//                    _challenge = _challengeFromDb;
+//                    _inUpdateMode = true;
+//                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        NavigationManager.NavigateTo($"/");
+    }
+
+}

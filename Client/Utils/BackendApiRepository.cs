@@ -215,13 +215,49 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
+        public async Task<IList<StravaSegmentChallenge>> GetChallenges()
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallenges");
+            if (response.IsSuccessStatusCode)
+            {
+                return (await response.Content.ReadFromJsonAsync<IList<StravaSegmentChallenge>>()) ?? new List<StravaSegmentChallenge>();
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
         public async Task<StravaSegmentChallenge?> GetChallengeByTitle(string urlTitle)
         {
             this.PrepareHttpClient();
             var response = await _http.GetAsync($"/api/GetChallengeByTitle/{urlTitle}");
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+                if ((response.Content.Headers.ContentLength ?? 0) > 0)
+                {
+                    return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge?>();
+                }
+                else 
+                { 
+                    return null; 
+                }
             }
             else
             {
@@ -248,6 +284,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<StravaAccess>?>($"/api/GetUsers");
+        }
+        public async Task<StravaAccess?> GetUser(string id)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<StravaAccess?>($"/api/GetUser/{id}");
         }
         public async Task<IEnumerable<StravaSegmentEffort>?> GetSegmentsEfforts()
         {

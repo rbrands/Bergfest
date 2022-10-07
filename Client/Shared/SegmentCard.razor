@@ -110,6 +110,11 @@
                 </li>
             }
             </ul>
+            <hr />
+            @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
+            {
+                <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank">Streckenempfehlung</a>
+            }
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">

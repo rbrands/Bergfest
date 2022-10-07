@@ -77,6 +77,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetChallenges",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetChallengeByTitle/*",
       "allowedRoles": [ "anonymous" ]
     },
@@ -98,6 +102,10 @@
     },
     {
       "route": "/api/GetUsers",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetUser/*",
       "allowedRoles": [ "admin" ]
     },
     {

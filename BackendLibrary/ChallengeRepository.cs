@@ -47,7 +47,7 @@ namespace BackendLibrary
                 throw;
             }
         }
-        public async Task<StravaSegmentChallenge> GetChallengeByTitle(string challengeTitle)
+        public async Task<StravaSegmentChallenge?> GetChallengeByTitle(string challengeTitle)
         {
             try
             {
@@ -58,10 +58,6 @@ namespace BackendLibrary
                 string challengeTitleLowerCase = challengeTitle.ToLowerInvariant();
                 _logger.LogInformation($"GetChallengeByTitle(ChallengeTitle = {challengeTitleLowerCase}");
                 StravaSegmentChallenge? challenge = await _cosmosRepository.GetFirstItemOrDefault(c => c.UrlTitle == challengeTitleLowerCase);
-                if (null == challenge)
-                {
-                    throw new Exception($"Challenge {challengeTitleLowerCase} not found.");
-                }
                 return challenge;
             }
             catch (Exception ex)

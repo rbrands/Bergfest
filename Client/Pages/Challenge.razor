@@ -88,7 +88,7 @@
         {
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2" hidden="@(_challenge.Participants == null || _challenge.Participants.Count == 0)">
-                    <ChallengSummaryCard Challenge="_challenge"></ChallengSummaryCard>
+                    <ChallengeSummaryCard Challenge="_challenge"></ChallengeSummaryCard>
                 </div>
                 @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
                 {
@@ -131,10 +131,19 @@
     {
         try
         {
+            if (String.IsNullOrEmpty(Scope))
+            {
+                throw new Exception("Challenge fehlt in der URL");
+            }
             _challenge = await Api.GetChallengeByTitle(Scope);
             if (null == _challenge)
             {
-                throw new Exception($"Ups, es gibt keine Challenge mit dem Titel {Scope}");
+                // Check if ID is given
+                _challenge = await Api.GetChallenge(Scope);
+            }
+            if (null == _challenge)
+            {
+                throw new Exception($"Ups, es gibt keine Challenge mit dem Titel/der ID {Scope}");
             }
             ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(_challenge.Id);
             _challengeEfforts = challengeWithEfforts.Efforts;

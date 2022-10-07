@@ -1,0 +1,70 @@
+﻿@page "/challenges"
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<PageTitle>
+    Bergfest - Challenges
+</PageTitle>
+
+<div class="m-2 p-4 bg-light border">
+    <EditArticle ArticleKey="Challenges" ImageMaxHeight="8em">
+        <h2>Challenges</h2>
+        <p>
+            Dies sind die aktuellen und abgeschlossenen Segment-Challenges mit den tagesaktuellen Ergebnissen.
+        </p>
+    </EditArticle>
+</div>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<div class="row">
+    @foreach (StravaSegmentChallenge challenge in _challengesPublic)
+    {
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+            <ChallengeSummaryCard Challenge="@challenge" Title="@challenge.GetTitleWithDate()"
+                                  ShowDescription="true" 
+                                  ShowImage="true"
+                                  ShowFooter="true">
+            </ChallengeSummaryCard>
+        </div>
+    }
+</div>
+
+
+@code {
+    private NotificationMessage? _notificationMessage;
+    IEnumerable<StravaSegmentChallenge> _challengesPublic = new List<StravaSegmentChallenge>();
+    IEnumerable<StravaSegmentChallenge> _challengesPrivate = new List<StravaSegmentChallenge>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await Reload();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    private async Task Reload()
+    {
+        try
+        {
+            _notificationMessage?.Hide();
+            List<StravaSegmentChallenge> challenges = new List<StravaSegmentChallenge>(await Api.GetChallenges());
+            _challengesPublic = challenges.Where(c => c.IsPublicVisible);
+            _challengesPrivate = challenges.Where(c => !c.IsPublicVisible);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+        }
+    }
+
+}

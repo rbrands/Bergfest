@@ -153,7 +153,7 @@ namespace BlazorApp.Shared
             }
             else
             {
-                return PointLookup[rank-1];
+                return PointLookup[rank - 1];
             }
         }
 
@@ -236,6 +236,8 @@ namespace BlazorApp.Shared
             }
             return urlFriendlyTitle;
         }
-        public string GetInvitationLink() => $"/registerfor/{UrlTitle}/withtoken/{InvitationLink}";
+        public string GetInvitationLink() => $"/registerfor/{GetUrl()}/withtoken/{InvitationLink}";
+        public string GetTitleWithDate() => $"{ChallengeTitle} {StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy")} - {EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")}";
+        public string GetUrl() => $"{UrlTitle ?? Id}";
     }
 }
