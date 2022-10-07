@@ -18,7 +18,7 @@
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <h6>
-                                <span class="badge bg-secondary rounded-pill">@p.Value.Rank.</span>
+                                <span class="badge bg-secondary rounded-pill">@p.Value.Rank.ToString("##").</span>
                             </h6>
                             <div class="ms-2 me-auto">
                                 <div>
@@ -27,7 +27,7 @@
                             </div>
                             <h6>
                                 <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
-                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints Punkte</span>
+                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0") Punkte</span>
                             </h6>
                         </li>
                      }
@@ -39,7 +39,7 @@
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <h6>
-                                <span class="badge bg-secondary rounded-pill"> @p.Value.Rank.</span>
+                                <span class="badge bg-secondary rounded-pill"> @p.Value.Rank.ToString("##").</span>
                             </h6>
                             <div class="ms-2 me-auto">
                                 <div>
@@ -48,7 +48,7 @@
                             </div>
                             <h6>
                                 <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
-                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints Punkte</span>
+                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0") Punkte</span>
                             </h6>
                         </li>
                     }
