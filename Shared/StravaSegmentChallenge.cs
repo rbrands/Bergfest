@@ -236,5 +236,6 @@ namespace BlazorApp.Shared
             }
             return urlFriendlyTitle;
         }
+        public string GetInvitationLink() => $"/registerfor/{UrlTitle}/withtoken/{InvitationLink}";
     }
 }

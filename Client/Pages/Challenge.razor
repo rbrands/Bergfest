@@ -1,5 +1,6 @@
 @page "/{Scope}"
-@page "/invitedto/{Scope}/withtoken/{Invitation}"
+@page "/registerfor/{Scope}/withtoken/{Invitation}"
+@page "/{Scope}/{Invitation}"
 @using System.Text.RegularExpressions
 @using System.Web
 @using BlazorApp.Client.Utils
@@ -12,7 +13,7 @@
 <ErrorBoundary @ref="_errorBoundary">
     <ChildContent>
         <PageTitle>
-            Bergfest - @_challenge?.ChallengeTitle
+            Bergfest - @_challenge?.ChallengeTitle 
         </PageTitle>
         <HeadContent>
             <meta property="og:type" content="article" />
@@ -56,6 +57,10 @@
                             <div class="btn-group mr-2" role="group" aria-label="Ändern">
                                 <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"/editchallenge/{_challenge.Id}")><span class="oi oi-pencil"></span></a>
                                 <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
+                                @if(_challenge.InvitationRequired && !String.IsNullOrEmpty(_challenge.InvitationLink))
+                                {
+                                    <a href="@_challenge.GetInvitationLink()" target="_blank" alt="Einladungslink" title="Einladungslink">Einladungs-Link</a>
+                                }
                             </div>
                         </Authorized>
                     </AuthorizeView>
