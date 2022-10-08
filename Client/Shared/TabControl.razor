@@ -32,11 +32,19 @@
 
 	string GetButtonClass(TabPage page)
 	{
-		return page == ActivePage ? "btn-primary" : "btn-secondary";
+		return page == ActivePage ? "btn-primary" : "btn-primary";
 	}
 
 	void ActivatePage(TabPage page)
 	{
 		ActivePage = page;
+	}
+	public void ActivatePage(string name)
+	{
+		TabPage? pageToActivate = Pages.Find(p => p.Name == name);
+		if (null != pageToActivate)
+		{
+			ActivatePage(pageToActivate);
+		}
 	}
 }
