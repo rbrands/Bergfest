@@ -48,7 +48,7 @@
                         {
                             <text>Für An/Abmeldung:</text>
                         }
-                        <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="CheckRegistration"></StravaConnect>
+                        <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="OnStravaConnect"></StravaConnect>
                     </div>
                 }
                 <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
@@ -59,7 +59,7 @@
                                 <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
                                 @if(_challenge.InvitationRequired && !String.IsNullOrEmpty(_challenge.InvitationLink))
                                 {
-                                    <a href="@_challenge.GetInvitationLink()" target="_blank" alt="Einladungslink" title="Einladungslink">Einladungs-Link</a>
+                                    <a href="@_challenge.GetInvitationLink()" class="btn btn-sm btn-outline-secondary" target="_blank" alt="Einladungslink" title="Einladungslink">Einladungs-Link</a>
                                 }
                             </div>
                         </Authorized>
@@ -88,7 +88,7 @@
         {
             <div class="row">
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2" hidden="@(_challenge.Participants == null || _challenge.Participants.Count == 0)">
-                    <ChallengeSummaryCard Challenge="_challenge"></ChallengeSummaryCard>
+                    <ChallengeSummaryCard Challenge="_challenge" ShowRating="true"></ChallengeSummaryCard>
                 </div>
                 @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
                 {
@@ -150,7 +150,7 @@
             _challenge = challengeWithEfforts.Challenge;
             bool invitationMatches = !_challenge.InvitationRequired || _challenge.InvitationLink?.ToLowerInvariant() == Invitation?.ToLowerInvariant();
             _registrationAllowed = _challenge.RegistrationIsOpen && invitationMatches;
-            
+
         }
         catch (Exception ex)
         {
@@ -163,8 +163,24 @@
         if (AppStateStore.IsConnectedWithStrava)
         {
             _userIsRegistered =  _challenge!.Participants.ContainsKey((ulong)AppStateStore.AthleteId);
+            if (_userIsRegistered)
+            {
+                _notificationMessage!.ShowInfo("Du bist angemeldet.");
+            }
+            else
+            {
+                _notificationMessage!.ShowInfo("Du bist abgemeldet.");
+            }
             StateHasChanged();
         }
+    }
+    protected async Task OnStravaConnect()
+    {
+        CheckRegistration();
+        if (_registrationAllowed && !_userIsRegistered)
+        {
+            await Register();
+        }  
     }
     protected async Task UnRegister()
     {

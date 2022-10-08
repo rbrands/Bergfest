@@ -12,11 +12,59 @@
 <h3>User editieren</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
+<EditForm Model="@_user" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="athleteId">Athlete-Id</label>
+        <InputNumber id="athleteId" aria-describedby="athleteIdHelp" class="form-control" @bind-Value="_user.AthleteId" placeholder="Id auf Strava" />
+        <small id="athleteIdHelp" class="form-text text-muted">
+            Id des Athleten auf Strava
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="firstName">Vorname</label>
+        <InputText id="firstName" aria-describedby="firstNameHelp" class="form-control" @bind-Value="_user.FirstName" placeholder="Vorname" />
+        <small id="firstNameHelp" class="form-text text-muted">
+            Vorname des Mitglieds
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="lastName">Nachname</label>
+        <InputText id="lastName" aria-describedby="lastNameHelp" class="form-control" @bind-Value="_user.LastName" placeholder="Nachname" />
+        <small id="lastNameHelp" class="form-text text-muted">
+            Nachname des Mitglieds
+        </small>
+    </div>
+    <div class="form-group">
+        <InputSelect id="sex" aria-describedby="sexHelp" @bind-Value="_user.Sex">
+            <option value="M">Männlich</option>
+            <option value="F">Weiblich</option>
+        </InputSelect>
+        <small id="sexHelp" class="form-text text-muted">
+            Geschlecht des Mitglieds
+        </small>
+    </div>
+
+    <div class="card card-body">
+        <ValidationSummary />
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+    </div>
+
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
 @code {
     [Parameter]
     public string Id { get; set; } = String.Empty;
     private NotificationMessage? _notificationMessage;
-    private StravaAccess _user = new StravaAccess();
+    private NotificationMessage? _saveMessage;
+    private StravaAccess _user = new StravaAccess()
+    {
+            StravaAuthorizationIsPending = true,
+            Sex = "M"
+    };
     private Boolean _inUpdateMode = false;
 
 
@@ -26,12 +74,12 @@
         {
             if (!String.IsNullOrEmpty(Id))
             {
-//                StravaAccess? _userFromDb = await Api.GetUser(Id);
-//                if (null != _challengeFromDb)
-//                {
-//                    _challenge = _challengeFromDb;
-//                    _inUpdateMode = true;
-//                }
+                StravaAccess? _userFromDb = await Api.GetUser(Id);
+                if (null != _userFromDb)
+                {
+                    _user = _userFromDb;
+                    _inUpdateMode = true;
+                }
             }
         }
         catch (Exception ex)
@@ -44,5 +92,29 @@
     {
         NavigationManager.NavigateTo($"/");
     }
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            if (_inUpdateMode)
+            {
+                await Api.UpdateUser(_user);
+            }
+            else
+            {
+                await Api.WriteUser(_user);
+            }
+            NavigationManager.NavigateTo("/members");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
 
 }

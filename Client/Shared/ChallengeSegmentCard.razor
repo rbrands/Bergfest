@@ -76,9 +76,8 @@
                                 </div>
                             </div>
                             <h6>
-                                <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0") Punkte</span>
-                            </h6>
-                            <h6>
+                                <span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span>
+                                <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
                                 <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
                             </h6>
                         </li>
@@ -101,9 +100,8 @@
                                     </div>
                                 </div>
                                 <h6>
-                                    <span class="badge bg-secondary rounded-pill">@e.RankingFemalePoints.ToString("##0.0") Punkte</span>
-                                </h6>
-                                <h6>
+                                    <span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span>
+                                    <span class="badge bg-secondary rounded-pill">@e.RankingFemalePoints.ToString("##0.0")</span>
                                     <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
                                 </h6>
                             </li>

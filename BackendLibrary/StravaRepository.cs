@@ -156,6 +156,28 @@ namespace BackendLibrary
         {
             await this.DeleteItemByKeyAsync(athleteId.ToString());
         }
+        public async Task<StravaAccess> UpdateUser(StravaAccess user)
+        {
+            try
+            {
+                _logger.LogInformation($"UpdateUser({user.GetFullName()})");
+                List<PatchOperation> patchOperations = new()
+                {
+                    PatchOperation.Add("/FirstName", user.FirstName),
+                    PatchOperation.Add("/LastName", user.LastName),
+                    PatchOperation.Add("/Sex", user.Sex)
+                };
+
+                StravaAccess updatedUser = await this.PatchItem(user.Id, patchOperations);
+                return updatedUser;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateChallenge failed.");
+                throw;
+            }
+        }
+
 
     }
 }

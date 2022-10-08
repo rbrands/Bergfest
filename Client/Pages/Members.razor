@@ -48,7 +48,7 @@ else
                             }
                         </a>
                     </td>
-                    <td>@member.ExpirationAt</td>
+                    <td>@(member.StravaAuthorizationIsPending ? "Authorization noch offen" : member.ExpirationAt)</td>
                 </tr>
             }
         </tbody>

@@ -150,6 +150,18 @@ namespace BlazorApp.Client.Utils
             HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/DeleteUser", user);
             response.EnsureSuccessStatusCode();
         }
+        public async Task WriteUser(StravaAccess user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/WriteUser", user);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task UpdateUser(StravaAccess user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/UpdateUser", user);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task PostStravaEvent(StravaEvent stravaEvent)
         {
             this.PrepareHttpClient();

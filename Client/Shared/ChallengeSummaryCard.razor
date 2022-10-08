@@ -12,7 +12,7 @@
     </div>
     @if (ShowImage && !String.IsNullOrEmpty(Challenge.ImageLink))
     {
-        <a href="/@Challenge.Id">
+        <a href="/@Challenge.UrlTitle">
             <img class="card-img-top" src="@Challenge.ImageLink" alt="@Challenge.ChallengeTitle">
         </a>
     }
@@ -30,7 +30,7 @@
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <h6>
-                                <span class="badge bg-secondary rounded-pill">@p.Value.Rank.ToString("##").</span>
+                                <span class="badge bg-primary rounded-pill">@p.Value.Rank.ToString("##").</span>
                             </h6>
                             <div class="ms-2 me-auto">
                                 <div>
@@ -39,7 +39,7 @@
                             </div>
                             <h6>
                                 <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
-                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0") Punkte</span>
+                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
                             </h6>
                         </li>
                      }
@@ -51,7 +51,7 @@
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <h6>
-                                <span class="badge bg-secondary rounded-pill"> @p.Value.Rank.ToString("##").</span>
+                                <span class="badge bg-primary rounded-pill"> @p.Value.Rank.ToString("##").</span>
                             </h6>
                             <div class="ms-2 me-auto">
                                 <div>
@@ -60,17 +60,42 @@
                             </div>
                             <h6>
                                 <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
-                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0") Punkte</span>
+                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
                             </h6>
                         </li>
                     }
                 </ul>
             </TabPage>
+            @if (ShowRating)
+            {
+                <TabPage Text="Punkte">
+                    <p>
+                        Für die Rangfolge auf den Segmenten werden die folgenden Punkte vergeben:
+                    </p>
+                    <table class="table table-sm table-striped table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col" class="align-content-center">Rang</th>
+                                <th scope="col" class="align-content-center">Punkte</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Challenge.PointLookup.Length; ++i)
+                            {
+                                <tr>
+                                    <td align="right">@((i+1).ToString("##0"))</td>
+                                    <td align="right">@Challenge.PointLookup[i].ToString("##0.0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </TabPage>
+            }
         </TabControl>
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Zur Challenge" hidden="@(!ShowFooter)">
-            <a class="btn btn-sm btn-outline-secondary" title="Details" href=@($"/{Challenge.Id}")>Zu den Segmenten</a>
+            <a class="btn btn-sm btn-outline-secondary" title="Details" href=@($"/{Challenge.UrlTitle}")>Zu den Segmenten</a>
         </div>
     </div>
 </div>
@@ -86,4 +111,6 @@
     public Boolean ShowImage { get; set; } = false;
     [Parameter]
     public Boolean ShowFooter { get; set; } = false;
+    [Parameter]
+    public Boolean ShowRating { get; set; } = false;
 }

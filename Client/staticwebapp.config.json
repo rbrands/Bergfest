@@ -65,6 +65,14 @@
       "allowedRoles": [ "admin" ]
     },
     {
+      "route": "/api/WriteUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/UpdateUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
       "route": "/api/PostStravaEvent",
       "allowedRoles": [ "anonymous" ]
     },
