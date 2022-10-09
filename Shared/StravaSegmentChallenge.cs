@@ -237,7 +237,7 @@ namespace BlazorApp.Shared
             return urlFriendlyTitle;
         }
         public string GetInvitationLink() => $"/registerfor/{GetUrl()}/withtoken/{InvitationLink}";
-        public string GetTitleWithDate() => $"{ChallengeTitle} {StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy")} - {EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")}";
+        public string GetTitleWithDate() => $"{ChallengeTitle} {StartDateUTC.ToLocalTime().ToString("dd.MM.")} - {EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")}";
         public string GetUrl() => $"{UrlTitle ?? Id}";
     }
 }
