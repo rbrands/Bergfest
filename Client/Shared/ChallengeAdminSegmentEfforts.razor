@@ -1,0 +1,180 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<div>
+    <TabControl @ref="_tabControl">
+        <TabPage Text="Liste" Name="List">
+            <table class="table table-sm table-striped table-bordered">
+                <tbody>
+                    @foreach(var e in ChallengeEfforts!)
+                    {
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary" title="Editieren" @onclick="@(() => EditItem(e))"><span class="oi oi-pencil"></span></button>
+                                <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(e))"><span class="oi oi-trash"></span></button>
+                            </td>
+                            <td>@e.AthleteName</td>
+                            <td>@e.AthleteSex</td>
+                            <td>@e.StartDateLocal.ToString("dd.MM.")</td>
+                            <td>@e.GetElapsedTimeAsString()</td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </TabPage>
+        <TabPage Text="Edit" Name="Edit">
+            <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+            <EditForm Model="@_currentEffort" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <InputSelect @bind-Value="_currentEffort.AthleteId">
+                        <option value="0">Teilnehmer ...</option>
+                        @foreach (var m in Challenge!.Participants)
+                        {
+                            <option value="@m.Value.AthleteId" @onselect="@(() => OnSelectAthlete(m.Value))">@m.Value.AthleteName</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label for="activityId">Activity-Id</label>
+                    <InputNumber id="activityId" class="form-control" @bind-Value="_activityIdAsInt" placeholder="Activity-Id auf Strava" />
+                </div>
+                <div class="form-group">
+                    <label for="activityName">Aktivitätsname</label>
+                    <InputText id="activityName" class="form-control" @bind-Value="_currentEffort.ActivityName" placeholder="Name der Aktivität" />
+                </div>
+                <div class="form-group">
+                    <label for="elapsedTime">Zeit</label>
+                    <InputText id="elapsedTime" class="form-control" @bind-Value="_elapsedTimeAsString" placeholder="Zeit" />
+                </div>
+                <div class="form-group">
+                    <label for="date">Datum</label>
+                    <InputText id="date" class="form-control" @bind-Value="_startDateAsString" placeholder="Datum" />
+                </div>
+
+                <ValidationSummary />
+                <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+                <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zur Liste</button>
+                <button class="btn btn-secondary" title="Neu" @onclick="@(() => InitChallengeSegmentEffort())">Neuer Eintrag</button>
+            </EditForm>
+        </TabPage>
+    </TabControl>
+    <button @onclick="Cancel" class="btn btn-secondary">Zurück</button>
+</div>
+@code {
+    [CascadingParameter] 
+    BlazoredModalInstance BlazoredModal { get; set; } = new BlazoredModalInstance();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    [Parameter]
+    public StravaSegmentChallenge? Challenge { get; set; }
+    [Parameter]
+    public StravaSegmentChallenge.Segment? Segment { get; set; }
+    [Parameter]
+    public IEnumerable<ChallengeSegmentEffort>? ChallengeEfforts { get; set; }
+    TabControl? _tabControl;
+    private NotificationMessage? _notificationMessage;
+    private ChallengeSegmentEffort _currentEffort = new ChallengeSegmentEffort();
+    private long _activityIdAsInt 
+    { 
+        get => (long)_currentEffort.ActivityId; 
+        set => _currentEffort.ActivityId = (ulong)value; 
+    }
+    private string _elapsedTimeAsString
+    {
+        get => TimeSpan.FromSeconds(_currentEffort.ElapsedTime).ToString();
+        set => _currentEffort.ElapsedTime = (long)TimeSpan.Parse(value).TotalSeconds;
+    }
+    private string _startDateAsString
+    {
+        get => _currentEffort.StartDateLocal.ToString("dd.MM.yyyy");
+        set => _currentEffort.StartDateLocal = DateTime.Parse(value);
+    }
+
+
+    void Close() => BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    void Cancel() => BlazoredModal.CancelAsync();
+
+    protected override void OnInitialized()
+    {
+        InitChallengeSegmentEffort();
+    }
+
+    protected async Task DeleteItem(ChallengeSegmentEffort effort)
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Eintrag löschen?", "Soll der Eintrag wirklich aus der Rangliste gelöscht werden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            // await Api.DeleteSegmentEffort(effort);
+        }
+    }
+    protected void EditItem(ChallengeSegmentEffort effort)
+    {
+        _currentEffort = effort;
+        _tabControl!.ActivatePage("Edit");
+    }
+    public void InitChallengeSegmentEffort()
+    {
+        _currentEffort = new ChallengeSegmentEffort()
+        {
+            ChallengeId = Challenge?.Id,
+            SegmentId = Segment?.SegmentId ?? 0,
+            SegmentTitle = Segment?.SegmentName
+        };
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+    protected void OnCancel()
+    {
+        InitChallengeSegmentEffort();
+        _tabControl!.ActivatePage("List");
+    }
+    protected void OnSelectAthlete(StravaSegmentChallenge.Participant p)
+    {
+        _currentEffort.AthleteName = p.AthleteName;
+        _currentEffort.AthleteSex = p.AthleteSex;
+        _currentEffort.ProfileImageLink = p.ProfileImage;
+    }
+
+
+
+    public static async Task<ModalResult> Admin(IModalService modalService, 
+                                                StravaSegmentChallenge challenge, 
+                                                StravaSegmentChallenge.Segment segment,
+                                                IEnumerable<ChallengeSegmentEffort> challengeEfforts)
+    {
+        var parameters = new ModalParameters()
+                            .Add(nameof(ChallengeAdminSegmentEfforts.Challenge), challenge)
+                            .Add(nameof(ChallengeAdminSegmentEfforts.Segment), segment)
+                            .Add(nameof(ChallengeAdminSegmentEfforts.ChallengeEfforts), challengeEfforts);
+        var options = new ModalOptions()
+        {
+            Size = ModalSize.Large
+        };
+        var modal = modalService.Show<ChallengeAdminSegmentEfforts>("Segment-Rangliste", parameters, options);
+        return await modal.Result;
+    }
+
+}

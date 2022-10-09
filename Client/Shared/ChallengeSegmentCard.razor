@@ -116,35 +116,52 @@
         }
     </div>
     <div class="card-footer">
+        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+            <AuthorizeView Roles="admin,segmentadmin">
+                <Authorized>
+                    <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => Admin())"><span class="oi oi-pencil"></span></button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
         @foreach (string tag in Segment.GetTags())
         {
             <span class="badge bg-light text-dark p-1 m-0 mt-2">
                 #@tag
             </span>
         }
+        </div>
     </div>
 </div>
 
-@code {
-    [Parameter]
-    public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
-    [Parameter]
-    public EventCallback OnReload { get; set; }
-    [Parameter]
-    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
-    [Parameter]
-    public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
-    [CascadingParameter]
-    public IModalService? Modal { get; set; }
-    private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
+    @code {
+        [Parameter]
+        public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
+        [Parameter]
+        public EventCallback OnReload { get; set; }
+        [Parameter]
+        public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+        [Parameter]
+        public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
+        [CascadingParameter]
+        public IModalService? Modal { get; set; }
+        private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
 
-    protected override void OnInitialized()
-    {
-        _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
-    }
-    private async Task Reload()
-    {
-        await OnReload.InvokeAsync();
+        protected override void OnInitialized()
+        {
+            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+        }
+        private async Task Reload()
+        {
+            await OnReload.InvokeAsync();
+        }
+        protected async Task Admin()
+        {
+            if (null != Modal)
+            {
+                ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment);
+                await Reload();
+            }
     }
 
 }
