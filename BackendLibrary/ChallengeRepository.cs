@@ -307,7 +307,7 @@ namespace BackendLibrary
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "UpsertSegmentEffort failed.");
+                _logger.LogError(ex, "DeleteSegmentEffort failed.");
                 throw;
             }
         }
@@ -321,7 +321,7 @@ namespace BackendLibrary
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "UpsertSegmentEffort failed.");
+                _logger.LogError(ex, "DeleteSegmentEffort failed.");
                 throw;
             }
         }
