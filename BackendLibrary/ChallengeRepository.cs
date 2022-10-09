@@ -271,7 +271,7 @@ namespace BackendLibrary
                 if (null == effortInStock || segmentEffort.ElapsedTime < effortInStock.ElapsedTime)
                 {
                     _logger.LogInformation($"UpdateSegmentEffortImprovement({segmentEffort.SegmentTitle} for {segmentEffort.AthleteName} with time {segmentEffort.ElapsedTime})");
-                    ChallengeSegmentEffort updatedEffort = await UpsertItem(segmentEffort);
+                    ChallengeSegmentEffort updatedEffort = await UpsertSegmentEffort(segmentEffort);
                     // Recalculate all rankings
                     await this.CalculateRanking(segmentEffort.ChallengeId);
                     return updatedEffort;

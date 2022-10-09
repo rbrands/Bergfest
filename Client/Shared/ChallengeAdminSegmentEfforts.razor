@@ -57,7 +57,7 @@
                 </div>
                 <div class="form-group">
                     <label for="date">Datum</label>
-                    <InputText id="date" class="form-control" @bind-Value="_startDateAsString" placeholder="Datum" />
+                    <InputDate id="date" class="form-control" @bind-Value="_currentEffort.StartDateLocal" placeholder="Datum" />
                 </div>
 
                 <ValidationSummary />
@@ -128,11 +128,12 @@
     public void InitChallengeSegmentEffort()
     {
         _currentEffort = new ChallengeSegmentEffort()
-        {
-            ChallengeId = Challenge?.Id,
-            SegmentId = Segment?.SegmentId ?? 0,
-            SegmentTitle = Segment?.SegmentName
-        };
+            {
+                ChallengeId = Challenge?.Id,
+                SegmentId = Segment?.SegmentId ?? 0,
+                SegmentTitle = Segment?.SegmentName,
+                StartDateLocal = DateTime.Today
+    };
     }
     private async Task OnSave()
     {
