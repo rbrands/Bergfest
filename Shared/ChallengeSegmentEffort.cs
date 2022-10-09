@@ -60,5 +60,10 @@ namespace BlazorApp.Shared
             string link = $"https://www.strava.com/activities/{ActivityId}/segments/{SegmentEffortId}";
             return link;
         }
+        public string GetElapsedTimeAsString()
+        {
+            return ElapsedTime < 3600 ? TimeSpan.FromSeconds(ElapsedTime).ToString(@"mm\:ss") : TimeSpan.FromSeconds(ElapsedTime).ToString(@"hh\:mm\:ss");
+        }
+
     }
 }

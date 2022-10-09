@@ -67,18 +67,15 @@
                     @foreach (var e in _effortsForSegment)
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <h6>
-                                <span class="badge bg-secondary rounded-pill">@e.Rank.ToString("##").</span>
-                            </h6>
                             <div class="ms-2 me-auto">
                                 <div>
                                     <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
                                 </div>
                             </div>
                             <h6>
-                                <span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span>
+                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
                                 <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
-                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                             </h6>
                         </li>
                     }
@@ -91,18 +88,15 @@
                         @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <h6>
-                                    <span class="badge bg-secondary rounded-pill">@e.RankFemale.ToString("##").</span>
-                                </h6>
                                 <div class="ms-2 me-auto">
                                     <div>
                                         <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
                                     </div>
                                 </div>
                                 <h6>
-                                    <span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span>
+                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
                                     <span class="badge bg-secondary rounded-pill">@e.RankingFemalePoints.ToString("##0.0")</span>
-                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                 </h6>
                             </li>
                         }

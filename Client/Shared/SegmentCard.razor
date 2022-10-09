@@ -83,7 +83,7 @@
                                         </div>
                                     </div>
                                     <h6>
-                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                     </h6>
                                 </li>
                             }
@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
                                     <h6>
-                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                     </h6>
                                 </li>
                             }
