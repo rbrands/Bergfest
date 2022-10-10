@@ -189,7 +189,14 @@
     }
     protected void OnCancel()
     {
-        NavigationManager.NavigateTo($"/");
+        if (_inUpdateMode)
+        {
+            NavigationManager.NavigateTo($"/{_challenge.UrlTitle}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/challenges");
+        }
     }
     private string? StripEmptyHtml(string htmlContent)
     {
@@ -215,7 +222,14 @@
             {
                 await Api.WriteChallenge(_challenge);
             }
-            NavigationManager.NavigateTo($"/");
+            if (_inUpdateMode)
+            {
+                NavigationManager.NavigateTo($"/{_challenge.UrlTitle}");
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"/challenges");
+            }
         }
         catch (Exception ex)
         {
