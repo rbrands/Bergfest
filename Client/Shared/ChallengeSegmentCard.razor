@@ -154,12 +154,14 @@
         private async Task Reload()
         {
             await OnReload.InvokeAsync();
+            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+            StateHasChanged();
         }
         protected async Task Admin()
         {
             if (null != Modal)
             {
-                ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment);
+                ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment, OnReload);
                 await Reload();
             }
     }

@@ -74,7 +74,8 @@
                 AthleteId = (ulong)participant.AthleteId,
                 AthleteName = participant.GetFullName(),
                 AthleteSex = participant.Sex,
-                ProfileImage = participant.ProfileImageLink
+                ProfileImage = participant.ProfileImageLink,
+                StravaAuthorizationIsPending = participant.StravaAuthorizationIsPending
             };
             StravaSegmentChallenge? updatedChallenge;
             if (IsSelected(participant))

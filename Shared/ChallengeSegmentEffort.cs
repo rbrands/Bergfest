@@ -42,22 +42,47 @@ namespace BlazorApp.Shared
         public double RankingFemalePoints { get; set; }
         public string GetSegmentLink()
         {
-            string segmentLink = $"https://www.strava.com/segments/{SegmentId}";
-            return segmentLink;
+            string link = "#";
+            if (SegmentId > 0)
+            {
+                link = $"https://www.strava.com/segments/{SegmentId}";
+            }
+            else
+            {
+                link = GetActivityLink();
+            }
+
+            return link;
         }
         public string GetActivityLink()
         {
-            string link = $"https://www.strava.com/activities/{ActivityId}";
+            string link = "#";
+            if (ActivityId > 0)
+            {
+                link = $"https://www.strava.com/activities/{ActivityId}";
+            }
             return link;
         }
         public string GetAhtleteLink()
         {
-            string link = $"https://www.strava.com/athletes/{AthleteId}";
+            string link = "#";
+            if (AthleteId > 0)
+            { 
+                link = $"https://www.strava.com/athletes/{AthleteId}";
+            }
             return link;
         }
         public string GetActivitySegmentLink()
         {
-            string link = $"https://www.strava.com/activities/{ActivityId}/segments/{SegmentEffortId}";
+            string link = "#";
+            if (SegmentEffortId > 0)
+            {
+                link = $"https://www.strava.com/activities/{ActivityId}/segments/{SegmentEffortId}";
+            }
+            else
+            {
+                link = GetSegmentLink();
+            }
             return link;
         }
         public string GetElapsedTimeAsString()

@@ -19,6 +19,9 @@ namespace BlazorApp.Shared
             public string AthleteName { get; set; }
             [JsonPropertyName("profileImage")]
             public string ProfileImage { get; set; }
+            [JsonPropertyName("stravaAuthorizationIsPending")]
+            public bool StravaAuthorizationIsPending { get; set; }
+
             [JsonPropertyName("rank")]
             public int Rank { get; set; }
             [JsonPropertyName("totalPoints")]

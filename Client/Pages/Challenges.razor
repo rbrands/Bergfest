@@ -31,9 +31,12 @@
         </div>
     }
 </div>
+
 <AuthorizeView Roles="admin,segmentadmin">
     <Authorized>
+        <hr />
         <h4>Nicht öffentliche Challenges</h4>
+        <p>Die folgenden Challenges sind nur per direktem Link sichtbar.</p>
         <div class="row">
             @foreach (StravaSegmentChallenge challenge in _challengesPrivate)
             {

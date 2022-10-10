@@ -10,6 +10,15 @@
     <TabControl @ref="_tabControl">
         <TabPage Text="Liste" Name="List">
             <table class="table table-sm table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Aktion</th>
+                        <th scope="col">Geschlecht</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Datum</th>
+                        <th scope="col">Zeit</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach(var e in ChallengeEfforts!)
                     {
@@ -35,11 +44,19 @@
                 <DataAnnotationsValidator />
 
                 <div class="form-group">
-                    <InputSelect @bind-Value="_currentEffort.AthleteId">
+                    <InputSelect ValueExpression="@(() => _currentEffort.AthleteId)"
+                                 Value="_currentEffort.AthleteId"
+                                 ValueChanged="@((ulong args) => { _currentEffort.AthleteId = args; OnSelectAthlete(); })">
                         <option value="0">Teilnehmer ...</option>
                         @foreach (var m in Challenge!.Participants)
                         {
-                            <option value="@m.Value.AthleteId" @onselect="@(() => OnSelectAthlete(m.Value))">@m.Value.AthleteName</option>
+                            <option value="@m.Value.AthleteId">
+                                @m.Value.AthleteName
+                                @if (m.Value.StravaAuthorizationIsPending)
+                                {
+                                    <text>(manuell)</text>
+                                }
+                            </option>
                         }
                     </InputSelect>
                 </div>
@@ -58,6 +75,10 @@
                 <div class="form-group">
                     <label for="date">Datum</label>
                     <InputDate id="date" class="form-control" @bind-Value="_currentEffort.StartDateLocal" placeholder="Datum" />
+                </div>
+                <div class="form-group">
+                    <label for="effortId">Segmenteffort-Id</label>
+                    <InputNumber id="effortId" class="form-control" @bind-Value="_effortIdAsInt" placeholder="SegmentEffort-Id auf Strava" />
                 </div>
 
                 <ValidationSummary />
@@ -80,6 +101,8 @@
     public StravaSegmentChallenge.Segment? Segment { get; set; }
     [Parameter]
     public IEnumerable<ChallengeSegmentEffort>? ChallengeEfforts { get; set; }
+    [Parameter]
+    public EventCallback OnReload { get; set; }
     TabControl? _tabControl;
     private NotificationMessage? _notificationMessage;
     private ChallengeSegmentEffort _currentEffort = new ChallengeSegmentEffort();
@@ -97,6 +120,11 @@
     {
         get => _currentEffort.StartDateLocal.ToString("dd.MM.yyyy");
         set => _currentEffort.StartDateLocal = DateTime.Parse(value);
+    }
+    private long _effortIdAsInt
+    {
+        get => (long)_currentEffort.SegmentEffortId;
+        set => _currentEffort.SegmentEffortId = (ulong)value;
     }
 
 
@@ -117,7 +145,8 @@
             {
                 return;
             }
-            // await Api.DeleteSegmentEffort(effort);
+            await Api.DeleteChallengeSegmentEffort(effort);
+            await OnReload.InvokeAsync();
         }
     }
     protected void EditItem(ChallengeSegmentEffort effort)
@@ -133,7 +162,7 @@
                 SegmentId = Segment?.SegmentId ?? 0,
                 SegmentTitle = Segment?.SegmentName,
                 StartDateLocal = DateTime.Today
-    };
+            };
     }
     private async Task OnSave()
     {
@@ -141,6 +170,9 @@
 
         try
         {
+            await Api.WriteChallengeSegmentEffort(_currentEffort);
+            _notificationMessage?.ShowInfo("Gespeichert");
+            await OnReload.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -152,8 +184,9 @@
         InitChallengeSegmentEffort();
         _tabControl!.ActivatePage("List");
     }
-    protected void OnSelectAthlete(StravaSegmentChallenge.Participant p)
+    protected void OnSelectAthlete()
     {
+        StravaSegmentChallenge.Participant p = Challenge!.Participants![_currentEffort.AthleteId];
         _currentEffort.AthleteName = p.AthleteName;
         _currentEffort.AthleteSex = p.AthleteSex;
         _currentEffort.ProfileImageLink = p.ProfileImage;
@@ -164,15 +197,18 @@
     public static async Task<ModalResult> Admin(IModalService modalService, 
                                                 StravaSegmentChallenge challenge, 
                                                 StravaSegmentChallenge.Segment segment,
-                                                IEnumerable<ChallengeSegmentEffort> challengeEfforts)
+                                                IEnumerable<ChallengeSegmentEffort> challengeEfforts,
+                                                EventCallback onReload)
     {
         var parameters = new ModalParameters()
                             .Add(nameof(ChallengeAdminSegmentEfforts.Challenge), challenge)
                             .Add(nameof(ChallengeAdminSegmentEfforts.Segment), segment)
-                            .Add(nameof(ChallengeAdminSegmentEfforts.ChallengeEfforts), challengeEfforts);
+                            .Add(nameof(ChallengeAdminSegmentEfforts.ChallengeEfforts), challengeEfforts)
+                            .Add(nameof(ChallengeAdminSegmentEfforts.OnReload), onReload);
         var options = new ModalOptions()
         {
-            Size = ModalSize.Large
+            Size = ModalSize.Large,
+            DisableBackgroundCancel = true
         };
         var modal = modalService.Show<ChallengeAdminSegmentEfforts>("Segment-Rangliste", parameters, options);
         return await modal.Result;
