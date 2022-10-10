@@ -1,18 +1,259 @@
 @page "/{Scope}"
+@page "/registerfor/{Scope}/withtoken/{Invitation}"
+@page "/{Scope}/{Invitation}"
+@using System.Text.RegularExpressions
+@using System.Web
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
+@implements IDisposable
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<PageTitle>
-    Bergfest - Challenge
-</PageTitle>
-<p>
-    @Scope
-</p>
+<ErrorBoundary @ref="_errorBoundary">
+    <ChildContent>
+        <PageTitle>
+            Bergfest - @_challenge?.ChallengeTitle 
+        </PageTitle>
+        <HeadContent>
+            <meta property="og:type" content="article" />
+            <meta property="og:title" content="@_challenge?.ChallengeTitle" />
+            <meta property="og:description" content="@StripHTML(_challenge?.Description)" />
+            <meta property="og:image" content="@_challenge?.ImageLink" />
+        </HeadContent>
+
+
+        @if (null == _challenge)
+        {
+            <p><em>Daten werden geladen...</em></p>
+        }
+        else
+        {
+            <div class="m-2 p-4 bg-light border">
+                <div class="overflow-auto" style="max-height: 800px">
+                    @if (!String.IsNullOrEmpty(_challenge.ImageLink))
+                    {
+                        <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
+                    }
+                    <h2>@_challenge.ChallengeTitle</h2>
+                    <h6 class="fw-light">
+                        @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
+                    </h6>
+                    @((MarkupString)_challenge.Description)
+                </div>
+                @if (_registrationAllowed)
+                {
+                    <div class="container m-0 p-0">
+                        @if (!AppStateStore.IsConnectedWithStrava)
+                        {
+                            <text>Für An/Abmeldung:</text>
+                        }
+                        <StravaConnect Code="@Code" Error="@Error" OnConnectedCallback="OnStravaConnect"></StravaConnect>
+                    </div>
+                }
+                <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+                    <AuthorizeView Roles="admin,segmentadmin">
+                        <Authorized>
+                            <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                                <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"/editchallenge/{_challenge.Id}")><span class="oi oi-pencil"></span></a>
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
+                                @if(_challenge.InvitationRequired && !String.IsNullOrEmpty(_challenge.InvitationLink))
+                                {
+                                    <a href="@_challenge.GetInvitationLink()" class="btn btn-sm btn-outline-secondary" target="_blank" alt="Einladungslink" title="Einladungslink">Einladungs-Link</a>
+                                }
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
+                    @if (_registrationAllowed)
+                    {
+                        <div class="btn-group mr-2" role="group" aria-label="Anmeldung">
+                            @if(AppStateStore.IsConnectedWithStrava)
+                            {
+                                @if(_userIsRegistered)
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => UnRegister())" title="Abmelden">Abmelden</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => Register())" title="Anmelden">Anmelden</button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+        @if (null != _challenge)
+        {
+            <div class="row">
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2" hidden="@(_challenge.Participants == null || _challenge.Participants.Count == 0)">
+                    <ChallengeSummaryCard Challenge="_challenge" ShowRating="true"></ChallengeSummaryCard>
+                </div>
+                @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
+                {
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                        <ChallengeSegmentCard Challenge="_challenge" 
+                                              Segment="s.Value" 
+                                              Efforts="_challengeEfforts"
+                                              OnReload="Reload">
+                        </ChallengeSegmentCard>
+                    </div>
+                }
+            </div>
+        }
+    </ChildContent>
+    <ErrorContent>
+        <p class="blazor-error-boundary">
+            Fehler:
+        </p>
+    </ErrorContent>
+</ErrorBoundary>
+
 @code {
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
     [Parameter]
     public string Scope { get; set; } = String.Empty;
+    [Parameter]
+    public string Invitation { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "code")]
+    public string Code { get; set; } = String.Empty;
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string Error { get; set; } = String.Empty;
+
+    private NotificationMessage? _notificationMessage;
+    private ErrorBoundary? _errorBoundary;
+    private StravaSegmentChallenge? _challenge;
+    private IEnumerable<ChallengeSegmentEffort>? _challengeEfforts;
+    private bool _userIsRegistered = false;
+    private bool _registrationAllowed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (String.IsNullOrEmpty(Scope))
+            {
+                throw new Exception("Challenge fehlt in der URL");
+            }
+            _challenge = await Api.GetChallengeByTitle(Scope);
+            if (null == _challenge)
+            {
+                // Check if ID is given
+                _challenge = await Api.GetChallenge(Scope);
+            }
+            if (null == _challenge)
+            {
+                throw new Exception($"Ups, es gibt keine Challenge mit dem Titel/der ID {Scope}");
+            }
+            await Reload();
+            bool invitationMatches = !_challenge.InvitationRequired || _challenge.InvitationLink?.ToLowerInvariant() == Invitation?.ToLowerInvariant();
+            _registrationAllowed = _challenge.RegistrationIsOpen && invitationMatches;
+
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage!.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    private async Task Reload()
+    {
+        ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(_challenge!.Id);
+        _challengeEfforts = challengeWithEfforts.Efforts;
+        _challenge = challengeWithEfforts.Challenge;
+        StateHasChanged();
+    }
+    protected void CheckRegistration()
+    {
+        if (AppStateStore.IsConnectedWithStrava)
+        {
+            _userIsRegistered =  _challenge!.Participants.ContainsKey((ulong)AppStateStore.AthleteId);
+            if (_userIsRegistered)
+            {
+                _notificationMessage!.ShowInfo("Du bist angemeldet.");
+            }
+            else
+            {
+                _notificationMessage!.ShowInfo("Du bist abgemeldet.");
+            }
+            StateHasChanged();
+        }
+    }
+    protected async Task OnStravaConnect()
+    {
+        CheckRegistration();
+        if (_registrationAllowed && !_userIsRegistered)
+        {
+            await Register();
+        }  
+    }
+    protected async Task UnRegister()
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Abmelden?", $"Von {_challenge!.ChallengeTitle} wirklich abmelden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            var participant = _challenge.Participants[(ulong)AppStateStore.AthleteId];
+            _challenge = await Api.RemoveParticipantFromChallenge(participant, _challenge!.Id);
+            ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(_challenge!.Id);
+            _challengeEfforts = challengeWithEfforts.Efforts;
+            _challenge = challengeWithEfforts.Challenge;
+            CheckRegistration();
+        }
+    }
+    protected async Task Register()
+    {
+        StravaSegmentChallenge.Participant challengeParticipant = new StravaSegmentChallenge.Participant()
+        {
+            AthleteId = (ulong)AppStateStore.AthleteId,
+            AthleteName = AppStateStore.AhtleteName,
+            AthleteSex = AppStateStore.AthleteSex,
+            ProfileImage = AppStateStore.AthleteProfileImage
+        };
+        _challenge = await Api.AddParticipantToChallenge(challengeParticipant, _challenge!.Id);
+        ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(_challenge!.Id);
+        _challengeEfforts = challengeWithEfforts.Efforts;
+        _challenge = challengeWithEfforts.Challenge;
+        CheckRegistration();
+    }
+
+    protected async Task DeleteChallenge()
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Löschen?", $"Soll {_challenge!.ChallengeTitle} wirklich mit allen Daten gelöscht werden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            await Api.DeleteChallenge(_challenge);
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+
+    public string StripHTML(string? HTMLText, bool decode = true)
+    {
+        if (null != HTMLText)
+        {
+            Regex reg = new Regex("<[^>]+>", RegexOptions.IgnoreCase);
+            var stripped = reg.Replace(HTMLText, "");
+            return decode ? HttpUtility.HtmlDecode(stripped) : stripped;
+        }
+        else
+        {
+            return String.Empty;
+        }
+    }
+    public void Dispose()
+    {
+    }
 
 }

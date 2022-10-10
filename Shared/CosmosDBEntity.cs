@@ -51,6 +51,9 @@ namespace BlazorApp.Shared
         [JsonProperty(PropertyName = "tenant", NullValueHandling = NullValueHandling.Ignore)]
         [JsonPropertyName("tenant")]
         public string Tenant { get; set; }
+        [JsonProperty(PropertyName = "_ts")]
+        [JsonPropertyName("_ts")]
+        public string TimeStamp { get; set; }
         public void SetUniqueKey()
         {
             if (null != LogicalKey)

@@ -9,11 +9,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using BlazorApp.Shared;
 using System.Web.Http;
-using BlazorApp.Api.Repositories;
-using BlazorApp.Api.Utils;
 using System.Collections.Generic;
-using System.Linq;
-
+using BackendLibrary;
 
 namespace BlazorApp.Api
 {

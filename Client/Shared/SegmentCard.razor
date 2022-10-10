@@ -11,7 +11,7 @@
     <div class="card-header">
         <em>
             @SegmentWithEfforts.StravaSegment.SegmentName
-            <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank"><span class="oi oi-link-intact"></span></a>
+            <text>&nbsp;</text><a href="@SegmentWithEfforts.StravaSegment.GetSegmentLink()" target="_blank" title="Segment auf Strava" alt="Segment auf Strava"><span class="oi oi-link-intact"></span></a>
         </em>
         @foreach (string tag in SegmentWithEfforts.StravaSegment.GetLabels())
         {
@@ -83,7 +83,7 @@
                                         </div>
                                     </div>
                                     <h6>
-                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                     </h6>
                                 </li>
                             }
@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
                                     <h6>
-                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@TimeSpan.FromSeconds(e.ElapsedTime).ToString(@"hh\:mm\:ss")</span></a>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.AthleteName" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                     </h6>
                                 </li>
                             }
@@ -110,6 +110,11 @@
                 </li>
             }
             </ul>
+            <hr />
+            @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
+            {
+                <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank">Streckenempfehlung</a>
+            }
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
@@ -163,10 +168,6 @@
     protected void EditItem(ulong itemId)
     {
         NavigationManager.NavigateTo($"/editsegment/{itemId}");
-    }
-    protected void DeleteItem(string itemId)
-    {
-
     }
 
     protected async Task DeleteItem()

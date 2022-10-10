@@ -1,0 +1,139 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<div>
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+    @if (null != _segments)
+    {
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Auswahl</th>
+                    <th scope="col">Segment</th>
+                    <th scope="col">Distanz</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(StravaSegment s in _segments)
+                {
+                    <tr>
+                        <td>
+                           <input type="checkbox" checked="@IsSelected(s)" @oninput="@(() => CheckSegment(s))">
+                        </td>
+                        <td>
+                            @s.SegmentName
+                            @foreach (string tag in s.GetLabels())
+                            {
+                                <span class="badge bg-info text-dark p-1 m-1">
+                                    @tag
+                                </span>
+                            }
+                            @if (!s.IsEnabled)
+                            {
+                                <span class="badge bg-warning text-dark p-1 m-1">
+                                    inaktiv
+                                </span>
+                            }
+                            <br />
+                            @foreach (string tag in s.GetTags())
+                            {
+                                <span class="badge bg-light text-dark p-1 m-0 mt-2">
+                                    #@tag
+                                </span>
+                            }
+
+                        </td>
+                        <td>
+                            @s.GetDistanceAsText()
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private NotificationMessage? _notificationMessage;
+    private IEnumerable<StravaSegment>? _segments;
+    private IDictionary<ulong, StravaSegment> _segmentLookup = new Dictionary<ulong, StravaSegment>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _segments = await Api.GetSegments();
+            if (null == Challenge.Segments)
+            {
+                Challenge.Segments = new Dictionary<ulong, StravaSegmentChallenge.Segment>();
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected async void CheckSegment(StravaSegment segment)
+    {
+        try
+        {
+            StravaSegmentChallenge.Segment challengeSegment = new StravaSegmentChallenge.Segment()
+            {
+                SegmentId = segment.SegmentId,
+                SegmentName = segment.SegmentName,
+                Distance = segment.Distance,
+                AverageGrade = segment.AverageGrade,
+                MaximumGrade = segment.MaximumGrade,
+                Elevation = segment.Elevation,
+                ClimbCategory = segment.ClimbCategory,
+                City = segment.City,
+                ImageLink = segment.ImageLink,
+                Description = segment.Description,
+                RouteRecommendation = segment.RouteRecommendation,
+                Tags = segment.Tags,
+                Labels = segment.Labels,
+                Scope = segment.Scope
+            };
+            if (IsSelected(segment))
+            {
+                Challenge.Segments.Remove(segment.SegmentId);
+                StravaSegmentChallenge? updatedChallenge = await Api.RemoveSegmentFromChallenge(challengeSegment, Challenge.Id);
+                if (null != updatedChallenge)
+                {
+                    Challenge.Segments = updatedChallenge.Segments;
+                }
+            }
+            else
+            {
+                Challenge.Segments.Add(segment.SegmentId, challengeSegment);
+                StravaSegmentChallenge? updatedChallenge = await Api.AddSegmentToChallenge(challengeSegment, Challenge.Id);
+                if (null != updatedChallenge)
+                {
+                    Challenge.Segments = updatedChallenge.Segments;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+
+    protected bool IsSelected(StravaSegment segment)
+    {
+        return Challenge.Segments.ContainsKey(segment.SegmentId);
+    }
+
+
+}

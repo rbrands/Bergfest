@@ -95,6 +95,7 @@ else
             List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts(Tag));
             _segments = segmentsWithEfforts.Where(s => s.StravaSegment.DisplayEnabled);
             _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);    
+            StateHasChanged();
         }
         catch (Exception ex)
         {

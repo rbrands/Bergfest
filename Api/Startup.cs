@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
-using BlazorApp.Api.Repositories;
+using BackendLibrary;
 using BlazorApp.Shared;
-using Microsoft.AspNetCore.Routing;
-using System.Xml.Linq;
-using Flurl;
 using Flurl.Http.Configuration;
 using System.Reflection;
 
@@ -42,7 +36,7 @@ namespace BlazorApp.Api
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegment>>();
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentEffort>>();
             builder.Services.AddSingleton<CosmosDBRepository<StravaSegmentChallenge>>();
-            builder.Services.AddSingleton<CosmosDBRepository<ChallengeParticipant>>();
+            builder.Services.AddSingleton<ChallengeRepository>();
         }
         public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
         {

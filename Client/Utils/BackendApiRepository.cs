@@ -84,10 +84,52 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegment>();
         }
+        public async Task<ChallengeSegmentEffort?> WriteChallengeSegmentEffort(ChallengeSegmentEffort effort)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<ChallengeSegmentEffort>($"/api/WriteChallengeSegmentEffort", effort);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<ChallengeSegmentEffort>();
+        }
         public async Task<StravaSegmentChallenge?> WriteChallenge(StravaSegmentChallenge challenge)
         {
             this.PrepareHttpClient();
             HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge>($"/api/WriteChallenge", challenge);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
+        public async Task<StravaSegmentChallenge?> UpdateChallenge(StravaSegmentChallenge challenge)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge>($"/api/UpdateChallenge", challenge);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
+        public async Task<StravaSegmentChallenge?> AddSegmentToChallenge(StravaSegmentChallenge.Segment segment, string challengeId)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge.Segment>($"/api/AddSegmentToChallenge/{challengeId}", segment);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
+        public async Task<StravaSegmentChallenge?> AddParticipantToChallenge(StravaSegmentChallenge.Participant participant, string challengeId)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge.Participant>($"/api/AddParticipantToChallenge/{challengeId}", participant);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
+        public async Task<StravaSegmentChallenge?> RemoveSegmentFromChallenge(StravaSegmentChallenge.Segment segment, string challengeId)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge.Segment>($"/api/RemoveSegmentFromChallenge/{challengeId}", segment);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+        }
+        public async Task<StravaSegmentChallenge?> RemoveParticipantFromChallenge(StravaSegmentChallenge.Participant participant, string challengeId)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentChallenge.Participant>($"/api/RemoveParticipantFromChallenge/{challengeId}", participant);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
         }
@@ -109,10 +151,28 @@ namespace BlazorApp.Client.Utils
             HttpResponseMessage response = await _http.PostAsJsonAsync<StravaSegmentEffort>($"/api/DeleteSegmentEffort", segmentEffort);
             response.EnsureSuccessStatusCode();
         }
+        public async Task DeleteChallengeSegmentEffort(ChallengeSegmentEffort segmentEffort)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<ChallengeSegmentEffort>($"/api/DeleteChallengeSegmentEffort", segmentEffort);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task DeleteUser(StravaAccess user)
         {
             this.PrepareHttpClient();
             HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/DeleteUser", user);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task WriteUser(StravaAccess user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/WriteUser", user);
+            response.EnsureSuccessStatusCode();
+        }
+        public async Task UpdateUser(StravaAccess user)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<StravaAccess>($"/api/UpdateUser", user);
             response.EnsureSuccessStatusCode();
         }
         public async Task PostStravaEvent(StravaEvent stravaEvent)
@@ -151,10 +211,109 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
+        public async Task<StravaSegmentChallenge?> GetChallenge(string id)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallenge/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge>();
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<IList<StravaSegmentChallenge>> GetChallenges()
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallenges");
+            if (response.IsSuccessStatusCode)
+            {
+                return (await response.Content.ReadFromJsonAsync<IList<StravaSegmentChallenge>>()) ?? new List<StravaSegmentChallenge>();
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<StravaSegmentChallenge?> GetChallengeByTitle(string urlTitle)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallengeByTitle/{urlTitle}");
+            if (response.IsSuccessStatusCode)
+            {
+                if ((response.Content.Headers.ContentLength ?? 0) > 0)
+                {
+                    return await response.Content.ReadFromJsonAsync<StravaSegmentChallenge?>();
+                }
+                else 
+                { 
+                    return null; 
+                }
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
         public async Task<IEnumerable<StravaAccess>?> GetUsers()
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<StravaAccess>?>($"/api/GetUsers");
+        }
+        public async Task<StravaAccess?> GetUser(string id)
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<StravaAccess?>($"/api/GetUser/{id}");
         }
         public async Task<IEnumerable<StravaSegmentEffort>?> GetSegmentsEfforts()
         {
@@ -172,6 +331,76 @@ namespace BlazorApp.Client.Utils
                 if (null != segmentsWithEfforts)
                 {
                     returnList = segmentsWithEfforts;
+                }
+                return returnList;
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<ChallengeWithEfforts> GetChallengeSegmentEfforts(string challengeId)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetChallengeSegmentEfforts/{challengeId}");
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<ChallengeSegmentEffort> returnList = new List<ChallengeSegmentEffort>();
+                ChallengeWithEfforts? challengeWithEfforts = await response.Content.ReadFromJsonAsync<ChallengeWithEfforts>();
+                if (null == challengeWithEfforts)
+                {
+                   throw new Exception("Challenge not found.");
+                }
+                return challengeWithEfforts;
+            }
+            else
+            {
+                ErrorMessage error = new ErrorMessage()
+                {
+                    Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+                };
+                try
+                {
+                    ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                    if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                    {
+                        error.Message = errorFromResponse.Message;
+                    }
+                }
+                catch (Exception)
+                {
+                    // No exception in exception handler ...
+                }
+                throw new Exception(error?.Message);
+            }
+        }
+        public async Task<IEnumerable<StravaSegment>> GetSegments()
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetSegments");
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<StravaSegment> returnList = new List<StravaSegment>();
+                IEnumerable<StravaSegment>? segments = await response.Content.ReadFromJsonAsync<IEnumerable<StravaSegment>>();
+                if (null != segments)
+                {
+                    returnList = segments;
                 }
                 return returnList;
             }

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Azure.Cosmos.Linq;
 using BlazorApp.Shared;
 
-namespace BlazorApp.Api.Repositories
+namespace BackendLibrary
 {
     public class CosmosDBRepository<T> where T : CosmosDBEntity, new()
     {
@@ -17,6 +12,7 @@ namespace BlazorApp.Api.Repositories
         private CosmosClient _cosmosClient;
         string _cosmosDbDatabase;
         string _cosmosDbContainer;
+        const int MAX_PATCH_OPERATIONS = 10;
 
         /// <summary>
         /// Create repository, typically as singleton. Create CosmosClient before.
@@ -47,8 +43,19 @@ namespace BlazorApp.Api.Repositories
                                .GetContainer(_cosmosDbContainer)
                                .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
         }
+        public async Task DeleteItemByKeyAsync(string key)
+        {
+            if (String.IsNullOrEmpty(key))
+            {
+                throw new ApplicationException("Missing item key.");
+            }
+            string id = typeof(T).Name + "-" + key;
+            await _cosmosClient.GetDatabase(_cosmosDbDatabase)
+                               .GetContainer(_cosmosDbContainer)
+                               .DeleteItemAsync<T>(id, new PartitionKey(typeof(T).Name));
+        }
 
-        public async Task<T> GetItem(string id)
+        public async Task<T?> GetItem(string id)
         {
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
             if (String.IsNullOrEmpty(id))
@@ -82,7 +89,7 @@ namespace BlazorApp.Api.Repositories
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<T> GetItemByKey(string key)
+        public async Task<T?> GetItemByKey(string key)
         {
             if (String.IsNullOrEmpty(key))
             {
@@ -112,7 +119,7 @@ namespace BlazorApp.Api.Repositories
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public async Task<T> GetFirstItemOrDefault(Expression<Func<T, bool>> predicate)
+        public async Task<T?> GetFirstItemOrDefault(Expression<Func<T, bool>> predicate)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -126,7 +133,7 @@ namespace BlazorApp.Api.Repositories
             {
                 results.AddRange(await itemIterator.ReadNextAsync());
             }
-            T firstItem = results.FirstOrDefault();
+            T? firstItem = results.FirstOrDefault();
             return firstItem;
         }
         public async Task<IList<T>> GetItems()
@@ -162,7 +169,7 @@ namespace BlazorApp.Api.Repositories
 
             return response.Resource;
         }
-        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations)
+        public async Task<T> PatchItem(string id, IReadOnlyList<PatchOperation> patchOperations, string? timestamp = null)
         {
             Container container = _cosmosClient.GetDatabase(_cosmosDbDatabase).GetContainer(_cosmosDbContainer);
             PartitionKey partitionKey = new PartitionKey(typeof(T).Name);
@@ -171,23 +178,39 @@ namespace BlazorApp.Api.Repositories
             {
                 throw new ArgumentNullException("id");
             }
+            PatchItemRequestOptions patchOption = new PatchItemRequestOptions();
+            if (null != timestamp)
+            {
+                patchOption.FilterPredicate = $"from c where c._ts = {timestamp}";
+            }
+            // PatchItem only supports up to 10 operations. If there are more than that given, create more batches and 
+            // patch the document several times.
+            List<PatchOperation> po = new List<PatchOperation>(patchOperations);
+            ItemResponse<T>? response = null;
+            do
+            {
+                po = new List<PatchOperation>(po.Take(MAX_PATCH_OPERATIONS));
+                response = await container.PatchItemAsync<T>(
+                    id: id,
+                    partitionKey: partitionKey,
+                    patchOperations: po,
+                    requestOptions: patchOption
 
-            ItemResponse<T> response = await container.PatchItemAsync<T>(
-                id: id,
-                partitionKey: partitionKey,
-                patchOperations: patchOperations
-            );
+                );
+                po = new List<PatchOperation>(po.Skip(MAX_PATCH_OPERATIONS));
+            }
+            while (po.Count > 0);
 
             return response.Resource;
         }
-        public async Task<T> PatchField(string id, string fieldName, object value)
+        public async Task<T> PatchField(string id, string fieldName, object value, string? timestamp = null)
         {
-            List<PatchOperation> patchOperations = new ()
+            List<PatchOperation> patchOperations = new()
             {
                 PatchOperation.Add($"/{fieldName}", value)
             };
 
-            return await PatchItem(id, patchOperations);
+            return await PatchItem(id, patchOperations, timestamp);
         }
 
 

@@ -63,7 +63,11 @@
     {
         try
         {
-            _members = await Api.GetUsers();
+            _members = (await Api.GetUsers());
+            if (null != _members)
+            {
+                _members = _members.Where(u => !u.StravaAuthorizationIsPending);
+            }
 
         }
         catch (Exception ex)

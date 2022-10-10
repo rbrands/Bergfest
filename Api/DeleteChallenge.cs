@@ -10,9 +10,8 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using BlazorApp.Shared;
 using System.Web.Http;
-using BlazorApp.Api.Repositories;
-using BlazorApp.Api.Utils;
-using Microsoft.AspNetCore.Routing;
+using BackendLibrary;
+
 
 namespace BlazorApp.Api
 {
@@ -20,15 +19,18 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
-        private CosmosDBRepository<ChallengeParticipant> _cosmosParticipantRepository;
+        private ChallengeRepository _challengeRepository;
+        private CosmosDBRepository<StravaSegment> _cosmosSegmentRepository;
 
         public DeleteChallenge(ILogger<DeleteChallenge> logger,
-                         CosmosDBRepository<ChallengeParticipant> cosmosParticipantRepository,
-                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository)
+                         CosmosDBRepository<StravaSegmentChallenge> cosmosRepository,
+                         ChallengeRepository challengeRepository,
+                         CosmosDBRepository<StravaSegment> cosmosSegmentRepository)
         {
             _logger = logger;
-            _cosmosParticipantRepository = cosmosParticipantRepository;
             _cosmosRepository = cosmosRepository;
+            _challengeRepository = challengeRepository;
+            _cosmosSegmentRepository = cosmosSegmentRepository;
         }
 
         [FunctionName("DeleteChallenge")]
@@ -46,11 +48,21 @@ namespace BlazorApp.Api
                     return new BadRequestErrorMessageResult("Id of StravaSegmentChallenge to be deleted is missing.");
                 }
                 await _cosmosRepository.DeleteItemAsync(challenge.Id);
-                // Delete all participants
-                IEnumerable<ChallengeParticipant> participants = await _cosmosParticipantRepository.GetItems(p => p.ChallengeId == challenge.Id);
-                foreach (ChallengeParticipant p in participants)
+                // Delete all challenge segment efforts
+                IEnumerable<ChallengeSegmentEffort> efforts = await _challengeRepository.GetItems(e => e.ChallengeId == challenge.Id);
+                foreach (var e in efforts)
                 {
-                    await _cosmosParticipantRepository.DeleteItemAsync(p.Id);
+                    await _challengeRepository.DeleteItemAsync(e.Id);
+                }
+                // Delete challenge from all segments
+                IEnumerable<StravaSegment> _segments = await _cosmosSegmentRepository.GetItems();
+                foreach (var segment in _segments)
+                {
+                    if (null != segment.Challenges && segment.Challenges.ContainsKey(challenge.Id))
+                    {
+                        segment.Challenges.Remove(challenge.Id);
+                        await _cosmosSegmentRepository.PatchField(segment.Id, "Challenges", segment.Challenges, segment.TimeStamp);
+                    }
                 }
                 return new OkResult();
             }

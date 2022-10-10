@@ -29,6 +29,30 @@
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
     {
+      "route": "/api/UpdateChallenge",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/AddSegmentToChallenge/*",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/AddParticipantToChallenge/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/RemoveSegmentFromChallenge/*",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
+      "route": "/api/RemoveParticipantFromChallenge/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/WriteChallengeSegment",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/DeleteSegment",
       "allowedRoles": [ "admin", "segmentadmin" ]
     },
@@ -41,7 +65,19 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/DeleteChallengeSegmentEffort",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/DeleteUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/WriteUser",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/UpdateUser",
       "allowedRoles": [ "admin" ]
     },
     {
@@ -57,7 +93,23 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetChallenges",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetChallengeByTitle/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetSegmentsWithEfforts/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetChallengeSegmentEfforts/*",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/api/GetSegments",
       "allowedRoles": [ "anonymous" ]
     },
     {
@@ -66,6 +118,10 @@
     },
     {
       "route": "/api/GetUsers",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetUser/*",
       "allowedRoles": [ "admin" ]
     },
     {

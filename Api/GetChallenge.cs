@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,13 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using BlazorApp.Shared;
 using System.Web.Http;
-using Flurl;
-using Flurl.Http.Configuration;
-using Flurl.Http;
-using Flurl.Http.Content;
-using System.Collections.Generic;
-using BlazorApp.Api.Repositories;
-using BlazorApp.Api.Utils;
+using BackendLibrary;
+
 
 namespace BlazorApp.Api
 {
@@ -23,11 +17,11 @@ namespace BlazorApp.Api
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
-        private CosmosDBRepository<StravaSegmentChallenge> _cosmosRepository;
+        private ChallengeRepository _cosmosRepository;
 
         public GetChallenge(ILogger<GetChallenge> logger,
                         IConfiguration config,
-                        CosmosDBRepository<StravaSegmentChallenge> cosmosRepository
+                        ChallengeRepository cosmosRepository
         )
         {
             _logger = logger;
@@ -45,7 +39,11 @@ namespace BlazorApp.Api
                 {
                     throw new Exception("Missing challengeId for call GetChallenge()");
                 }
-                StravaSegmentChallenge challenge = await _cosmosRepository.GetItem(challengeId.ToString());
+                StravaSegmentChallenge challenge = await _cosmosRepository.GetChallenge(challengeId);
+                if (null == challenge)
+                {
+                    throw new Exception($"GetChallenge(ChallengeId = >{challengeId}< not found.");
+                }
                 _logger.LogInformation($"GetChallenge(ChallengeId = {challengeId} Title = {challenge.ChallengeTitle}");
                 return new OkObjectResult(challenge);
             }

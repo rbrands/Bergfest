@@ -1,0 +1,169 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+
+<div class="card">
+    <div class="card-header fst-italic">
+        @Segment.SegmentName
+        <text>&nbsp;</text><a href="@Segment.GetSegmentLink()" target="_blank" title="Segment auf Strava" alt="Segment auf Strava"><span class="oi oi-link-intact"></span></a>
+        @foreach (string tag in Segment.GetLabels())
+        {
+            <span class="badge bg-info text-dark p-2 m-1">
+                @tag
+            </span>
+        }
+    </div>
+    @if (!String.IsNullOrEmpty(Segment.ImageLink))
+    {
+        <a href="@Segment.GetSegmentLink()" target="_blank">
+            <img class="card-img-top" src="@Segment.ImageLink" alt="@Segment.SegmentName">
+        </a>
+    }
+    <div class="card-body">
+        <div class="row">
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Distanz</p>
+                <p class="h6 mb-0 mt-0">@Segment.GetDistanceAsText()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Hm</p>
+                <p class="h6 mb-0 mt-0">@Segment.Elevation.ToString("N0")<text>m</text></p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Steigung</p>
+                <p class="h6 mb-0 mt-0">@Segment.AverageGrade.ToString("N2")%</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Kategorie</p>
+                <p class="h6 mb-0 mt-0">@Segment.GetClimbCategoryLabel()</p>
+            </div>
+            <div class="col border-0">
+                <p class="small mb-0 text-muted">Ort/Strecke</p>
+                <p class="h6 mb-0 mt-0">
+                    @Segment.City<text>&nbsp;</text>
+                    @if (!String.IsNullOrEmpty(Segment.RouteRecommendation))
+                    {
+                        <a href="@Segment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                    }
+                </p>
+            </div>
+        </div>
+        <hr />
+        <p class="card-text">
+            <div class="overflow-auto" style="max-height: 500px">
+                @((MarkupString)Segment.Description)
+            </div>
+        </p>
+        <hr />
+        <div class="containter overflow-auto" style="max-height: 500px">
+        <TabControl>
+            <TabPage Text="Gesamt">
+                <ul class="list-group list-group-flush">
+                    @foreach (var e in _effortsForSegment)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <h6>
+                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                </h6>
+                                <div class="ms-2 me-auto">
+                                <div>
+                                    <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
+                                </div>
+                            </div>
+                            <h6>
+                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
+                            </h6>
+                        </li>
+                    }
+                </ul>
+            </TabPage>
+            <TabPage Text="Frauen">
+                @if (_effortsForSegment.Count(e => e.AthleteSex == "F") > 0)
+                {
+                    <ul class="list-group list-group-flush overflow-auto" style="max-height:500px">
+                        @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <h6>
+                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                </h6>
+                                <div class="ms-2 me-auto">
+                                    <div>
+                                        <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
+                                    </div>
+                                </div>
+                                <h6>
+                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                    <span class="badge bg-secondary rounded-pill">@e.RankingFemalePoints.ToString("##0.0")</span>
+                                </h6>
+                            </li>
+                        }
+                    </ul>
+                }
+            </TabPage>
+        </TabControl>
+        </div>
+        <hr />
+        @if (!String.IsNullOrEmpty(Segment.RouteRecommendation))
+        {
+            <a href="@Segment.RouteRecommendation" target="_blank">Streckenempfehlung</a>
+        }
+    </div>
+    <div class="card-footer">
+        <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
+            <AuthorizeView Roles="admin,segmentadmin">
+                <Authorized>
+                    <div class="btn-group mr-2" role="group" aria-label="Ändern">
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => Admin())"><span class="oi oi-pencil"></span></button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+        @foreach (string tag in Segment.GetTags())
+        {
+            <span class="badge bg-light text-dark p-1 m-0 mt-2">
+                #@tag
+            </span>
+        }
+        </div>
+    </div>
+</div>
+
+    @code {
+        [Parameter]
+        public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
+        [Parameter]
+        public EventCallback OnReload { get; set; }
+        [Parameter]
+        public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+        [Parameter]
+        public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
+        [CascadingParameter]
+        public IModalService? Modal { get; set; }
+        private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
+
+        protected override void OnInitialized()
+        {
+            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+        }
+        private async Task Reload()
+        {
+            await OnReload.InvokeAsync();
+            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+            StateHasChanged();
+        }
+        protected async Task Admin()
+        {
+            if (null != Modal)
+            {
+                ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment, OnReload);
+                await Reload();
+            }
+    }
+
+}

@@ -1,0 +1,243 @@
+﻿@page "/editchallenge"
+@page "/editchallenge/{Id}"
+@attribute [Authorize(Roles = "admin,segmentadmin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Challenge editieren</h3>
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<EditForm Model="@_challenge" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_challenge.ChallengeTitle" autocomplete="on" placeholder="Titel" />
+            <small id="titleHelp" class="form-text text-muted">
+                Titel der Challenge
+            </small>
+        </div>
+        <div class="form-group mt-3">
+            <label for="description">Beschreibung</label>
+            <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung der Challenge">
+                <ToolbarContent>
+                    <span class="ql-formats">
+                        <select class="ql-font">
+                            <option selected=""></option>
+                            <option value="serif"></option>
+                            <option value="monospace"></option>
+                        </select>
+                        <select class="ql-size">
+                            <option value="small"></option>
+                            <option selected=""></option>
+                            <option value="large"></option>
+                            <option value="huge"></option>
+                        </select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-link"></button>
+                    </span>
+                </ToolbarContent>
+                <EditorContent>
+                    @if (null != _challenge.Description)
+                    {
+                        @((MarkupString)_challenge.Description)
+                    }
+                </EditorContent>
+            </BlazoredTextEditor>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <InputText id="image" aria-describedby="imageHelp" class="form-control" @bind-Value="_challenge.ImageLink" autocomplete="on" placeholder="Image-Link" />
+            <small id="imageHelp" class="form-text text-muted">
+                Optional: Link zu einem Image, das im in der Headline angezeigt werden soll.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="urlTitle">Url-Titel</label>
+            <InputText id="urlTitle" aria-describedby="urlTitleHelp" class="form-control" @bind-Value="_challenge.UrlTitle" autocomplete="on" placeholder="Url-Titel" />
+            <small id="imageHelp" class="form-text text-muted">
+            Optional: Titel für URL zum direkten Aufruf. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>'Url-Titel'</text>
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start-Datum</label>
+            <InputDate id="startDate" aria-describedby="startDateHelp" class="form-control" @bind-Value="_startDateLocal" autocomplete="on" placeholder="Startdatum" />
+            <small id="startDateHelp" class="form-text text-muted">
+                Startdatum der Challenge.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="endDate">Enddatum</label>
+            <InputDate id="endDate" aria-describedby="endDateHelp" class="form-control" @bind-Value="_endDateLocal" autocomplete="on" placeholder="Enddatum" />
+            <small id="endDateHelp" class="form-text text-muted">
+                Enddatum der Challenge.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="invitationLink">Einladungs-Link</label>
+            <InputText id="invitationLink" aria-describedby="invitationLinkHelp" class="form-control" @bind-Value="_challenge.InvitationLink" autocomplete="on" placeholder="Einladungs-Link" />
+            <small id="invitationLinkHelp" class="form-text text-muted">
+                Optional: Einladungslink. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>invitation/'Einladungslink'</text>
+            </small>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                <InputCheckbox id="public" aria-describedby="publicHelp" class="form-check-input" @bind-Value="_challenge.IsPublicVisible" />
+                <label for="public" class="form-checklabel">
+                    Öffentlich sichtbar?
+                </label>
+            </div>
+            <small id="publicHelp" class="form-text text-muted">
+                Soll die Challenge öffentlich sichtbar sein?
+            </small>
+        </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="invitation" aria-describedby="invitationHelp" class="form-check-input" @bind-Value="_challenge.InvitationRequired" />
+            <label for="invitation" class="form-checklabel">
+                Teilnahme nur per Einladungslink?
+            </label>
+        </div>
+        <small id="invitationHelp" class="form-text text-muted">
+            Kann man sich zur Challenge nur über den Einladungslink anmelden?
+        </small>
+    </div>
+    <div class="form-group">
+        <div class="form-check">
+            <InputCheckbox id="registrationOpen" aria-describedby="registrationOpenHelp" class="form-check-input" @bind-Value="_challenge.RegistrationIsOpen" />
+            <label for="registrationOpen" class="form-checklabel">
+                Anmeldung offen?
+            </label>
+        </div>
+        <small id="registrationOpenHelp" class="form-text text-muted">
+            Ist die Challenge offen für Anmeldungen?
+        </small>
+    </div>
+
+    <ValidationSummary />
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_saveMessage" />
+
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
+@if (_inUpdateMode)
+{
+    <hr />
+    <TabControl>
+        <TabPage Text="Segmente">
+            <h4>Auswahl der Segmente</h4>
+            <SegmentSelector Challenge="_challenge"></SegmentSelector>
+        </TabPage>
+        <TabPage Text="Teilnehmer">
+            <h4>Teilnehmer auswählen</h4>
+            <ParticipantSelector Challenge="_challenge"></ParticipantSelector>
+        </TabPage>
+    </TabControl>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = String.Empty;
+    private NotificationMessage? _notificationMessage;
+    private NotificationMessage? _saveMessage;
+    private BlazoredTextEditor? _htmlDescription;
+    private StravaSegmentChallenge _challenge = new StravaSegmentChallenge();
+    private Boolean _inUpdateMode = false;
+    private DateTime _startDateLocal;
+    private DateTime _endDateLocal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!String.IsNullOrEmpty(Id))
+            {
+                StravaSegmentChallenge? _challengeFromDb = await Api.GetChallenge(Id);
+                if (null != _challengeFromDb)
+                {
+                    _challenge = _challengeFromDb;
+                    _inUpdateMode = true;
+                }
+            }
+            _startDateLocal = _challenge.StartDateUTC.ToLocalTime();
+            _endDateLocal = _challenge.EndDateUTC.ToLocalTime();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        if (_inUpdateMode)
+        {
+            NavigationManager.NavigateTo($"/{_challenge.UrlTitle}");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/challenges");
+        }
+    }
+    private string? StripEmptyHtml(string htmlContent)
+    {
+        return (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+    }
+
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            _saveMessage?.Hide();
+            StateHasChanged();
+            _challenge.Description = StripEmptyHtml(await _htmlDescription!.GetHTML());
+            _challenge.StartDateUTC = _startDateLocal.ToUniversalTime();
+            _challenge.EndDateUTC = _endDateLocal.ToUniversalTime();
+            if (_inUpdateMode)
+            {
+                await Api.UpdateChallenge(_challenge);
+            }
+            else
+            {
+                await Api.WriteChallenge(_challenge);
+            }
+            if (_inUpdateMode)
+            {
+                NavigationManager.NavigateTo($"/{_challenge.UrlTitle}");
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"/challenges");
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+
+
+
+
+}
