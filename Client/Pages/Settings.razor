@@ -1,0 +1,24 @@
+﻿@page "/settings"
+@attribute [Authorize(Roles = "admin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<h3>Settings</h3>
+<TabControl>
+    <TabPage Text="Neue Infobox" Name="Info">
+
+    </TabPage>
+    <TabPage Text="Teilnehmer" Name="Members">
+
+    </TabPage>
+    <TabPage Text="Leistungen" Name="Efforts">
+
+    </TabPage>
+</TabControl>
+
+@code {
+
+}
