@@ -66,6 +66,37 @@
                     }
                 </ul>
             </TabPage>
+            @if (null != Efforts && Efforts.Any())
+            {
+                <TabPage Text="Aktuell">
+                    <p>
+                        Die letzten Aktivitäten der Teilnehmer:innen auf einen Blick:
+                        <table class="table table-sm table-striped table-bordered">
+                            <tbody>
+                                @foreach(var e in Efforts)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.SegmentTitle" alt="Segment">@e.SegmentTitle</a>
+                                        </td>
+                                        <td>
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </p>
+                </TabPage>
+            }
             @if (ShowRating)
             {
                 <TabPage Text="Punkte">
@@ -113,4 +144,6 @@
     public Boolean ShowFooter { get; set; } = false;
     [Parameter]
     public Boolean ShowRating { get; set; } = false;
+    [Parameter]
+    public IEnumerable<ChallengeSegmentEffort>? Efforts { get; set; }
 }
