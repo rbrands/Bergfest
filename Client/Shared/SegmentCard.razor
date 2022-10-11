@@ -53,10 +53,13 @@
             <div class="col border-0">
                 <p class="small mb-0 text-muted">Ort/Strecke</p>
                 <p class="h6 mb-0 mt-0">
-                    @SegmentWithEfforts.StravaSegment.City<text>&nbsp;</text>
                     @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
                     {
-                        <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                        <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag">@SegmentWithEfforts.StravaSegment.City<span class="oi oi-globe"></span></a>
+                    }
+                    else
+                    {
+                        @SegmentWithEfforts.StravaSegment.City
                     }
                 </p>
             </div>
@@ -110,11 +113,6 @@
                 </li>
             }
             </ul>
-            <hr />
-            @if (!String.IsNullOrEmpty(SegmentWithEfforts.StravaSegment.RouteRecommendation))
-            {
-                <a href="@SegmentWithEfforts.StravaSegment.RouteRecommendation" target="_blank">Streckenempfehlung</a>
-            }
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
@@ -163,7 +161,7 @@
                     Efforts = efforts,
                     EffortsWomen = efforts.Where(e => e.AthleteSex == "F")
                 }
-        ).Where(d => d.Count > 0);
+        ).Where(d => d.Count > 1);
     }
     protected void EditItem(ulong itemId)
     {

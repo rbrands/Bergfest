@@ -32,7 +32,7 @@
 
 	string GetButtonClass(TabPage page)
 	{
-		return page == ActivePage ? "btn-primary" : "btn-primary";
+		return page == ActivePage ? "btn-outline-primary active" : "btn-outline-primary";
 	}
 
 	void ActivatePage(TabPage page)
@@ -45,6 +45,7 @@
 		if (null != pageToActivate)
 		{
 			ActivatePage(pageToActivate);
+			StateHasChanged();
 		}
 	}
 }

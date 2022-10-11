@@ -45,10 +45,13 @@
             <div class="col border-0">
                 <p class="small mb-0 text-muted">Ort/Strecke</p>
                 <p class="h6 mb-0 mt-0">
-                    @Segment.City<text>&nbsp;</text>
                     @if (!String.IsNullOrEmpty(Segment.RouteRecommendation))
                     {
-                        <a href="@Segment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag"><span class="oi oi-link-intact"></span></a>
+                        <a href="@Segment.RouteRecommendation" target="_blank" title="Streckenvorschlag" alt="Streckenvorschlag">@Segment.City<span class="oi oi-globe"></span></a>
+                    }
+                    else
+                    {
+                        @Segment.City
                     }
                 </p>
             </div>
@@ -109,11 +112,6 @@
             </TabPage>
         </TabControl>
         </div>
-        <hr />
-        @if (!String.IsNullOrEmpty(Segment.RouteRecommendation))
-        {
-            <a href="@Segment.RouteRecommendation" target="_blank">Streckenempfehlung</a>
-        }
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Aktionen zum Segment">
@@ -134,36 +132,37 @@
     </div>
 </div>
 
-    @code {
-        [Parameter]
-        public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
-        [Parameter]
-        public EventCallback OnReload { get; set; }
-        [Parameter]
-        public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
-        [Parameter]
-        public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
-        [CascadingParameter]
-        public IModalService? Modal { get; set; }
-        private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
+@code {
+    [Parameter]
+    public StravaSegmentChallenge.Segment Segment { get; set; } = new StravaSegmentChallenge.Segment();
+    [Parameter]
+    public EventCallback OnReload { get; set; }
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [Parameter]
+    public IEnumerable<ChallengeSegmentEffort> Efforts { get; set; } = new List<ChallengeSegmentEffort>();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private IEnumerable<ChallengeSegmentEffort> _effortsForSegment = new List<ChallengeSegmentEffort>();
 
-        protected override void OnInitialized()
+    protected override void OnInitialized()
+    {
+        _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+    }
+    private async Task Reload()
+    {
+        await OnReload.InvokeAsync();
+        _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+        StateHasChanged();
+    }
+    protected async Task Admin()
+    {
+        if (null != Modal)
         {
-            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
+            EventCallback reloadCallback = new EventCallback(this, () => Reload());
+            ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment, reloadCallback);
+            await Reload();
         }
-        private async Task Reload()
-        {
-            await OnReload.InvokeAsync();
-            _effortsForSegment = Efforts.Where(e => e.SegmentId == Segment.SegmentId);
-            StateHasChanged();
-        }
-        protected async Task Admin()
-        {
-            if (null != Modal)
-            {
-                ModalResult result = await ChallengeAdminSegmentEfforts.Admin(Modal, Challenge, Segment, _effortsForSegment, OnReload);
-                await Reload();
-            }
     }
 
 }
