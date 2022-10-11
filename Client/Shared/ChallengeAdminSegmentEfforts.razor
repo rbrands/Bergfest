@@ -135,6 +135,11 @@
     {
         InitChallengeSegmentEffort();
     }
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        StateHasChanged();
+    }
 
     protected async Task DeleteItem(ChallengeSegmentEffort effort)
     {
@@ -146,7 +151,9 @@
                 return;
             }
             await Api.DeleteChallengeSegmentEffort(effort);
-            await OnReload.InvokeAsync();
+            ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(Challenge!.Id);
+            ChallengeEfforts = challengeWithEfforts.Efforts.Where(e => e.SegmentId == Segment!.SegmentId);
+            StateHasChanged();
         }
     }
     protected void EditItem(ChallengeSegmentEffort effort)
@@ -172,7 +179,9 @@
         {
             await Api.WriteChallengeSegmentEffort(_currentEffort);
             _notificationMessage?.ShowInfo("Gespeichert");
-            await OnReload.InvokeAsync();
+            ChallengeWithEfforts challengeWithEfforts = await Api.GetChallengeSegmentEfforts(Challenge!.Id);
+            ChallengeEfforts = challengeWithEfforts.Efforts.Where(e => e.SegmentId == Segment!.SegmentId);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -210,7 +219,7 @@
             Size = ModalSize.Large,
             DisableBackgroundCancel = true
         };
-        var modal = modalService.Show<ChallengeAdminSegmentEfforts>("Segment-Rangliste", parameters, options);
+        var modal = modalService.Show<ChallengeAdminSegmentEfforts>(segment.SegmentName, parameters, options);
         return await modal.Result;
     }
 

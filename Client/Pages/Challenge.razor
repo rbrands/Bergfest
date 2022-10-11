@@ -96,7 +96,7 @@
                         <ChallengeSegmentCard Challenge="_challenge" 
                                               Segment="s.Value" 
                                               Efforts="_challengeEfforts"
-                                              OnReload="Reload">
+                                              OnReload="@(() => Reload())">
                         </ChallengeSegmentCard>
                     </div>
                 }
