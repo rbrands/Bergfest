@@ -168,7 +168,8 @@
                 ChallengeId = Challenge?.Id,
                 SegmentId = Segment?.SegmentId ?? 0,
                 SegmentTitle = Segment?.SegmentName,
-                StartDateLocal = DateTime.Today
+                StartDateLocal = DateTime.Today,
+                ActivityName = Segment?.SegmentName
             };
     }
     private async Task OnSave()
