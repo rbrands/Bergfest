@@ -44,6 +44,13 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Article>();
         }
+        public async Task<InfoItem?> WriteInfoItem(InfoItem infoItem)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<InfoItem>($"/api/WriteInfoItem", infoItem);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<InfoItem>();
+        }
         public async Task<Article?> GetArticle(string key)
         {
             this.PrepareHttpClient();
@@ -319,6 +326,11 @@ namespace BlazorApp.Client.Utils
         {
             this.PrepareHttpClient();
             return await _http.GetFromJsonAsync<IEnumerable<StravaSegmentEffort>?>($"/api/GetSegmentsEfforts");
+        }
+        public async Task<IEnumerable<InfoItem>?> GetInfoItems()
+        {
+            this.PrepareHttpClient();
+            return await _http.GetFromJsonAsync<IEnumerable<InfoItem>?>($"/api/GetInfoItems");
         }
         public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEfforts(string? tag)
         {

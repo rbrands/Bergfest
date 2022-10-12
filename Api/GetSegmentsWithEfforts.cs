@@ -15,7 +15,7 @@ using System.Web.Http;
 using System.Collections.Generic;
 using BlazorApp.Api.Utils;
 using BackendLibrary;
-
+using System.Threading;
 
 namespace BlazorApp.Api
 {
@@ -63,15 +63,31 @@ namespace BlazorApp.Api
                     List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.SegmentId && e.StartDateLocal > DateTime.UtcNow.AddDays(-Constants.DAYS_IN_PAST_FOR_EFFORTS)));
                     segmentWithEfforts.Efforts = efforts.OrderByDescending(e => e.StartDateLocal.DayOfYear).ThenBy(e => e.ElapsedTime);
 
-                    StravaSegmentEffort mostRecentEffort = segmentWithEfforts.Efforts.FirstOrDefault();
-                    if (null != mostRecentEffort)
+                    // As indication that there was a group of riders on the segment: Get days with more than one item
+                    var daySections = segmentWithEfforts.Efforts.GroupBy(
+                        e => e.StartDateLocal.Date,
+                        e => e,
+                        (day, efforts) => new
+                        {
+                            Day = day,
+                            Count = efforts.Count()
+                        }
+                    ).Where(d => d.Count >= StravaSegmentWithEfforts.MIN_ITEMS_TO_SHOW);
+                    if (daySections.Any())
                     {
-                        segmentWithEfforts.MostRecentEffort = mostRecentEffort.StartDateLocal;
+                        segmentWithEfforts.MostRecentEffort = daySections.First().Day;
                     }
+                    // Old version:
+                    //StravaSegmentEffort mostRecentEffort = segmentWithEfforts.Efforts.FirstOrDefault();
+                    //if (null != mostRecentEffort)
+                    //{
+                    //    segmentWithEfforts.MostRecentEffort = mostRecentEffort.StartDateLocal;
+                    //}
+                    
                     segmentsWithEfforts.Add(segmentWithEfforts);
                 }
                 // Order segments to get segment with most recent efforts on top 
-                return new OkObjectResult(segmentsWithEfforts.OrderByDescending(s => s.MostRecentEffort).ThenBy(s => s.StravaSegment.Distance));
+                return new OkObjectResult(segmentsWithEfforts.OrderByDescending(s => s.MostRecentEffort).ThenBy(s => s.StravaSegment.ClimbCategory).ThenBy(s => s.StravaSegment.Distance));
             }
             catch (Exception ex)
             {

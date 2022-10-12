@@ -1,0 +1,181 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+
+<EditForm Model="@_infoToEdit" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+        <div class="form-group">
+            <label for="orderId">Ordnungs ID</label>
+            <InputNumber id="orderId" aria-describedby="orderIdHelp" class="form-control" @bind-Value="_infoToEdit.OrderId" />
+            <small id="orderIdHelp" class="form-text text-muted">
+                Über die Ordnungs ID wird die Reihenfolge der Anzeige der Info-Boxen gesteuert. Infoboxen mit negativen Ordnungsnummern werden vor den Terminen angezeigt, mit positiven nach den Terminen.
+            </small>
+        </div>
+        @if (null != _challenges && _challenges.Any())
+        {
+            <div class="form-group">
+                <InputSelect Value="_infoToEdit.ChallengeId"
+                             ValueExpression="@(() => _infoToEdit.ChallengeId)"
+                             ValueChanged="@(async(string id) => { _infoToEdit.ChallengeId = id; await OnSelectChallenge(); })">
+                    <option value="">Challenge ...</option>
+                    @foreach (var c in _challenges)
+                    {
+                        <option value="@c.Id">@c.ChallengeTitle</option>
+                    }
+                </InputSelect>
+            </div>
+        }
+        <div class="form-group">
+            <label for="title">Kopfzeile</label>
+            <InputText id="header" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.HeaderTitle" autocomplete="on" placeholder="Kopftitel der Info" title="Kopfzeile" />
+            <small id="headerHelp" class="form-text text-muted">
+                Header zur Infobox.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="title">Titel</label>
+            <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.Title" autocomplete="on" placeholder="Titel der Info" title="Titel" />
+            <small id="titleHelp" class="form-text text-muted">
+                Haupttitel zur Infobox.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="title">Untertitel</label>
+            <InputText id="subTitle" aria-describedby="subTitleHelp" class="form-control" @bind-Value="_infoToEdit.SubTitle" autocomplete="on" placeholder="Untertitel der Info" title="Untertitel" />
+            <small id="subTitleHelp" class="form-text text-muted">
+                Untertitel zur Infobox.
+            </small>
+        </div>
+        <div class="form-group">
+            <label>Inhalt der Infobox</label>
+            <BlazoredTextEditor @ref="@_htmlDescription" Placeholder="Hier steht der Inhalt der Infobox">
+                <ToolbarContent>
+                    <span class="ql-formats">
+                        <button class="ql-bold"></button>
+                        <button class="ql-italic"></button>
+                        <button class="ql-underline"></button>
+                        <button class="ql-strike"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <select class="ql-color"></select>
+                        <select class="ql-background"></select>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-list" value="ordered"></button>
+                        <button class="ql-list" value="bullet"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-link"></button>
+                    </span>
+                </ToolbarContent>
+                <EditorContent>
+                    @if (null != _infoToEdit?.InfoContent)
+                    {
+                            @((MarkupString)_infoToEdit.InfoContent)
+                    }                   
+                </EditorContent>
+            </BlazoredTextEditor>
+        </div>
+        <div class="form-group">
+            <label for="infoLifeTime">Lebensdauer der Info</label>
+            <InputNumber id="infoLifeTime" aria-describedby="infoLifeTimeHelp" class="form-control" @bind-Value="_infoToEdit.InfoLifeTimeInDays" />
+            <small id="infoLifeTimeHelp" class="form-text text-muted">
+                Hier kann eingestellt werden, nach wie vielen Tagen die Info automatisch gelöscht werden soll. 0 = kein automatisches Löschen.
+            </small>
+        </div>
+        <div class="form-group">
+            <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_infoToEdit.Link" placeholder="URL" title="Link zu weiterer Infos" />
+            <small id="linkHelp" class="form-text text-muted">
+                Optional: Link zu weiteren Infos.
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="linkImage">Link zu einem Bild</label>
+            <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_infoToEdit.LinkImage" placeholder="URL" title="Link zu einem Image" />
+            <small id="linkImageHelp" class="form-text text-muted">
+                Optional: Link zu einem Bild zur Strecke
+            </small>
+        </div>
+        <div class="form-group">
+            <label for="linkTitle">Link-Bezeichnung</label>
+            <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_infoToEdit.LinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Info" />
+            <small id="linkTitleHelp" class="form-text text-muted">
+                Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext nicht passt.
+            </small>
+        </div>
+
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Neu</button>
+    <ValidationSummary />
+</EditForm>
+
+@code {
+    [Parameter]
+    public InfoItem? Info { get; set;}
+    public InfoItem _infoToEdit = new InfoItem();
+    private NotificationMessage? _notificationMessage;
+    private IEnumerable<StravaSegmentChallenge>? _challenges;
+    private BlazoredTextEditor? _htmlDescription;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _challenges = await Api.GetChallenges();
+            if (null != Info)
+            {
+                _infoToEdit = Info;
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            if (null != _htmlDescription)
+            {
+                _infoToEdit.InfoContent = StripEmptyHtml(await _htmlDescription.GetHTML());
+            }
+            await Api.WriteInfoItem(_infoToEdit);
+            _notificationMessage!.ShowInfo("Gespeichert.");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+    protected void OnCancel()
+    {
+        _infoToEdit = new InfoItem();
+    }
+
+    private string? StripEmptyHtml(string htmlContent)
+    {
+        return (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+    }
+
+    private async Task OnSelectChallenge()
+    {
+        StravaSegmentChallenge challenge = _challenges!.First(c => c.Id == _infoToEdit.ChallengeId);
+        _infoToEdit.HeaderTitle = challenge.ChallengeTitle;
+        _infoToEdit.Title = challenge.ChallengeTitle;
+        _infoToEdit.Link = $"/{challenge.UrlTitle}";
+        _infoToEdit.LinkTitle = challenge.ChallengeTitle;
+        _infoToEdit.LinkImage = challenge.ImageLink;
+        await _htmlDescription!.LoadHTMLContent(challenge.Description);
+    }
+
+}
+

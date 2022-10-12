@@ -29,7 +29,7 @@
         }
         else
         {
-            <div class="m-2 p-4 bg-light border">
+            <div class="p-4 bg-light border">
                 <div class="overflow-auto" style="max-height: 800px">
                     @if (!String.IsNullOrEmpty(_challenge.ImageLink))
                     {
@@ -90,7 +90,7 @@
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2" hidden="@(_challenge.Participants == null || _challenge.Participants.Count == 0)">
                     <ChallengeSummaryCard Challenge="_challenge" ShowRating="true" Efforts="_mostRecentEfforts"></ChallengeSummaryCard>
                 </div>
-                @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.Distance))
+                @foreach (var s in _challenge.Segments.OrderBy(s => s.Value.ClimbCategory).ThenBy(s => s.Value.Distance))
                 {
                     <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
                         <ChallengeSegmentCard Challenge="_challenge" 
