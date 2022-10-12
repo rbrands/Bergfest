@@ -13,6 +13,14 @@
       "allowedRoles": [ "admin" ]
     },
     {
+      "route": "/api/WriteInfoItem",
+      "allowedRoles": [ "admin" ]
+    },
+    {
+      "route": "/api/GetInfoItems",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
       "route": "/api/GetArticle/*",
       "allowedRoles": [ "anonymous" ]
     },

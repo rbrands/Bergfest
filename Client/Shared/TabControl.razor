@@ -1,5 +1,5 @@
 ﻿<CascadingValue Value="this">
-	<div class="btn-group" role="group">
+	<div class="@GetButtonGroupClass()" role="group">
 		@foreach (TabPage tabPage in Pages)
 		{
 			<button type="button"
@@ -18,6 +18,8 @@
 	// Next line is needed so we are able to add <TabPage> components inside
 	[Parameter]
 	public RenderFragment? ChildContent { get; set; }
+	[Parameter]
+	public Boolean Vertical { get; set; } = false;
 
 	public TabPage? ActivePage { get; set; }
 	List<TabPage> Pages = new List<TabPage>();
@@ -33,6 +35,10 @@
 	string GetButtonClass(TabPage page)
 	{
 		return page == ActivePage ? "btn-outline-primary active" : "btn-outline-primary";
+	}
+	string GetButtonGroupClass()
+	{
+		return Vertical ? "btn-group-vertical" : "btn-group";
 	}
 
 	void ActivatePage(TabPage page)

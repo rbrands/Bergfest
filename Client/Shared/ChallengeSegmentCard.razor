@@ -64,53 +64,57 @@
         </p>
         <hr />
         <div class="containter overflow-auto" style="max-height: 500px">
-        <TabControl>
-            <TabPage Text="Gesamt">
-                <ul class="list-group list-group-flush">
-                    @foreach (var e in _effortsForSegment)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <h6>
-                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
-                                </h6>
-                                <div class="ms-2 me-auto">
-                                <div>
-                                    <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
-                                </div>
-                            </div>
-                            <h6>
-                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
-                                <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
-                            </h6>
-                        </li>
-                    }
-                </ul>
-            </TabPage>
-            <TabPage Text="Frauen">
-                @if (_effortsForSegment.Count(e => e.AthleteSex == "F") > 0)
-                {
-                    <ul class="list-group list-group-flush overflow-auto" style="max-height:500px">
-                        @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <h6>
-                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
-                                </h6>
-                                <div class="ms-2 me-auto">
-                                    <div>
+            <TabControl>
+                <TabPage Text="Gesamt">
+                    <table class="table table-sm">
+                        <tbody>
+                            @foreach (var e in _effortsForSegment)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                    </td>
+                                    <td>
                                         <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
-                                    </div>
-                                </div>
-                                <h6>
-                                    <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
-                                    <span class="badge bg-secondary rounded-pill">@e.RankingFemalePoints.ToString("##0.0")</span>
-                                </h6>
-                            </li>
-                        }
-                    </ul>
-                }
-            </TabPage>
-        </TabControl>
+                                    </td>
+                                    <td>
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </TabPage>
+                <TabPage Text="Frauen">
+                    @if (_effortsForSegment.Count(e => e.AthleteSex == "F") > 0)
+                    {
+                        <table class="table table-sm">
+                            <tbody>
+                            @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                        </td>
+                                        <td>
+                                            <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
+                                        </td>
+                                        <td>
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary rounded-pill">@e.RankingPoints.ToString("##0.0")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </TabPage>
+            </TabControl>
         </div>
     </div>
     <div class="card-footer">

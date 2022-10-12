@@ -10,7 +10,7 @@
     Bergfest
 </PageTitle>
 
-<div class="m-2 p-4 bg-light border">
+<div class="p-4 bg-light border">
     <EditArticle ArticleKey="Index" ImageMaxHeight="8em">
         <h2>Cols und Sprints</h2>
         <p>
@@ -73,6 +73,7 @@ else
     private NotificationMessage? _notificationMessage;
     IEnumerable<StravaSegmentWithEfforts>? _segments = null;
     IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;
+    IEnumerable<InfoItem>? _infoItems = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,7 +95,8 @@ else
             _notificationMessage?.Hide();
             List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts(Tag));
             _segments = segmentsWithEfforts.Where(s => s.StravaSegment.DisplayEnabled);
-            _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);    
+            _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);
+            _infoItems = await Api.GetInfoItems();
             StateHasChanged();
         }
         catch (Exception ex)

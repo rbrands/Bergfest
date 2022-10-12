@@ -161,7 +161,7 @@
                     Efforts = efforts,
                     EffortsWomen = efforts.Where(e => e.AthleteSex == "F")
                 }
-        ).Where(d => d.Count > 1);
+        ).Where(d => d.Count >= StravaSegmentWithEfforts.MIN_ITEMS_TO_SHOW);
     }
     protected void EditItem(ulong itemId)
     {
