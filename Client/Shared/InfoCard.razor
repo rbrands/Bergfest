@@ -1,0 +1,21 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+@inject NavigationManager NavigationManager
+
+<div class="card">
+    <div class="card-header">
+        <em>
+            @Info.HeaderTitle
+        </em>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public InfoItem Info { get; set; } = new InfoItem();
+
+}
