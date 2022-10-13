@@ -17,6 +17,10 @@
       "allowedRoles": [ "admin" ]
     },
     {
+      "route": "/api/DeleteInfoItem",
+      "allowedRoles": [ "admin" ]
+    },
+    {
       "route": "/api/GetInfoItems",
       "allowedRoles": [ "anonymous" ]
     },

@@ -51,6 +51,12 @@ namespace BlazorApp.Client.Utils
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<InfoItem>();
         }
+        public async Task DeleteInfoItem(InfoItem infoItem)
+        {
+            this.PrepareHttpClient();
+            HttpResponseMessage response = await _http.PostAsJsonAsync<InfoItem>($"/api/DeleteInfoItem", infoItem);
+            response.EnsureSuccessStatusCode();
+        }
         public async Task<Article?> GetArticle(string key)
         {
             this.PrepareHttpClient();

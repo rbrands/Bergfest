@@ -1,0 +1,60 @@
+﻿@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<TabControl>
+    <TabPage Text="Gesamt">
+        <table class="table table-sm">
+            <tbody>
+                @foreach (var p in Challenge.Participants)
+                {
+                    <tr>
+                        <td>
+                            <span class="badge bg-primary rounded-pill">@p.Value.Rank.ToString("##").</span>
+                        </td>
+                        <td>
+                            <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+        </table>
+    </TabPage>
+    <TabPage Text="Frauen">
+        <table class="table table-sm">
+            <tbody>
+            @foreach (var p in Challenge.ParticipantsFemale)
+            {
+                <tr>
+                    <td>
+                        <span class="badge bg-primary rounded-pill"> @p.Value.Rank.ToString("##").</span>
+                    </td>
+                    <td>
+                        <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </TabPage>
+</TabControl>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+
+}
