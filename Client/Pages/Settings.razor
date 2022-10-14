@@ -6,17 +6,18 @@
 @inject BackendApiRepository Api
 @inject NavigationManager NavigationManager
 
-<h3>Settings</h3>
+<h3>Einstellungen</h3>
 <TabControl>
     <TabPage Text="Neue Infobox" Name="Info">
-        <h4>Infobox</h4>
+        <h5>Infobox</h5>
         <EditInfoItem></EditInfoItem>
     </TabPage>
     <TabPage Text="Teilnehmer" Name="Members">
-        <h4>Teilnehmer</h4>
+        <h5>Teilnehmer</h5>
     </TabPage>
     <TabPage Text="Leistungen" Name="Efforts">
-        <h4>Leistngen</h4>
+        <h5>Leistungen</h5>
+        <AdminEfforts></AdminEfforts>
     </TabPage>
 </TabControl>
 

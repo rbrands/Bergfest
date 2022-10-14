@@ -1,12 +1,9 @@
-@page "/segmentefforts"
 @attribute [Authorize(Roles = "admin")]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
-@inject NavigationManager NavigationManager
 
-<h3>Segment-Leistungen</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 
 @if (null == _efforts)
@@ -79,6 +76,4 @@ else
             _efforts = await Api.GetSegmentsEfforts();
         }
     }
-
-
 }
