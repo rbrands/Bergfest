@@ -1,12 +1,9 @@
-﻿@page "/members"
-@attribute [Authorize(Roles = "admin")]
+﻿@attribute [Authorize(Roles = "admin")]
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
 @inject BackendApiRepository Api
-@inject NavigationManager NavigationManager
 
-<h3>Teilnehmer</h3>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
 
 @if (null == _members)
@@ -38,7 +35,7 @@ else
                     <td>@member.Sex</td>
                     <td>
                         <a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @member.GetFullName()">
-                            @if(!String.IsNullOrEmpty(member.ProfileImageLink))
+                            @if (!String.IsNullOrEmpty(member.ProfileImageLink))
                             {
                                 <img src="@member.ProfileSmallImageLink" class="img-fluid" alt="Strava-Profil @member.GetFullName()" />
                             }
