@@ -212,6 +212,11 @@
             _saveMessage?.Hide();
             StateHasChanged();
             _challenge.Description = StripEmptyHtml(await _htmlDescription!.GetHTML());
+            if (_startDateLocal > _endDateLocal)
+            {
+                _saveMessage?.ShowError("Das Enddatum der Challenge darf nicht vor dem Startdatum liegen.");
+                return;
+            }
             _challenge.StartDateUTC = _startDateLocal.ToUniversalTime();
             _challenge.EndDateUTC = _endDateLocal.ToUniversalTime();
             if (_inUpdateMode)

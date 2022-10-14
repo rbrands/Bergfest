@@ -38,11 +38,29 @@ else
         </AuthorizeView>
     </p>
     <div class="row">
+        @if (null != _infoItems)
+        {
+            @foreach (var info in _infoItems.Where(i => i.OrderId < 0))
+            {
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                    <InfoCard Info="@info" OnReload="@(() => Reload())"></InfoCard>
+                </div>
+            }
+        }
         @foreach (StravaSegmentWithEfforts segment in _segments)
         {
             <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
                 <SegmentCard SegmentWithEfforts="@segment" OnReload="Reload"></SegmentCard>
             </div>
+        }
+        @if (null != _infoItems)
+        {
+            @foreach (var info in _infoItems.Where(i => i.OrderId >= 0))
+            {
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+                    <InfoCard Info="@info" OnReload="@(() => Reload())"></InfoCard>
+                </div>
+            }
         }
     </div>
 }

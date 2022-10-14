@@ -52,7 +52,7 @@
         </div>
         <div class="form-group">
             <label>Inhalt der Infobox</label>
-            <BlazoredTextEditor @ref="@_htmlDescription" Placeholder="Hier steht der Inhalt der Infobox">
+            <BlazoredTextEditor @ref="@_htmlDescription" DebugLevel="log" Placeholder="Hier steht der Inhalt der Infobox">
                 <ToolbarContent>
                     <span class="ql-formats">
                         <button class="ql-bold"></button>
@@ -73,10 +73,7 @@
                     </span>
                 </ToolbarContent>
                 <EditorContent>
-                    @if (null != _infoToEdit?.InfoContent)
-                    {
-                            @((MarkupString)_infoToEdit.InfoContent)
-                    }                   
+                        @((MarkupString)_htmlContent)
                 </EditorContent>
             </BlazoredTextEditor>
         </div>
@@ -120,7 +117,7 @@
     private NotificationMessage? _notificationMessage;
     private IEnumerable<StravaSegmentChallenge>? _challenges;
     private BlazoredTextEditor? _htmlDescription;
-
+    private string _htmlContent = String.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,6 +127,7 @@
             if (null != Info)
             {
                 _infoToEdit = Info;
+                _htmlContent = _infoToEdit.InfoContent;
             }
         }
         catch (Exception ex)
@@ -161,9 +159,15 @@
         _infoToEdit = new InfoItem();
     }
 
-    private string? StripEmptyHtml(string htmlContent)
+    private string? StripEmptyHtml(string? htmlContent)
     {
-        return (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+        htmlContent =  (null == htmlContent || htmlContent.Equals("<p><br></p>")) ? null : htmlContent;
+        if (null != htmlContent)
+        {
+            htmlContent = htmlContent.Replace("<p><br></p>", " ");
+            htmlContent = htmlContent.Replace("<p></p>", " ");
+        }
+        return htmlContent;
     }
 
     private async Task OnSelectChallenge()
@@ -176,6 +180,19 @@
         _infoToEdit.LinkImage = challenge.ImageLink;
         await _htmlDescription!.LoadHTMLContent(challenge.Description);
     }
+    public static async Task<ModalResult> Show(IModalService modalService,
+                                               InfoItem info)
+    {
+        var parameters = new ModalParameters()
+                            .Add(nameof(EditInfoItem.Info), info);
+        var options = new ModalOptions()
+            {
+                Size = ModalSize.Large,
+                DisableBackgroundCancel = true
+            };
+        var modal = modalService.Show<EditInfoItem>(info.Title, parameters, options);
+        return await modal.Result;
 
+    }
 }
 
