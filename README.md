@@ -8,7 +8,7 @@ Bergfest is a [Azure Static Web App](https://learn.microsoft.com/en-us/azure/sta
 
 The following diagram shows the overall architecture:
 
-![Architecture](/docs/Bergfest.png)
+![Architecture](/docs/Bergfest.drawio.svg)
 
 ## Solution Structure
 
