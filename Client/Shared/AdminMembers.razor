@@ -12,6 +12,10 @@
 }
 else
 {
+    <p>
+        <button class="btn btn-primary" title="Neue Teilnehmer:in" @onclick=@(() => NewMember()) >Neue Teilnehmer:in anlegen</button>
+    </p>
+
     <table class="table table-sm table-striped table-bordered">
         <thead class="thead-dark">
             <tr>
@@ -28,6 +32,7 @@ else
             {
                 <tr>
                     <td>
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(member))"><span class="oi oi-pencil"></span></button>
                         <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(member))"><span class="oi oi-trash"></span></button>
                     </td>
                     <td>@member.FirstName</td>
@@ -80,6 +85,23 @@ else
                 return;
             }
             await Api.DeleteUser(user);
+            _members = await Api.GetUsers();
+        }
+    }
+    protected async Task EditItem(StravaAccess user)
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await EditMember.Show(Modal, user);
+            _members = await Api.GetUsers();
+        }
+    }
+
+    protected async Task NewMember()
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await EditMember.Show(Modal, null);
             _members = await Api.GetUsers();
         }
     }
