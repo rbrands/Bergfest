@@ -1,0 +1,132 @@
+﻿@attribute [Authorize(Roles = "admin")]
+@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@using Blazored.TextEditor
+@using System.Text
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage"></BlazorApp.Client.Shared.NotificationMessage>
+<EditForm Model="@_user" OnValidSubmit="OnSave">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="athleteId">Athlete-Id</label>
+        <InputNumber id="athleteId" aria-describedby="athleteIdHelp" class="form-control" @bind-Value="_user.AthleteId" placeholder="Id auf Strava" />
+        <small id="athleteIdHelp" class="form-text text-muted">
+            Id der Teilnehmer:in auf Strava
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="firstName">Vorname</label>
+        <InputText id="firstName" aria-describedby="firstNameHelp" class="form-control" @bind-Value="_user.FirstName" placeholder="Vorname" />
+        <small id="firstNameHelp" class="form-text text-muted">
+            Vorname der Teilnehmer:in
+        </small>
+    </div>
+    <div class="form-group">
+        <label for="lastName">Nachname</label>
+        <InputText id="lastName" aria-describedby="lastNameHelp" class="form-control" @bind-Value="_user.LastName" placeholder="Nachname" />
+        <small id="lastNameHelp" class="form-text text-muted">
+            Nachname der Teilnehmer:in
+        </small>
+    </div>
+    <div class="form-group">
+        <InputSelect id="sex" aria-describedby="sexHelp" @bind-Value="_user.Sex">
+            <option value="M">Männlich</option>
+            <option value="F">Weiblich</option>
+        </InputSelect>
+        <small id="sexHelp" class="form-text text-muted">
+            Geschlecht der Teilnehmer:in
+        </small>
+    </div>
+
+    <div class="card card-body">
+        <ValidationSummary />
+    </div>
+
+    <button type="submit" id="BtnSave" class="btn btn-primary">Speichern</button>
+    <button type="reset" id="BtnCancel" class="btn btn-secondary" @onclick="@(() => OnCancel())">Zurück ohne Speichern</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public StravaAccess? User { get; set; } = null;
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    [CascadingParameter] 
+    BlazoredModalInstance BlazoredModal { get; set; } = new BlazoredModalInstance();
+    private NotificationMessage? _notificationMessage;
+    private StravaAccess _user = new StravaAccess()
+        {
+            StravaAuthorizationIsPending = true,
+            Sex = "M"
+        };
+    private Boolean _inUpdateMode = false;
+
+    void Close() => BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    void Cancel() => BlazoredModal.CancelAsync();
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            if (null != User)
+            {
+                _user = User;
+                _inUpdateMode = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
+            return;
+        }
+    }
+    protected void OnCancel()
+    {
+        Cancel();
+    }
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            StateHasChanged();
+            if (_inUpdateMode)
+            {
+                await Api.UpdateUser(_user);
+            }
+            else
+            {
+                await Api.WriteUser(_user);
+            }
+            _notificationMessage?.ShowInfo("Gespeichert");
+            Close();
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+    }
+    public static async Task<ModalResult> Show(IModalService modalService,
+                                               StravaAccess? user)
+    {
+        var parameters = new ModalParameters();
+        if (null != user)
+        {
+            parameters.Add(nameof(EditMember.User), user);
+        }
+        var options = new ModalOptions()
+            {
+                Size = ModalSize.Large,
+                DisableBackgroundCancel = true
+            };
+        var modal = modalService.Show<EditMember>("Teilnehmer:in", parameters, options);
+        return await modal.Result;
+
+    }
+
+}
