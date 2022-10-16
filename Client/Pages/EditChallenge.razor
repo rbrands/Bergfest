@@ -151,6 +151,13 @@
             <h4>Teilnehmer auswählen</h4>
             <ParticipantSelector Challenge="_challenge"></ParticipantSelector>
         </TabPage>
+        <TabPage Text="Punkte">
+            <h4>Punkte</h4>
+            <p>
+                Für die Rangfolge auf den Segmenten werden die folgenden Punkte vergeben:
+            </p>
+            <EditPoints Challenge="_challenge"></EditPoints>
+        </TabPage>
     </TabControl>
 }
 
@@ -221,6 +228,7 @@
             _challenge.EndDateUTC = _endDateLocal.ToUniversalTime();
             if (_inUpdateMode)
             {
+                _notificationMessage!.ShowInfo(_challenge.PointLookup[0].ToString());
                 await Api.UpdateChallenge(_challenge);
             }
             else

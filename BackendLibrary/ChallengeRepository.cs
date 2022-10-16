@@ -87,7 +87,7 @@ namespace BackendLibrary
                     PatchOperation.Add("/InvitationRequired", challenge.InvitationRequired),
                     PatchOperation.Add("/RegistrationIsOpen", challenge.RegistrationIsOpen),
                     PatchOperation.Add("/InvitationLink", challenge.InvitationLink),
-                    PatchOperation.Add("/PointLookup", challenge.PointLookup)
+                    PatchOperation.Add("/PointLookup", challenge.PointLookup),
                 };
 
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.PatchItem(challenge.Id, patchOperations);
