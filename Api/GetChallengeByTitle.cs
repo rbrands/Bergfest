@@ -43,7 +43,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"GetChallenge(challengeId = {challengeTitle}) failed.");
+                _logger.LogError(ex, $"GetChallenge(challengeTitle = {challengeTitle}) failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }
