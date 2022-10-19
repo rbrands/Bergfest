@@ -93,19 +93,10 @@ else
     IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;
     IEnumerable<InfoItem>? _infoItems = null;
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnParametersSetAsync()
     {
-        try
-        {
-            _segments = null;
-            _hiddenSegments = null;
-            await Reload();
-        }
-        catch (Exception ex)
-        {
-            _notificationMessage?.ShowError($"Fehler: {ex.Message}");
-            return;
-        }
+        await Reload();
     }
 
     private async Task Reload()
