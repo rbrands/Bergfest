@@ -129,7 +129,7 @@
         @foreach (string tag in Segment.GetTags())
         {
             <span class="badge bg-light text-dark p-1 m-0 mt-2">
-                #@tag
+               <a href="withtag/@tag" title="@tag">#@tag</a>
             </span>
         }
         </div>

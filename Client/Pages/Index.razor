@@ -38,7 +38,7 @@ else
         </AuthorizeView>
     </p>
     <div class="row">
-        @if (null != _infoItems)
+        @if (null != _infoItems && String.IsNullOrEmpty(Tag))
         {
             @foreach (var info in _infoItems.Where(i => i.OrderId < 0))
             {
@@ -53,7 +53,7 @@ else
                 <SegmentCard SegmentWithEfforts="@segment" OnReload="Reload"></SegmentCard>
             </div>
         }
-        @if (null != _infoItems)
+        @if (null != _infoItems && String.IsNullOrEmpty(Tag))
         {
             @foreach (var info in _infoItems.Where(i => i.OrderId >= 0))
             {
@@ -97,6 +97,8 @@ else
     {
         try
         {
+            _segments = null;
+            _hiddenSegments = null;
             await Reload();
         }
         catch (Exception ex)

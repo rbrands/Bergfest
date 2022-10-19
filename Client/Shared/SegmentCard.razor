@@ -127,7 +127,7 @@
             @foreach (string tag in SegmentWithEfforts.StravaSegment.GetTags())
             {
                 <span class="badge bg-light text-dark p-1 m-0 mt-2">
-                    #@tag
+                    <a href="@($"withtag/{tag}")" title="@tag">#@tag</a>
                 </span>
             }
         </div>
