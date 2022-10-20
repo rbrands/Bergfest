@@ -30,7 +30,7 @@
                         @foreach (var p in Challenge.Participants)
                         {
                             <tr>
-                                <td>
+                                <td align="right">
                                     <span class="badge bg-primary rounded-pill">@p.Value.Rank.ToString("##").</span>
                                 </td>
                                 <td>
@@ -53,7 +53,7 @@
                     @foreach (var p in Challenge.ParticipantsFemale)
                     {
                         <tr>
-                            <td>
+                            <td align="right">
                                 <span class="badge bg-primary rounded-pill"> @p.Value.Rank.ToString("##").</span>
                             </td>
                             <td>
