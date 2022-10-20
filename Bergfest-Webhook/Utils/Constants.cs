@@ -9,7 +9,7 @@ namespace Bergfest_Webhook.Utils
 {
     public class Constants
     {
-        public const string VERSION = "2022-10-12";
+        public const string VERSION = "2022-10-20";
         public const int STRAVA_TTL_ACCESS = 3 * 30 * 24 * 3600; // 3 month TTL for Strava Access
         public const int STRAVA_TTL_SEGMENT_EFFORT = 7 * 24 * 3600; // 7 days TTL for segment efforts
         public const string STRAVA_WEBHOOK_VERIFY_TOKEN = "Bergfest-Webhook";
