@@ -77,12 +77,6 @@ namespace BlazorApp.Api
                     {
                         segmentWithEfforts.MostRecentEffort = daySections.First().Day;
                     }
-                    // Old version:
-                    //StravaSegmentEffort mostRecentEffort = segmentWithEfforts.Efforts.FirstOrDefault();
-                    //if (null != mostRecentEffort)
-                    //{
-                    //    segmentWithEfforts.MostRecentEffort = mostRecentEffort.StartDateLocal;
-                    //}
                     
                     segmentsWithEfforts.Add(segmentWithEfforts);
                 }

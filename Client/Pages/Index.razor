@@ -1,5 +1,6 @@
 ﻿@page "/"
 @page "/withtag/{Tag}"
+@page "/route/{RouteTitle]"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -88,6 +89,8 @@ else
 @code {
     [Parameter]
     public string? Tag { get; set; }
+    [Parameter]
+    public string? RouteTitle { get; set; }
     private NotificationMessage? _notificationMessage;
     IEnumerable<StravaSegmentWithEfforts>? _segments = null;
     IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;

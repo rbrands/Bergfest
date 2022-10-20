@@ -129,6 +129,8 @@ namespace BlazorApp.Shared
         public DateTime EndDateUTC { get; set; } = DateTime.Now.Date.AddDays(37.0).ToUniversalTime();
         [JsonPropertyName("isPublicVisible")]
         public bool IsPublicVisible { get; set; } = true;
+        [JsonPropertyName("forRoute")]
+        public bool ForRoute { get; set; } = false;
         [JsonPropertyName("invitationRequired")]
         public bool InvitationRequired { get; set; } = false;
         [JsonPropertyName("registrationIsOpen")]
