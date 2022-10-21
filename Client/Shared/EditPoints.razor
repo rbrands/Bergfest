@@ -1,0 +1,61 @@
+﻿@using System.Linq
+@using System.Collections.Generic
+@using BlazorApp.Shared
+@using BlazorApp.Client.Utils
+@inject AppState AppStateStore
+@inject BackendApiRepository Api
+
+<div>
+    <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
+    <p>
+        <button type="button" class="btn btn-primary" @onclick="@(() => OnSave())">Speichern</button>
+    </p>
+    <table class="table table-sm table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col" align="center">Rang</th>
+                <th scope="col" align="center">Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Challenge.PointLookup.Length; ++i)
+            {
+                <tr>
+                    <td align="right">@((i + 1).ToString("##0"))</td>
+                    <td align="right">
+                        @{
+                            int index = i;
+                            <input @bind-value="Challenge.PointLookup[index]" />
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
+    private NotificationMessage? _notificationMessage;
+
+    private async Task OnSave()
+    {
+        _notificationMessage?.Hide();
+
+        try
+        {
+            await Api.UpdateChallenge(Challenge);
+            _notificationMessage?.ShowSuccess("Gespeichert");
+        }
+        catch (Exception ex)
+        {
+            _notificationMessage?.ShowError($"Fehler beim Speichern: {ex.Message}");
+        }
+
+    }
+
+}

@@ -26,6 +26,16 @@ namespace BackendLibrary
             _cosmosDbDatabase = _config["COSMOS_DB_DATABASE"];
             _cosmosDbContainer = _config["COSMOS_DB_CONTAINER"];
         }
+        public string CosmosDbDatabase
+        {
+            get => _cosmosDbDatabase;
+            set => _cosmosDbDatabase = value;
+        }
+        public string CosmosDbContainer
+        {
+            get => _cosmosDbContainer;
+            set => _cosmosDbContainer = value;
+        }
         public async Task<T> CreateItem(T item)
         {
             if (null == item)
@@ -185,21 +195,19 @@ namespace BackendLibrary
             }
             // PatchItem only supports up to 10 operations. If there are more than that given, create more batches and 
             // patch the document several times.
-            List<PatchOperation> po = new List<PatchOperation>(patchOperations);
             ItemResponse<T>? response = null;
             do
             {
-                po = new List<PatchOperation>(po.Take(MAX_PATCH_OPERATIONS));
+                List<PatchOperation> po = new List<PatchOperation>(patchOperations.Take(MAX_PATCH_OPERATIONS));
                 response = await container.PatchItemAsync<T>(
                     id: id,
                     partitionKey: partitionKey,
                     patchOperations: po,
                     requestOptions: patchOption
-
                 );
-                po = new List<PatchOperation>(po.Skip(MAX_PATCH_OPERATIONS));
+                patchOperations = new List<PatchOperation>(patchOperations.Skip(MAX_PATCH_OPERATIONS));
             }
-            while (po.Count > 0);
+            while (patchOperations.Count > 0);
 
             return response.Resource;
         }

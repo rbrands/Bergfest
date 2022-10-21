@@ -8,7 +8,7 @@ namespace BlazorApp.Shared
 {
     public class StravaSegmentWithEfforts
     {
-        public const int MIN_ITEMS_TO_SHOW = 2;
+        public const int MIN_ITEMS_TO_SHOW = 3;
         [JsonPropertyName("stravaSegment")]
         public StravaSegment StravaSegment { get; set; }
         [JsonPropertyName("mostRecentEffort")]

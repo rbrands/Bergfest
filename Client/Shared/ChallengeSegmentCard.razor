@@ -71,6 +71,9 @@
                             @foreach (var e in _effortsForSegment)
                             {
                                 <tr>
+                                    <td align="right">
+                                        <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@(e.Rank.ToString("##")).</span></a>
+                                    </td>
                                     <td>
                                         <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                     </td>
@@ -96,6 +99,9 @@
                             @foreach (var e in _effortsForSegment.Where(e => e.AthleteSex == "F"))
                                 {
                                     <tr>
+                                        <td align="right">
+                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@(e.RankFemale.ToString("##")).</span></a>
+                                        </td>
                                         <td>
                                             <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
                                         </td>
@@ -129,7 +135,7 @@
         @foreach (string tag in Segment.GetTags())
         {
             <span class="badge bg-light text-dark p-1 m-0 mt-2">
-                #@tag
+               <a href="withtag/@tag" title="@tag">#@tag</a>
             </span>
         }
         </div>

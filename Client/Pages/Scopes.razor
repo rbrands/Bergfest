@@ -1,4 +1,4 @@
-﻿@page "/challenges"
+@page "/scopes"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -6,27 +6,30 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>
-    Bergfest - Challenges
+    Bergfest - Sammlungen
 </PageTitle>
 
 <div class="p-4 bg-light border">
-    <EditArticle ArticleKey="Challenges" ImageMaxHeight="8em">
-        <h2>Challenges</h2>
+    <EditArticle ArticleKey="Scopes" ImageMaxHeight="8em">
+        <h2>Sammlungen</h2>
         <p>
-            Dies sind die aktuellen und abgeschlossenen Segment-Challenges mit den tagesaktuellen Ergebnissen.
+            Dies sind Sammlungen von Segmenten z.B. für Routen.
         </p>
     </EditArticle>
 </div>
 <BlazorApp.Client.Shared.NotificationMessage @ref="@_notificationMessage" />
 
 <div class="row">
-    @foreach (StravaSegmentChallenge challenge in _challengesPublic)
+    @foreach (StravaSegmentChallenge c in _challengesPublic)
     {
         <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
-            <ChallengeSummaryCard Challenge="@challenge" Title="@challenge.GetTitleWithDate()"
+            <ChallengeSummaryCard Challenge="@c" Title="@c.ChallengeTitle"
                                   ShowDescription="true" 
                                   ShowImage="true"
-                                  ShowFooter="true">
+                                  ShowFooter="true"
+                                  ShowRating="false"
+                                  ShowResults="false"
+                                  ShowSegments="true">
             </ChallengeSummaryCard>
         </div>
     }
@@ -35,16 +38,19 @@
 <AuthorizeView Roles="admin,segmentadmin">
     <Authorized>
         <hr />
-        <h4>Nicht öffentliche Challenges</h4>
-        <p>Die folgenden Challenges sind nur per direktem Link sichtbar.</p>
+        <h4>Nicht öffentliche Sammlungen</h4>
+        <p>Die folgenden Sammlungen sind nur per direktem Link sichtbar.</p>
         <div class="row">
-            @foreach (StravaSegmentChallenge challenge in _challengesPrivate)
+            @foreach (StravaSegmentChallenge c in _challengesPrivate)
             {
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
-                    <ChallengeSummaryCard Challenge="@challenge" Title="@challenge.GetTitleWithDate()"
+                    <ChallengeSummaryCard Challenge="@c" Title="@c.ChallengeTitle"
                                       ShowDescription="true"
                                       ShowImage="true"
-                                      ShowFooter="true">
+                                      ShowFooter="true"
+                                      ShowRating="false"
+                                      ShowSegments="true"
+                                      ShowResults="false">
                     </ChallengeSummaryCard>
                 </div>
             }
@@ -77,8 +83,8 @@
         {
             _notificationMessage?.Hide();
             List<StravaSegmentChallenge> challenges = new List<StravaSegmentChallenge>(await Api.GetChallenges());
-            _challengesPublic = challenges.Where(c => c.IsPublicVisible && !c.ForRoute);
-            _challengesPrivate = challenges.Where(c => !c.IsPublicVisible && !c.ForRoute);
+            _challengesPublic = challenges.Where(c => c.IsPublicVisible && c.ForRoute);
+            _challengesPrivate = challenges.Where(c => !c.IsPublicVisible && c.ForRoute);
             StateHasChanged();
         }
         catch (Exception ex)

@@ -37,6 +37,7 @@ namespace BlazorApp.Api
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                _logger.LogInformation(requestBody);
                 StravaSegmentChallenge challenge = JsonSerializer.Deserialize<StravaSegmentChallenge>(requestBody);
 
                 StravaSegmentChallenge updatedChallenge = await _cosmosRepository.UpdateChallenge(challenge);

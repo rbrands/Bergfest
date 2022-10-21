@@ -17,6 +17,26 @@ namespace BlazorApp.Client.Utils
         private void PrepareHttpClient()
         {
         }
+        private async Task<string> GetErrorMessage(HttpResponseMessage response)
+        {
+            ErrorMessage error = new ErrorMessage()
+            {
+                Message = $"Http Fehlercode - {response.StatusCode.ToString()}"
+            };
+            try
+            {
+                ErrorMessage? errorFromResponse = await response.Content.ReadFromJsonAsync<ErrorMessage>();
+                if (null != errorFromResponse && !String.IsNullOrEmpty(errorFromResponse.Message))
+                {
+                    error.Message = errorFromResponse.Message;
+                }
+            }
+            catch (Exception)
+            {
+                // No exception in exception handler ...
+            }
+            return error.Message;
+        }
         public BackendApiRepository(HttpClient http)
         {
             _http = http;
@@ -371,6 +391,26 @@ namespace BlazorApp.Client.Utils
                     // No exception in exception handler ...
                 }
                 throw new Exception(error?.Message);
+            }
+        }
+        public async Task<IEnumerable<StravaSegmentWithEfforts>> GetSegmentsWithEffortsForScope(string scope)
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetSegmentsWithEffortsForScope/{scope}");
+            if (response.IsSuccessStatusCode)
+            {
+                IEnumerable<StravaSegmentWithEfforts> returnList = new List<StravaSegmentWithEfforts>();
+                IEnumerable<StravaSegmentWithEfforts>? segmentsWithEfforts = await response.Content.ReadFromJsonAsync<IEnumerable<StravaSegmentWithEfforts>>();
+                if (null != segmentsWithEfforts)
+                {
+                    returnList = segmentsWithEfforts;
+                }
+                return returnList;
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessage(response);
+                throw new Exception(errorMessage);
             }
         }
         public async Task<ChallengeWithEfforts> GetChallengeSegmentEfforts(string challengeId)

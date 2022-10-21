@@ -36,9 +36,12 @@
                         <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
                     }
                     <h2>@_challenge.ChallengeTitle</h2>
-                    <h6 class="fw-light">
-                        @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
-                    </h6>
+                    @if (!_challenge.ForRoute)
+                    {
+                        <h6 class="fw-light">
+                            @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
+                        </h6>
+                    }
                     @((MarkupString)_challenge.Description)
                 </div>
                 @if (_registrationAllowed)
