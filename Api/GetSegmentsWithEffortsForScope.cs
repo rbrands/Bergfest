@@ -19,48 +19,65 @@ using System.Threading;
 
 namespace BlazorApp.Api
 {
-    public class GetSegmentsWithEfforts
+    public class GetSegmentsWithEffortsForScope
     {
         private readonly ILogger _logger;
         private readonly IConfiguration _config;
         private CosmosDBRepository<StravaSegment> _cosmosRepository;
         private CosmosDBRepository<StravaSegmentEffort> _cosmosEffortRepository;
-        public GetSegmentsWithEfforts(ILogger<GetSegmentsWithEfforts> logger,
+        private ChallengeRepository _challengeRepository;
+        public GetSegmentsWithEffortsForScope(ILogger<GetSegmentsWithEffortsForScope> logger,
                         IConfiguration config,
                         CosmosDBRepository<StravaSegmentEffort> cosmosEffortRepository,
-                        CosmosDBRepository<StravaSegment> cosmosRepository
+                        CosmosDBRepository<StravaSegment> cosmosRepository,
+                        ChallengeRepository challengeRepository
         )
         {
             _logger = logger;
             _config = config;
             _cosmosEffortRepository = cosmosEffortRepository;
             _cosmosRepository = cosmosRepository;
+            _challengeRepository = challengeRepository;
         }
 
-        [FunctionName(nameof(GetSegmentsWithEfforts))]
+        [FunctionName(nameof(GetSegmentsWithEffortsForScope))]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSegmentsWithEfforts/{tag}")] HttpRequest req, string tag)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetSegmentsWithEffortsForScope/{scope}")] HttpRequest req, string scope)
         {
             try
             {
-                _logger.LogInformation($"GetSegmentsWithEfforts({tag})");
+                _logger.LogInformation($"GetSegmentsWithEffortsForScope({scope})");
+                StravaSegmentChallenge? challenge = await _challengeRepository.GetChallengeByTitle(scope);
+                if (null == challenge)
+                {
+                    throw new Exception($"No challenge with >{scope}< found");
+                }
                 IEnumerable<StravaSegment> segments = await _cosmosRepository.GetItems();
                 List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>();
-                foreach (StravaSegment s in segments)
+                foreach (var s in challenge.Segments)
                 {
-                    if (!String.IsNullOrEmpty(tag) && tag != "*")
+                    StravaSegment stravaSegment = new StravaSegment()
                     {
-                        string[] tags = s.GetTags();
-                        tag = tag.ToLowerInvariant();
-                        if (String.IsNullOrEmpty(s.Tags) || !s.Tags.Contains(tag) )
-                        {
-                            // If the given tag is not found in the list of tags skip this segment
-                            continue;
-                        }
-                    }
+                        SegmentId = s.Value.SegmentId,
+                        IsEnabled = true,
+                        DisplayEnabled = true,
+                        SegmentName = s.Value.SegmentName,
+                        Distance = s.Value.Distance,
+                        AverageGrade = s.Value.AverageGrade,
+                        MaximumGrade = s.Value.MaximumGrade,
+                        Elevation = s.Value.Elevation,
+                        ClimbCategory = s.Value.ClimbCategory,
+                        City = s.Value.City,
+                        ImageLink = s.Value.ImageLink,
+                        Description = s.Value.Description,
+                        RouteRecommendation = s.Value.RouteRecommendation,
+                        Tags = s.Value.Tags,
+                        Labels = s.Value.Labels,
+                        Scope = s.Value.Scope
+                    };
                     // Get all efforts corresponding to the segment and order them date, elapsed time (desc)
-                    StravaSegmentWithEfforts segmentWithEfforts = new StravaSegmentWithEfforts(s);
-                    List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.SegmentId && e.StartDateLocal > DateTime.UtcNow.AddDays(-Constants.DAYS_IN_PAST_FOR_EFFORTS)));
+                    StravaSegmentWithEfforts segmentWithEfforts = new StravaSegmentWithEfforts(stravaSegment);
+                    List<StravaSegmentEffort> efforts = new List<StravaSegmentEffort>(await _cosmosEffortRepository.GetItems(e => e.SegmentId == s.Value.SegmentId && e.StartDateLocal > DateTime.UtcNow.AddDays(-Constants.DAYS_IN_PAST_FOR_EFFORTS)));
                     segmentWithEfforts.Efforts = efforts.OrderByDescending(e => e.StartDateLocal.DayOfYear).ThenBy(e => e.ElapsedTime);
 
                     // As indication that there was a group of riders on the segment: Get days with more than 2 items
@@ -77,7 +94,7 @@ namespace BlazorApp.Api
                     {
                         segmentWithEfforts.MostRecentEffort = daySections.First().Day;
                     }
-                    
+
                     segmentsWithEfforts.Add(segmentWithEfforts);
                 }
                 // Order segments to get segment with most recent efforts on top 
@@ -85,7 +102,7 @@ namespace BlazorApp.Api
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetSegmentsWithEfforts failed.");
+                _logger.LogError(ex, "GetSegmentsWithEffortsForScope failed.");
                 return new BadRequestErrorMessageResult(ex.Message);
             }
         }

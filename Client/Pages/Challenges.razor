@@ -77,8 +77,8 @@
         {
             _notificationMessage?.Hide();
             List<StravaSegmentChallenge> challenges = new List<StravaSegmentChallenge>(await Api.GetChallenges());
-            _challengesPublic = challenges.Where(c => c.IsPublicVisible);
-            _challengesPrivate = challenges.Where(c => !c.IsPublicVisible);
+            _challengesPublic = challenges.Where(c => c.IsPublicVisible && !c.ForRoute);
+            _challengesPrivate = challenges.Where(c => !c.IsPublicVisible || c.ForRoute);
             StateHasChanged();
         }
         catch (Exception ex)

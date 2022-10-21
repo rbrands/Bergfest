@@ -1,6 +1,6 @@
 ﻿@page "/"
 @page "/withtag/{Tag}"
-@page "/route/{RouteTitle]"
+@page "/scope/{Scope}"
 @using BlazorApp.Client.Utils
 @using BlazorApp.Shared
 @inject AppState AppStateStore
@@ -90,7 +90,7 @@ else
     [Parameter]
     public string? Tag { get; set; }
     [Parameter]
-    public string? RouteTitle { get; set; }
+    public string? Scope { get; set; }
     private NotificationMessage? _notificationMessage;
     IEnumerable<StravaSegmentWithEfforts>? _segments = null;
     IEnumerable<StravaSegmentWithEfforts>? _hiddenSegments = null;
@@ -107,9 +107,17 @@ else
         try
         {
             _notificationMessage?.Hide();
-            List<StravaSegmentWithEfforts> segmentsWithEfforts = new List<StravaSegmentWithEfforts>(await Api.GetSegmentsWithEfforts(Tag));
-            _segments = segmentsWithEfforts.Where(s => s.StravaSegment.DisplayEnabled);
-            _hiddenSegments = segmentsWithEfforts.Where(s => !s.StravaSegment.DisplayEnabled);
+            IEnumerable<StravaSegmentWithEfforts> segmentsFromDb;
+            if (!String.IsNullOrEmpty(Scope))
+            {
+                segmentsFromDb = await Api.GetSegmentsWithEffortsForScope(Scope);
+            }
+            else
+            {
+                segmentsFromDb = await Api.GetSegmentsWithEfforts(Tag);
+            }
+            _segments = segmentsFromDb.Where(s => s.StravaSegment.DisplayEnabled);
+            _hiddenSegments = segmentsFromDb.Where(s => !s.StravaSegment.DisplayEnabled);
             _infoItems = await Api.GetInfoItems();
             StateHasChanged();
         }
