@@ -23,15 +23,52 @@
                 @((MarkupString)Challenge.Description)
             </div>
         }
-        <TabControl>
-            <TabPage Text="Gesamt">
-                <table class="table table-sm">
-                    <tbody>
-                        @foreach (var p in Challenge.Participants)
+        @if (ShowSegments)
+        {
+            <h5>Segmente</h5>
+            <ul title="Segmente">
+                @foreach (var s in Challenge.Segments)
+                {
+                    <li>
+                        <a href="@s.Value.GetSegmentLink()" target="_blank" alt="@s.Value.SegmentName">@s.Value.SegmentName</a>
+                    </li>
+                }
+            </ul>
+        }
+        @if (ShowResults)
+        {
+            <TabControl>
+                <TabPage Text="Gesamt">
+                    <table class="table table-sm">
+                        <tbody>
+                            @foreach (var p in Challenge.Participants)
+                            {
+                                <tr>
+                                    <td align="right">
+                                        <span class="badge bg-primary rounded-pill">@p.Value.Rank.ToString("##").</span>
+                                    </td>
+                                    <td>
+                                        <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
+                                    </td>
+                                    <td align="right">
+                                        <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </TabPage>
+                <TabPage Text="Frauen">
+                    <table class="table table-sm">
+                        <tbody>
+                        @foreach (var p in Challenge.ParticipantsFemale)
                         {
                             <tr>
                                 <td align="right">
-                                    <span class="badge bg-primary rounded-pill">@p.Value.Rank.ToString("##").</span>
+                                    <span class="badge bg-primary rounded-pill"> @p.Value.Rank.ToString("##").</span>
                                 </td>
                                 <td>
                                     <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
@@ -43,97 +80,83 @@
                                     <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
                                 </td>
                             </tr>
-                         }
-                     </tbody>
-                </table>
-            </TabPage>
-            <TabPage Text="Frauen">
-                <table class="table table-sm">
-                    <tbody>
-                    @foreach (var p in Challenge.ParticipantsFemale)
-                    {
-                        <tr>
-                            <td align="right">
-                                <span class="badge bg-primary rounded-pill"> @p.Value.Rank.ToString("##").</span>
-                            </td>
-                            <td>
-                                <Tooltip Text="Strava Profil" ImageLink="@p.Value.ProfileImage" ImageHeight="124px" Link="@p.Value.GetAhtleteLink()">@p.Value.AthleteName</Tooltip>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary rounded-pill">@p.Value.SegmentCounter/@Challenge.Segments?.Count</span>
-                            </td>
-                            <td align="right">
-                                <span class="badge bg-primary rounded-pill">@p.Value.TotalPoints.ToString("##0.0")</span>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </TabPage>
-            @if (null != Efforts && Efforts.Any())
-            {
-                <TabPage Text="Aktuell">
-                    <p>
-                        Die letzten Aktivitäten der Teilnehmer:innen auf einen Blick:
-                        <table class="table table-sm">
+                        }
+                        </tbody>
+                    </table>
+                </TabPage>
+                @if (null != Efforts && Efforts.Any())
+                {
+                    <TabPage Text="Aktuell">
+                        <p>
+                            Die letzten Aktivitäten der Teilnehmer:innen auf einen Blick:
+                            <table class="table table-sm">
+                                <tbody>
+                                    @foreach(var e in Efforts)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
+                                            </td>
+                                            <td>
+                                                    <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
+                                            </td>
+                                            <td>
+                                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.SegmentTitle" alt="Segment">@e.SegmentTitle</a>
+                                            </td>
+                                            <td>
+                                                <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </p>
+                    </TabPage>
+                }
+                @if (ShowRating)
+                {
+                    <TabPage Text="Punkte">
+                        <p>
+                            Für die Rangfolge auf den Segmenten werden die folgenden Punkte vergeben:
+                        </p>
+                        <table class="table table-sm table-striped table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col" align="center">Rang</th>
+                                    <th scope="col" align="center">Punkte</th>
+                                </tr>
+                            </thead>
                             <tbody>
-                                @foreach(var e in Efforts)
+                                @for (int i = 0; i < Challenge.PointLookup.Length; ++i)
                                 {
                                     <tr>
-                                        <td>
-                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-primary rounded-pill">@e.GetElapsedTimeAsString()</span></a>
-                                        </td>
-                                        <td>
-                                                <Tooltip Text="Strava Profil" ImageLink="@e.ProfileImageLink" ImageHeight="124px" Link="@e.GetAhtleteLink()">@e.AthleteName</Tooltip>
-                                        </td>
-                                        <td>
-                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@e.SegmentTitle" alt="Segment">@e.SegmentTitle</a>
-                                        </td>
-                                        <td>
-                                            <a href="@e.GetActivitySegmentLink()" target="_blank" title="@(e.ActivityName ?? e.AthleteName)" alt="Segmentleistung"><span class="badge bg-secondary rounded-pill">@e.StartDateLocal.ToString("d.M.")</span></a>
-                                        </td>
+                                        <td align="right">@((i+1).ToString("##0"))</td>
+                                        <td align="right">@Challenge.PointLookup[i].ToString("##0.0")</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                    </p>
-                </TabPage>
-            }
-            @if (ShowRating)
-            {
-                <TabPage Text="Punkte">
-                    <p>
-                        Für die Rangfolge auf den Segmenten werden die folgenden Punkte vergeben:
-                    </p>
-                    <table class="table table-sm table-striped table-bordered">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th scope="col" align="center">Rang</th>
-                                <th scope="col" align="center">Punkte</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < Challenge.PointLookup.Length; ++i)
-                            {
-                                <tr>
-                                    <td align="right">@((i+1).ToString("##0"))</td>
-                                    <td align="right">@Challenge.PointLookup[i].ToString("##0.0")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </TabPage>
-            }
-        </TabControl>
+                    </TabPage>
+                }
+            </TabControl>
+        }
     </div>
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Zur Challenge" hidden="@(!ShowFooter)">
-            <a class="btn btn-sm btn-outline-secondary" title="Details" href=@($"/{Challenge.UrlTitle}")>Zu den Segmenten</a>
+            <a class="btn btn-sm btn-outline-secondary" title="Details" href=@(Challenge.ForRoute ? $"scope/{Challenge.UrlTitle}" : $"{Challenge.UrlTitle}")>Zu den Segmenten</a>
+            <AuthorizeView Roles="admin,segmentadmin">
+                <Authorized>
+                    <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"editchallenge/{Challenge.Id}")><span class="oi oi-pencil"></span></a>
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
+                </Authorized>
+            </AuthorizeView>
         </div>
     </div>
 </div>
 
 @code {
+    [CascadingParameter]
+    public IModalService? Modal { get; set; }
     [Parameter]
     public StravaSegmentChallenge Challenge { get; set; } = new StravaSegmentChallenge();
     [Parameter]
@@ -147,5 +170,23 @@
     [Parameter]
     public Boolean ShowRating { get; set; } = false;
     [Parameter]
+    public Boolean ShowResults { get; set; } = true;
+    [Parameter]
+    public Boolean ShowSegments { get; set; } = false;
+    [Parameter]
     public IEnumerable<ChallengeSegmentEffort>? Efforts { get; set; }
+
+    protected async Task DeleteChallenge()
+    {
+        if (null != Modal)
+        {
+            ModalResult result = await Confirm.ShowDialog(Modal, "Löschen?", $"Soll {Challenge!.ChallengeTitle} wirklich mit allen Daten gelöscht werden?");
+            if (result.Cancelled || !(result.Data is bool accepted) || !accepted)
+            {
+                return;
+            }
+            await Api.DeleteChallenge(Challenge);
+        }
+    }
+
 }

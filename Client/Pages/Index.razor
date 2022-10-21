@@ -38,6 +38,13 @@ else
             </Authorized>
         </AuthorizeView>
     </p>
+    @if (!String.IsNullOrEmpty(Tag))
+    {  
+        <h5>Segmente mit Tag #@Tag</h5>
+    } else if (!String.IsNullOrEmpty(Scope))
+    {
+        <h5>Segmente in Sammlung "@Scope"</h5>
+    }
     <div class="row">
         @if (null != _infoItems && String.IsNullOrEmpty(Tag))
         {
@@ -83,8 +90,6 @@ else
         }
     </Authorized>
 </AuthorizeView>
-
-
 
 @code {
     [Parameter]

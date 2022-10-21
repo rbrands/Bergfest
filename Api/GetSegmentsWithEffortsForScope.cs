@@ -47,7 +47,8 @@ namespace BlazorApp.Api
             try
             {
                 _logger.LogInformation($"GetSegmentsWithEffortsForScope({scope})");
-                StravaSegmentChallenge? challenge = await _challengeRepository.GetChallengeByTitle(scope);
+                StravaSegmentChallenge
+                 challenge = await _challengeRepository.GetChallengeByTitle(scope);
                 if (null == challenge)
                 {
                     throw new Exception($"No challenge with >{scope}< found");
