@@ -46,7 +46,7 @@ else
         <h5>Segmente in Sammlung "@Scope"</h5>
     }
     <div class="row">
-        @if (null != _infoItems && String.IsNullOrEmpty(Tag))
+        @if (null != _infoItems && String.IsNullOrEmpty(Tag) && String.IsNullOrEmpty(Scope))
         {
             @foreach (var info in _infoItems.Where(i => i.OrderId < 0))
             {
@@ -61,7 +61,7 @@ else
                 <SegmentCard SegmentWithEfforts="@segment" OnReload="Reload"></SegmentCard>
             </div>
         }
-        @if (null != _infoItems && String.IsNullOrEmpty(Tag))
+        @if (null != _infoItems && String.IsNullOrEmpty(Tag) && String.IsNullOrEmpty(Scope))
         {
             @foreach (var info in _infoItems.Where(i => i.OrderId >= 0))
             {
