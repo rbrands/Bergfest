@@ -180,17 +180,7 @@ namespace Bergfest_Webhook
                 };
                 if (effort.StartDateLocal.ToUniversalTime() >= stravaChallenge.StartDateUTC && effort.StartDateLocal.ToUniversalTime() <= stravaChallenge.EndDateUTC)
                 {
-                    StravaSegmentChallenge fullChallengeData = await _challengeRepository.GetChallenge(stravaChallenge.Id);
-                    if (fullChallengeData.Participants.ContainsKey(challengeSegmentEffort.AthleteId))
-                    {
-                        _logger.LogInformation($"ScanForChallenges(Challenge {fullChallengeData.ChallengeTitle} Participant {challengeSegmentEffort.AthleteName})");
-                        // Update effort only if athlete is participant
-                        await _challengeRepository.UpdateSegmentEffortImprovement(challengeSegmentEffort);
-                    }
-                    else
-                    {
-                        _logger.LogInformation($"ScanForChallenges({challengeSegmentEffort.AthleteName} not participant of challenge {stravaChallenge.ChallengeTitle})");
-                    }
+                    await _challengeRepository.UpdateSegmentEffortImprovement(challengeSegmentEffort);
                 }
             }
                     

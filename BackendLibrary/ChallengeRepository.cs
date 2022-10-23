@@ -268,7 +268,13 @@ namespace BackendLibrary
                 segmentEffort.LogicalKey = $"{segmentEffort.ChallengeId}-{segmentEffort.AthleteId}-{segmentEffort.SegmentId}";
                 // Check if there is already a time for the segment stored and update this one if the time has been improved
                 ChallengeSegmentEffort? effortInStock = await this.GetItemByKey(segmentEffort.LogicalKey);
-                if (null == effortInStock || segmentEffort.ElapsedTime < effortInStock.ElapsedTime)
+                StravaSegmentChallenge.Participant? challengeParticipant = null;
+                if (null == effortInStock)
+                {
+                    // No efforts for this segment for the athlete ==> check if the athlete is participant of challenge
+                    challengeParticipant = await GetChallengeParticipant(segmentEffort.ChallengeId, segmentEffort.AthleteId);
+                }
+                if ((null == effortInStock && null != challengeParticipant) || (null != effortInStock && segmentEffort.ElapsedTime < effortInStock.ElapsedTime))
                 {
                     _logger.LogInformation($"UpdateSegmentEffortImprovement({segmentEffort.SegmentTitle} for {segmentEffort.AthleteName} with time {segmentEffort.ElapsedTime})");
                     ChallengeSegmentEffort updatedEffort = await UpsertSegmentEffort(segmentEffort);
@@ -322,6 +328,24 @@ namespace BackendLibrary
             catch (Exception ex)
             {
                 _logger.LogError(ex, "DeleteSegmentEffort failed.");
+                throw;
+            }
+        }
+        public async Task<StravaSegmentChallenge.Participant?> GetChallengeParticipant(string challengeId, ulong athleteId)
+        {
+            try
+            {
+                StravaSegmentChallenge challenge = await GetChallenge(challengeId);
+                StravaSegmentChallenge.Participant? participant = null;
+                if (challenge.Participants != null)
+                {
+                    challenge.Participants.TryGetValue(athleteId, out participant);
+                }
+                return participant;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetChallengeParticipant failed.");
                 throw;
             }
         }
