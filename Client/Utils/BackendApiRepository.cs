@@ -7,6 +7,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using BlazorApp.Shared;
 using Microsoft.AspNetCore.Routing;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorApp.Client.Utils
 {
@@ -518,6 +521,46 @@ namespace BlazorApp.Client.Utils
                 throw new Exception(error?.Message);
             }
         }
+        public async Task<BlobAccessSignature> GetBlobAccessSignatureForPNGImageUpload()
+        {
+            this.PrepareHttpClient();
+            var response = await _http.GetAsync($"/api/GetBlobAccessSignatureForPNGImageUpload");
+            if (response.IsSuccessStatusCode)
+            {
+                BlobAccessSignature? blobAccess = await response.Content.ReadFromJsonAsync<BlobAccessSignature>();
+                if (null == blobAccess)
+                {
+                    throw new Exception("No Blob SAS for upload received.");
+                }
+                return blobAccess;
+            }
+            else
+            {
+                string errorMessage = await GetErrorMessage(response);
+                throw new Exception(errorMessage);
+            }
+        }
+        public async Task<string> UploadImage(IBrowserFile picture, string? title, string? label = null)
+        {
+            BlobAccessSignature sas = await GetBlobAccessSignatureForPNGImageUpload();
+            BlobClientOptions clientOptions = new BlobClientOptions();
+            clientOptions.Retry.MaxRetries = 0;
+            BlobClient blobClient = new BlobClient(sas.Sas, clientOptions);
+
+            using var stream = picture.OpenReadStream(maxAllowedSize: 2048000);
+            BlobUploadOptions options = new BlobUploadOptions();
+            options.HttpHeaders = new BlobHttpHeaders() { ContentType = picture.ContentType };
+            options.Metadata = new Dictionary<string, string>
+            {
+                { "Label", label ?? String.Empty },
+                { "Title", title ?? String.Empty },
+                { "Filename", picture.Name ?? String.Empty }
+            };
+            
+            await blobClient.UploadAsync(stream, options);
+            return sas.PublicLink; 
+        }
+
 
     }
 

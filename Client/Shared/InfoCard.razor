@@ -18,7 +18,7 @@
             <img class="card-img-top" src="@Info.LinkImage" alt="@Info.LinkTitle">
         </a>
     }
-    <div class="card-body overflow-auto" style="max-height:500px">
+    <div class="card-body">
         @if (!String.IsNullOrEmpty(Info.SubTitle))
         {
             <h6 class="text-muted card-subtitle mb-2">@Info.SubTitle</h6>
@@ -27,15 +27,17 @@
         {
             <h5 class="card-title">@Info.Title</h5>
         }
-        <p class="card-text">
-            <div>
-                @((MarkupString)Info.InfoContent)
-            </div>
-        </p>
-        @if (null != _challenge)
-        {
-            <ChallengeRanking Challenge="@_challenge"></ChallengeRanking>
-        }
+        <div class="overflow-auto" style="max-height:500px">
+            <p class="card-text">
+                <div>
+                    @((MarkupString)Info.InfoContent)
+                </div>
+            </p>
+            @if (null != _challenge)
+            {
+                <ChallengeRanking Challenge="@_challenge"></ChallengeRanking>
+            }
+        </div>
         <hr />
         @if (!String.IsNullOrEmpty(Info.Link))
         {
