@@ -90,7 +90,7 @@ else
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
     <div class="form-row">
-        <div class="form-group col-md-10">
+        <div class="form-group col-md-6">
            <input class="form-control" @bind="@_imageLink" placeholder="Link zu einem Bild" title="Bildlink"></input>
             <small id="imageInlineLinkHelp" class="form-text text-muted">
                 Optional: Image in Text einfügen.
@@ -98,6 +98,9 @@ else
         </div>
         <div class="col-md-2">
             <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => InsertImage())">Bild einfügen</button>
+        </div>
+        <div class="col-md-2">
+            <UploadImage Title="@ArticleKey" Label="Article-Image"></UploadImage>
         </div>
      </div>
     @if (null != _article)
