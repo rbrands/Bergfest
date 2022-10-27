@@ -8,7 +8,7 @@
 
 <EditForm Model="@_infoToEdit" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
-        <div class="form-group">
+        <div class="mb-3">
             <label for="orderId">Ordnungs ID</label>
             <InputNumber id="orderId" aria-describedby="orderIdHelp" class="form-control" @bind-Value="_infoToEdit.OrderId" />
             <small id="orderIdHelp" class="form-text text-muted">
@@ -17,7 +17,7 @@
         </div>
         @if (null != _challenges && _challenges.Any())
         {
-            <div class="form-group">
+            <div class="mb-3">
                 <InputSelect Value="_infoToEdit.ChallengeId"
                              ValueExpression="@(() => _infoToEdit.ChallengeId)"
                              ValueChanged="@(async(string id) => { _infoToEdit.ChallengeId = id; await OnSelectChallenge(); })">
@@ -29,28 +29,28 @@
                 </InputSelect>
             </div>
         }
-        <div class="form-group">
+        <div class="mb-3">
             <label for="title">Kopfzeile</label>
             <InputText id="header" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.HeaderTitle" autocomplete="on" placeholder="Kopftitel der Info" title="Kopfzeile" />
             <small id="headerHelp" class="form-text text-muted">
                 Header zur Infobox.
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label for="title">Titel</label>
             <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.Title" autocomplete="on" placeholder="Titel der Info" title="Titel" />
             <small id="titleHelp" class="form-text text-muted">
                 Haupttitel zur Infobox.
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label for="title">Untertitel</label>
             <InputText id="subTitle" aria-describedby="subTitleHelp" class="form-control" @bind-Value="_infoToEdit.SubTitle" autocomplete="on" placeholder="Untertitel der Info" title="Untertitel" />
             <small id="subTitleHelp" class="form-text text-muted">
                 Untertitel zur Infobox.
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label>Inhalt der Infobox</label>
             <BlazoredTextEditor @ref="@_htmlDescription" DebugLevel="log" Placeholder="Hier steht der Inhalt der Infobox">
                 <ToolbarContent>
@@ -77,27 +77,32 @@
                 </EditorContent>
             </BlazoredTextEditor>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label for="infoLifeTime">Lebensdauer der Info</label>
             <InputNumber id="infoLifeTime" aria-describedby="infoLifeTimeHelp" class="form-control" @bind-Value="_infoToEdit.InfoLifeTimeInDays" />
             <small id="infoLifeTimeHelp" class="form-text text-muted">
                 Hier kann eingestellt werden, nach wie vielen Tagen die Info automatisch gelöscht werden soll. 0 = kein automatisches Löschen.
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_infoToEdit.Link" placeholder="URL" title="Link zu weiterer Infos" />
             <small id="linkHelp" class="form-text text-muted">
                 Optional: Link zu weiteren Infos.
             </small>
         </div>
-        <div class="form-group">
-            <label for="linkImage">Link zu einem Bild</label>
-            <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_infoToEdit.LinkImage" placeholder="URL" title="Link zu einem Image" />
-            <small id="linkImageHelp" class="form-text text-muted">
-                Optional: Link zu einem Bild zur Strecke
-            </small>
+        <div class="row mb-3">
+            <div class="col-6">
+                <label for="linkImage">Link zu einem Bild</label>
+                <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_infoToEdit.LinkImage" placeholder="URL" title="Link zu einem Image" />
+                <small id="linkImageHelp" class="form-text text-muted">
+                    Optional: Link zu einem Bild zur Strecke
+                </small>
+            </div>
+            <div class="col-6 d-flex align-items-center">
+                <UploadImage Title="@_infoToEdit.Title" Label="InfoCard-Image" OnFileUploaded="@((string uploadLink) => {_infoToEdit.LinkImage = uploadLink; })" ></UploadImage>
+            </div>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label for="linkTitle">Link-Bezeichnung</label>
             <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_infoToEdit.LinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Info" />
             <small id="linkTitleHelp" class="form-text text-muted">
