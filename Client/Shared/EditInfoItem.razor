@@ -9,7 +9,7 @@
 <EditForm Model="@_infoToEdit" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
         <div class="mb-3">
-            <label for="orderId">Ordnungs ID</label>
+            <label class="form-label" for="orderId">Ordnungs ID</label>
             <InputNumber id="orderId" aria-describedby="orderIdHelp" class="form-control" @bind-Value="_infoToEdit.OrderId" />
             <small id="orderIdHelp" class="form-text text-muted">
                 Über die Ordnungs ID wird die Reihenfolge der Anzeige der Info-Boxen gesteuert. Infoboxen mit negativen Ordnungsnummern werden vor den Terminen angezeigt, mit positiven nach den Terminen.
@@ -30,28 +30,28 @@
             </div>
         }
         <div class="mb-3">
-            <label for="title">Kopfzeile</label>
+            <label class="form-label" for="title">Kopfzeile</label>
             <InputText id="header" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.HeaderTitle" autocomplete="on" placeholder="Kopftitel der Info" title="Kopfzeile" />
             <small id="headerHelp" class="form-text text-muted">
                 Header zur Infobox.
             </small>
         </div>
         <div class="mb-3">
-            <label for="title">Titel</label>
+            <label class="form-label" for="title">Titel</label>
             <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_infoToEdit.Title" autocomplete="on" placeholder="Titel der Info" title="Titel" />
             <small id="titleHelp" class="form-text text-muted">
                 Haupttitel zur Infobox.
             </small>
         </div>
         <div class="mb-3">
-            <label for="title">Untertitel</label>
+            <label class="form-label" for="title">Untertitel</label>
             <InputText id="subTitle" aria-describedby="subTitleHelp" class="form-control" @bind-Value="_infoToEdit.SubTitle" autocomplete="on" placeholder="Untertitel der Info" title="Untertitel" />
             <small id="subTitleHelp" class="form-text text-muted">
                 Untertitel zur Infobox.
             </small>
         </div>
         <div class="mb-3">
-            <label>Inhalt der Infobox</label>
+            <label class="form-label">Inhalt der Infobox</label>
             <BlazoredTextEditor @ref="@_htmlDescription" DebugLevel="log" Placeholder="Hier steht der Inhalt der Infobox">
                 <ToolbarContent>
                     <span class="ql-formats">
@@ -78,7 +78,7 @@
             </BlazoredTextEditor>
         </div>
         <div class="mb-3">
-            <label for="infoLifeTime">Lebensdauer der Info</label>
+            <label class="form-label" for="infoLifeTime">Lebensdauer der Info</label>
             <InputNumber id="infoLifeTime" aria-describedby="infoLifeTimeHelp" class="form-control" @bind-Value="_infoToEdit.InfoLifeTimeInDays" />
             <small id="infoLifeTimeHelp" class="form-text text-muted">
                 Hier kann eingestellt werden, nach wie vielen Tagen die Info automatisch gelöscht werden soll. 0 = kein automatisches Löschen.
@@ -92,7 +92,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-6">
-                <label for="linkImage">Link zu einem Bild</label>
+                <label class="form-label" for="linkImage">Link zu einem Bild</label>
                 <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_infoToEdit.LinkImage" placeholder="URL" title="Link zu einem Image" />
                 <small id="linkImageHelp" class="form-text text-muted">
                     Optional: Link zu einem Bild zur Strecke
@@ -103,7 +103,7 @@
             </div>
         </div>
         <div class="mb-3">
-            <label for="linkTitle">Link-Bezeichnung</label>
+            <label class="form-label" for="linkTitle">Link-Bezeichnung</label>
             <InputText id="linkTitle" aria-describedby="linkTitleHelp" class="form-control" @bind-Value="_infoToEdit.LinkTitle" placeholder="Kurze Überschrift zum Link" title="Bezeichnung des Links zur weiterern Info" />
             <small id="linkTitleHelp" class="form-text text-muted">
                 Optional: Kurze Bezeichnung zu dem Link oben, falls der Standardtext nicht passt.

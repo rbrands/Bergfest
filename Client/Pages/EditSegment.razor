@@ -15,23 +15,23 @@
 
 <EditForm Model="@_segmentToEdit" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
-    @if (String.IsNullOrEmpty(Id))
-    {
-        <div class="form-row">
+    <div class="row mb-3">
+        @if (String.IsNullOrEmpty(Id))
+        {
             <div class="form-group col-md-10">
                 <InputText id="segmentId" aria-describedby="segmentIdHelp" class="form-control" @bind-Value="_segmentId" placeholder="Segment-Id" title="Id des Segments" />
                 <small id="segmentIdHelp" class="form-text text-muted">
                     Die Id des Segments aus der URL der Form https://www.strava.com/segments/id
                 </small>
             </div>
+        }
+        <div class="mb-3 col-md-2">
+            <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
         </div>
-    }
-    <div class="form-group col-md-2">
-        <button id="btnGetSegmentFromStrava" class="btn btn-primary" type="button" @onclick="@(() => GetSegmentFromStrava())">Segment lesen</button>
     </div>
     @if (null != _segmentOnStrava && _segmentOnStrava.SegmentId > 0)
     {
-        <div class="form-row mt-3">
+        <div class="row mb-3 mt-3">
             <h4 class="mb-0">@_segmentOnStrava?.SegmentName</h4>
             <a class="small mt-0" href="@_segmentOnStrava?.GetSegmentLink()" target="_blank">Segment auf Strava</a>
             <div class="list-group list-group-horizontal-md flex-fill">
@@ -65,8 +65,8 @@
                 </div>
             </div>
         </div>
-        <div class="form-group mt-3">
-            <label for="description">Beschreibung</label>
+        <div class="mb-3">
+            <label class="form-label" for="description">Beschreibung</label>
             <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung des Segments">
                 <ToolbarContent>
                     <span class="ql-formats">
@@ -107,31 +107,31 @@
                 </EditorContent>
             </BlazoredTextEditor>
         </div>
-        <div class="form-group">
-            <label for="tags">Tags</label>
+        <div class="mb-3">
+            <label class="form-label" for="tags">Tags</label>
             <InputText id="tags" aria-describedby="tagsHelp" class="form-control" @bind-Value="_segmentToEdit.Tags" autocomplete="on" placeholder="Tags" />
             <small id="tagsHelp" class="form-text text-muted">
                 Mit Komma getrennte Liste von Tags wie scuderia, dsd usw.
             </small>
         </div>
-        <div class="form-group">
-            <label for="level">Labels</label>
+        <div class="mb-3">
+            <label class="form-label" for="level">Labels</label>
             <InputText id="labels" aria-describedby="labelsHelp" class="form-control" @bind-Value="_segmentToEdit.Labels" autocomplete="on" placeholder="Label" />
             <small id="labelsHelp" class="form-text text-muted">
                 Mit Komma getrennte Liste von Label wie Sprint, Berg usw.
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <InputText id="link" aria-describedby="linkHelp" class="form-control" @bind-Value="_segmentToEdit.RouteRecommendation" placeholder="Streckenvorschlag zum Segment" title="Streckenvorschlag zum Segment" />
             <small id="linkHelp" class="form-text text-muted">
                 Optional: Link zu einer Strecke mit dem Segment, z.B. Komoot, Strava usw.
             </small>
         </div>
 
-        <div class="form-group">
+        <div class="mb-3">
             <div class="form-check">
                 <InputCheckbox id="public" aria-describedby="enabledHelp" class="form-check-input" @bind-Value="_segmentToEdit.IsEnabled" />
-                <label for="public" class="form-checklabel">
+                <label for="public" class="form-check-label">
                     Segment aktiv schalten?
                 </label>
             </div>
@@ -139,10 +139,10 @@
                 Ist das Segment aktiv?
             </small>
         </div>
-        <div class="form-group">
+        <div class="mb-3">
             <div class="form-check">
                 <InputCheckbox id="public" aria-describedby="displayEnabledHelp" class="form-check-input" @bind-Value="_segmentToEdit.DisplayEnabled" />
-                <label for="public" class="form-checklabel">
+                <label for="public" class="form-check-label">
                     Segment anzeigen?
                 </label>
             </div>
@@ -152,18 +152,23 @@
         </div>
         @if (!String.IsNullOrEmpty(_segmentToEdit.ImageLink))
         {
-            <div class="form-row">
-                <div class="form-group col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
+            <div class="row mb-3">
+                <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mt-2">
                     <img src="@_segmentToEdit.ImageLink" class="img-fluid" />
                 </div>
             </div>
         }
-        <div class="form-group">
-            <label for="linkImage">Link zu einem Bild</label>
-            <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_segmentToEdit.ImageLink" placeholder="URL" title="Link zu einem Image" />
-            <small id="linkImageHelp" class="form-text text-muted">
-                Optional: Link zu einem Bild zum Segment
-            </small>
+        <div class="row mb-3">
+            <div class="col-6">
+                <label class="form-label" for="linkImage">Link zu einem Bild</label>
+                <InputText id="linkImage" aria-describedby="linkImageHelp" class="form-control" @bind-Value="_segmentToEdit.ImageLink" placeholder="URL" title="Link zu einem Image" />
+                <small id="linkImageHelp" class="form-text text-muted">
+                    Optional: Link zu einem Bild zum Segment
+                </small>
+            </div>
+            <div class="col-6 d-flex align-items-center">
+                <UploadImage Title="@_segmentToEdit.SegmentName" Label="Segment-Image" OnFileUploaded="@((string uploadLink) => {_segmentToEdit.ImageLink = uploadLink; })"></UploadImage>
+            </div>
         </div>
 
 
