@@ -14,15 +14,15 @@
 
 <EditForm Model="@_challenge" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
-    <div class="form-group">
-        <label for="title">Titel</label>
+    <div class="mb-3">
+        <label class="form-label" for="title">Titel</label>
         <InputText id="title" aria-describedby="titleHelp" class="form-control" @bind-Value="_challenge.ChallengeTitle" autocomplete="on" placeholder="Titel" />
         <small id="titleHelp" class="form-text text-muted">
             Titel der Challenge
         </small>
     </div>
-    <div class="form-group mt-3">
-        <label for="description">Beschreibung</label>
+    <div class="mb-3 mt-3">
+        <label class="form-label" for="description">Beschreibung</label>
         <BlazoredTextEditor @ref="_htmlDescription" Placeholder="Beschreibung der Challenge">
             <ToolbarContent>
                 <span class="ql-formats">
@@ -63,45 +63,50 @@
             </EditorContent>
         </BlazoredTextEditor>
     </div>
-    <div class="form-group">
-        <label for="image">Image</label>
-        <InputText id="image" aria-describedby="imageHelp" class="form-control" @bind-Value="_challenge.ImageLink" autocomplete="on" placeholder="Image-Link" />
-        <small id="imageHelp" class="form-text text-muted">
-            Optional: Link zu einem Image, das im in der Headline angezeigt werden soll.
-        </small>
+    <div class="row mb-3">
+        <div class="col-6">
+            <label class="form-label" for="image">Image</label>
+            <InputText id="image" aria-describedby="imageHelp" class="form-control" @bind-Value="_challenge.ImageLink" autocomplete="on" placeholder="Image-Link" />
+            <small id="imageHelp" class="form-text text-muted">
+                Optional: Link zu einem Image, das im in der Headline angezeigt werden soll.
+            </small>
+        </div>
+        <div class="col-6 d-flex align-items-center">
+            <UploadImage Title="@_challenge.ChallengeTitle" Label="Challenge-Image" OnFileUploaded="@((string uploadLink) => {_challenge.ImageLink = uploadLink; })"></UploadImage>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="urlTitle">Url-Titel</label>
+    <div class="mb-3">
+        <label class="form-label" for="urlTitle">Url-Titel</label>
         <InputText id="urlTitle" aria-describedby="urlTitleHelp" class="form-control" @bind-Value="_challenge.UrlTitle" autocomplete="on" placeholder="Url-Titel" />
         <small id="imageHelp" class="form-text text-muted">
         Optional: Titel für URL zum direkten Aufruf. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>'Url-Titel'</text>
         </small>
     </div>
-    <div class="form-group">
-        <label for="startDate">Start-Datum</label>
+    <div class="mb-3">
+        <label class="form-label" for="startDate">Start-Datum</label>
         <InputDate id="startDate" aria-describedby="startDateHelp" class="form-control" @bind-Value="_startDateLocal" autocomplete="on" placeholder="Startdatum" />
         <small id="startDateHelp" class="form-text text-muted">
             Startdatum der Challenge.
         </small>
     </div>
-    <div class="form-group">
-        <label for="endDate">Enddatum</label>
+    <div class="mb-3">
+        <label class="form-label" for="endDate">Enddatum</label>
         <InputDate id="endDate" aria-describedby="endDateHelp" class="form-control" @bind-Value="_endDateLocal" autocomplete="on" placeholder="Enddatum" />
         <small id="endDateHelp" class="form-text text-muted">
             Enddatum der Challenge.
         </small>
     </div>
-    <div class="form-group">
-        <label for="invitationLink">Einladungs-Link</label>
+    <div class="mb-3">
+        <label class="form-label" for="invitationLink">Einladungs-Link</label>
         <InputText id="invitationLink" aria-describedby="invitationLinkHelp" class="form-control" @bind-Value="_challenge.InvitationLink" autocomplete="on" placeholder="Einladungs-Link" />
         <small id="invitationLinkHelp" class="form-text text-muted">
             Optional: Einladungslink. Der Link setzt sich dann zusammen als @NavigationManager.BaseUri<text>invitation/'Einladungslink'</text>
         </small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
         <div class="form-check">
             <InputCheckbox id="public" aria-describedby="publicHelp" class="form-check-input" @bind-Value="_challenge.IsPublicVisible" />
-            <label for="public" class="form-checklabel">
+            <label for="public" class="form-check-label">
                 Öffentlich sichtbar?
             </label>
         </div>
@@ -109,7 +114,7 @@
             Soll die Challenge öffentlich sichtbar sein?
         </small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
         <div class="form-check">
             <InputCheckbox id="forRoute" aria-describedby="forRouteHelp" class="form-check-input" @bind-Value="_challenge.ForRoute" />
             <label for="forRoute" class="form-checklabel">
@@ -120,7 +125,7 @@
             Sollen hier Segmente für eine Route zusammen gestellt werden??
         </small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
         <div class="form-check">
             <InputCheckbox id="invitation" aria-describedby="invitationHelp" class="form-check-input" @bind-Value="_challenge.InvitationRequired" />
             <label for="invitation" class="form-checklabel">
@@ -131,7 +136,7 @@
             Kann man sich zur Challenge nur über den Einladungslink anmelden?
         </small>
     </div>
-    <div class="form-group">
+    <div class="mb-3">
         <div class="form-check">
             <InputCheckbox id="registrationOpen" aria-describedby="registrationOpenHelp" class="form-check-input" @bind-Value="_challenge.RegistrationIsOpen" />
             <label for="registrationOpen" class="form-checklabel">

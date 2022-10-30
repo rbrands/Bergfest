@@ -15,29 +15,29 @@
 <EditForm Model="@_user" OnValidSubmit="OnSave">
     <DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label for="athleteId">Athlete-Id</label>
+    <div class="mb-3">
+        <label class="form-label" for="athleteId">Athlete-Id</label>
         <InputNumber id="athleteId" aria-describedby="athleteIdHelp" class="form-control" @bind-Value="_user.AthleteId" placeholder="Id auf Strava" />
         <small id="athleteIdHelp" class="form-text text-muted">
             Id des Athleten auf Strava
         </small>
     </div>
-    <div class="form-group">
-        <label for="firstName">Vorname</label>
+    <div class="mb-3">
+        <label class="form-label" for="firstName">Vorname</label>
         <InputText id="firstName" aria-describedby="firstNameHelp" class="form-control" @bind-Value="_user.FirstName" placeholder="Vorname" />
         <small id="firstNameHelp" class="form-text text-muted">
             Vorname des Mitglieds
         </small>
     </div>
-    <div class="form-group">
-        <label for="lastName">Nachname</label>
+    <div class="mb-3">
+        <label class="form-label" for="lastName">Nachname</label>
         <InputText id="lastName" aria-describedby="lastNameHelp" class="form-control" @bind-Value="_user.LastName" placeholder="Nachname" />
         <small id="lastNameHelp" class="form-text text-muted">
             Nachname des Mitglieds
         </small>
     </div>
-    <div class="form-group">
-        <InputSelect id="sex" aria-describedby="sexHelp" @bind-Value="_user.Sex">
+    <div class="mb-3">
+        <InputSelect class="form-select" id="sex" aria-describedby="sexHelp" @bind-Value="_user.Sex">
             <option value="M">Männlich</option>
             <option value="F">Weiblich</option>
         </InputSelect>

@@ -89,8 +89,8 @@ else
     </BlazoredTextEditor>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
     <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
-    <div class="form-row">
-        <div class="form-group col-md-10">
+    <div class="row mb-3">
+        <div class="col-md-6">
            <input class="form-control" @bind="@_imageLink" placeholder="Link zu einem Bild" title="Bildlink"></input>
             <small id="imageInlineLinkHelp" class="form-text text-muted">
                 Optional: Image in Text einfügen.
@@ -99,15 +99,21 @@ else
         <div class="col-md-2">
             <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => InsertImage())">Bild einfügen</button>
         </div>
+        <div class="col-md-4">
+            <UploadImage Title="@ArticleKey" Label="Article-Inserted-Image" OnFileUploaded="@((string uploadLink) => {_imageLink = uploadLink; })" ></UploadImage>
+        </div>
      </div>
     @if (null != _article)
     {
-        <div class="form-row">
-            <div class="form-group col-md-10">
+        <div class="row">
+            <div class="col-md-8">
                 <input class="form-control" @bind="@_article.ImageLink" placeholder="Link zu einem Header-Bild" title="Header-Bild"></input>
                 <small id="imageLinkHelp" class="form-text text-muted">
                     Optional: Link zu einem Image das rechts oben angezeigt werden soll.
                 </small>
+            </div>
+            <div class="col-md-4">
+                <UploadImage Title="@ArticleKey" Label="Article-Header-Image" OnFileUploaded="@((string uploadLink) => {_article.ImageLink = uploadLink; })"></UploadImage>
             </div>
         </div>
      }

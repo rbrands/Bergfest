@@ -129,6 +129,10 @@
       "allowedRoles": [ "anonymous" ]
     },
     {
+      "route": "/api/GetBlobAccessSignatureForPNGImageUpload",
+      "allowedRoles": [ "admin", "segmentadmin" ]
+    },
+    {
       "route": "/api/GetSegmentsEffortsForUser/*",
       "allowedRoles": [ "anonymous" ]
     },
