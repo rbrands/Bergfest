@@ -268,6 +268,7 @@ namespace BackendLibrary
                 _logger.LogInformation($"UpdateSegmentEffortImprovement({segmentEffort.SegmentTitle} for {segmentEffort.AthleteName} in challenge {segmentEffort.ChallengeId})");
                 segmentEffort.LogicalKey = $"{segmentEffort.ChallengeId}-{segmentEffort.AthleteId}-{segmentEffort.SegmentId}";
                 // Check if there is already a time for the segment stored and update this one if the time has been improved
+                _logger.LogInformation($"Look for effort with key >{segmentEffort.LogicalKey}<");
                 ChallengeSegmentEffort? effortInStock = await this.GetItemByKey(segmentEffort.LogicalKey);
                 StravaSegmentChallenge.Participant? challengeParticipant = null;
                 if (null == effortInStock)
