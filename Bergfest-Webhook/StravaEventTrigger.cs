@@ -180,6 +180,7 @@ namespace Bergfest_Webhook
                 };
                 if (effort.StartDateLocal.ToUniversalTime() >= stravaChallenge.StartDateUTC && effort.StartDateLocal.ToUniversalTime() <= stravaChallenge.EndDateUTC)
                 {
+                    _logger.LogDebug($"ScanForChallenges: Call UpdateSegmentEffortImprovement for segment >{effort.SegmentName}< for athlete >{challengeSegmentEffort.AthleteName}<");
                     await _challengeRepository.UpdateSegmentEffortImprovement(challengeSegmentEffort);
                 }
             }
