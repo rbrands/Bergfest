@@ -156,8 +156,10 @@ namespace Bergfest_Webhook
         }
         public async Task ScanForChallenges(StravaSegment segment, StravaSegmentEffort effort)
         {
+            _logger.LogInformation($"ScanForChallenges(segment >{segment.SegmentName}< for athlete >{effort.AthleteName}<)");
             if (null == segment.Challenges)
             {
+                _logger.LogInformation($"ScanForChallenges: >{segment.SegmentName}< has no challenges.");
                 return;
             }
             foreach(KeyValuePair<string, StravaSegment.Challenge> challenge in segment.Challenges)
@@ -180,6 +182,7 @@ namespace Bergfest_Webhook
                 };
                 if (effort.StartDateLocal.ToUniversalTime() >= stravaChallenge.StartDateUTC && effort.StartDateLocal.ToUniversalTime() <= stravaChallenge.EndDateUTC)
                 {
+                    _logger.LogDebug($"ScanForChallenges: Call UpdateSegmentEffortImprovement for segment >{effort.SegmentName}< for athlete >{challengeSegmentEffort.AthleteName}<");
                     await _challengeRepository.UpdateSegmentEffortImprovement(challengeSegmentEffort);
                 }
             }
