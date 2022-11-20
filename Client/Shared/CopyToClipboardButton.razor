@@ -1,0 +1,64 @@
+﻿@using BlazorApp.Client.Utils
+@using BlazorApp.Shared
+@inject ClipboardService ClipboardService
+
+<button type="button" class="@_buttonClass" disabled="@_buttonIsDisabled" @onclick="ToClipboard" title="In die Zwischenablage kopieren">
+    <i class="@_buttonIcon"></i> 
+    @if (WithLabel)
+    {
+        @_buttonText
+    }
+</button>
+
+@code {
+    [Parameter] public string Text { get; set; } = "Clipboard";
+    [Parameter] public bool WithLabel { get; set; } = true;
+
+    private const string _successButtonClass = "btn btn-sm btn-outline-secondary";
+    private const string _infoButtonClass = "btn btn-sm btn-outline-secondary";
+    private const string _errorButtonClass = "btn btn-sm btn-outline-secondary";
+    private const string _iconCopy = "bi-clipboard-plus-fill pe-1";
+    private const string _iconCheck = "bi-check pe-1";
+    private const string _iconError = "bi-exclamation-circle-fill pe-1";
+    private const string _copyText = "Kopieren";
+    private const string _copiedText = "Kopiert!";
+    private const string _errorText = "Ups, noch einmal versuchen.";
+
+    private string _buttonClass = _infoButtonClass;
+    private bool _buttonIsDisabled = false;
+    private string _buttonIcon = _iconCopy;
+    private string _buttonText = _copyText;
+
+    public async Task ToClipboard()
+    {
+        try
+        {
+            await ClipboardService.WriteTextAsync(Text);
+
+            _buttonIsDisabled = true;
+            _buttonText = _copiedText;
+            _buttonClass = _successButtonClass;
+            _buttonIcon = _iconCheck;
+            await TriggerButtonState();
+        }
+        catch
+        {
+            _buttonIsDisabled = true;
+            _buttonText = _errorText;
+            _buttonClass = _errorButtonClass;
+            _buttonIcon = _iconError;
+            await TriggerButtonState();
+        }
+        _buttonIsDisabled = false;
+        _buttonText = _copyText;
+        _buttonClass = _infoButtonClass;
+        _buttonIcon = _iconCopy;
+    }
+
+    private async Task TriggerButtonState()
+    {
+        StateHasChanged();
+        await Task.Delay(TimeSpan.FromMilliseconds(1500));
+    }
+
+}

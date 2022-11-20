@@ -146,8 +146,8 @@
             <a class="btn btn-sm btn-outline-secondary" title="Details" href=@(Challenge.ForRoute ? $"scope/{Challenge.UrlTitle}" : $"{Challenge.UrlTitle}")>Zu den Segmenten</a>
             <AuthorizeView Roles="admin,segmentadmin">
                 <Authorized>
-                    <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"editchallenge/{Challenge.Id}")><span class="oi oi-pencil"></span></a>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><span class="oi oi-trash"></span></button>
+                    <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"editchallenge/{Challenge.Id}")><i class="bi-pencil-fill"></i></a>
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="@(() => DeleteChallenge())" title="Löschen"><i class="bi-trash-fill"></i></button>
                 </Authorized>
             </AuthorizeView>
         </div>

@@ -41,8 +41,16 @@
                         <h6 class="fw-light">
                             @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
                         </h6>
+                        <h6>
+
+                        </h6>
                     }
                     @((MarkupString)_challenge.Description)
+                    <p>
+                        
+                        <a href="@GetChallengeLink()" target="_blank" title="Direkter Link" style="font-size: small">@GetChallengeLink()</a>
+                        <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="true"></CopyToClipboardButton>
+                    </p>
                 </div>
                 @if (_registrationAllowed)
                 {
@@ -63,6 +71,7 @@
                                 @if(_challenge.InvitationRequired && !String.IsNullOrEmpty(_challenge.InvitationLink))
                                 {
                                     <a href="@_challenge.GetInvitationLink()" class="btn btn-sm btn-outline-secondary" target="_blank" alt="Einladungslink" title="Einladungslink">Einladungs-Link</a>
+                                    <CopyToClipboardButton Text="@GetInvitationLink()" WithLabel="false"></CopyToClipboardButton>
                                 }
                             </div>
                         </Authorized>
@@ -260,6 +269,14 @@
         {
             return String.Empty;
         }
+    }
+    private string GetInvitationLink()
+    {
+        return NavigationManager.BaseUri + _challenge!.GetInvitationLink().TrimStart('/');
+    }
+    private string GetChallengeLink()
+    {
+        return NavigationManager.BaseUri + _challenge!.GetUrl().TrimStart('/');
     }
     public void Dispose()
     {

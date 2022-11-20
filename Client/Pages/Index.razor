@@ -29,9 +29,9 @@ else
 {
     <p>
         <a class="btn-link" title="Strava Connect" href="/authorize"><img class="img-fluid" style="max-height:3em" src="/images/btn_strava_connectwith_orange@2x.png" alt="Strava Connect Button" /></a>
-        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><span class="oi oi-reload"></span></button>
-        <a class="btn btn-primary" title="Meine Segment-Leistungen" alt="Segment-Leistungen" href="/myefforts"><span class="oi oi-bar-chart"></span></a>
-        <a class="btn btn-primary" title="Aktivität nachreichen" alt="Aktivität nachreichen" href="/myactivity"><span class="oi oi-envelope-open"></span></a>
+        <button class="btn btn-primary" title="Reload" @onclick="@(() => Reload())"><i class="bi-repeat"></i></button>
+        <a class="btn btn-primary" title="Meine Segment-Leistungen" alt="Segment-Leistungen" href="/myefforts"><i class="bi-graph-up-arrow"></i></a>
+        <a class="btn btn-primary" title="Aktivität nachreichen" alt="Aktivität nachreichen" href="/myactivity"><i class="bi-envelope-open-fill"></i></a>
         <AuthorizeView Roles="admin,segmentadmin">
             <Authorized>
                 <a class="btn btn-primary" href=@($"editsegment") title="Segment anlegen">Segment anlegen</a>
