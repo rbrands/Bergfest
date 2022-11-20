@@ -17,44 +17,44 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-bar-chart"></span> Segmente
+                <i class="bi-graph-up-arrow pe-2"></i> Segmente
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Challenges">
-                <span class="oi oi-pulse"></span> Challenges
+                <i class="bi-list-check pe-2"></i> Challenges
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Scopes">
-                <span class="oi oi-folder"></span> Sammlungen
+                <i class="bi-folder2 pe-2"></i> Sammlungen
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Authorize">
-                <i class="bi-strava pe-3"></i>Strava Connect
+                <i class="bi-strava pe-2"></i>Strava Connect
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="MyActivity">
-                <span class="oi oi-envelope-open" aria-hidden="true"></span> Nachreichen
+                <i class="bi-envelope-open-fill pe-2" aria-hidden="true"></i> Nachreichen
             </NavLink>
         </div>
         <AuthorizeView Roles="admin,segmentadmin">
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="PostActivity">
-                        <span class="oi oi-envelope-closed" aria-hidden="true"></span> Aktivität
+                        <i class="bi-envelope-check-fill pe-2" aria-hidden="true"></i> Aktivität
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="EditSegment">
-                        <span class="oi oi-document" aria-hidden="true"></span> Neues Segment
+                        <i class="bi-file-earmark-text-fill pe-2" aria-hidden="true"></i> Neues Segment
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="EditChallenge">
-                        <span class="oi oi-document" aria-hidden="true"></span> Neue Challenge
+                        <i class="bi-file-earmark-spreadsheet-fill pe-2" aria-hidden="true"></i> Neue Challenge
                     </NavLink>
                 </div>
             </Authorized>
@@ -63,24 +63,24 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Settings">
-                        <span class="oi oi-wrench" aria-hidden="true"></span> Einstellungen
+                        <i class="bi-wrench pe-2" aria-hidden="true"></i> Einstellungen
                     </NavLink>
                 </div>
             </Authorized>
         </AuthorizeView>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="MyEfforts">
-                <span class="oi oi-bar-chart" aria-hidden="true"></span> Meine Segmente
+                <i class="bi-bar-chart-line-fill pe-2" aria-hidden="true"></i> Meine Segmente
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="Faq">
-                <span class="oi oi-question-mark" aria-hidden="true"></span> FAQ
+                <i class="bi-question-lg pe-2" aria-hidden="true"></i> FAQ
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="About">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Über ...
+                <i class="bi-list pe-2" aria-hidden="true"></i> Über ...
             </NavLink>
         </div>
     </nav>
