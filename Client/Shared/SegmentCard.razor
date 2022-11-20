@@ -119,8 +119,8 @@
             <AuthorizeView Roles="admin,segmentadmin">
                 <Authorized>
                     <div class="btn-group mr-2" role="group" aria-label="Ändern">
-                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(SegmentWithEfforts.StravaSegment.SegmentId))"><span class="oi oi-pencil"></span></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())"><span class="oi oi-trash"></span></button>
+                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(SegmentWithEfforts.StravaSegment.SegmentId))"><i class="bi-pencil-fill"></i></button>
+                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem())"><i class="bi-trash-fill"></i></button>
                     </div>
                 </Authorized>
             </AuthorizeView>
