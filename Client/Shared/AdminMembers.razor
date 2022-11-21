@@ -19,8 +19,8 @@ else
         Anzahl Teilnehmer:innen: @_members.Count()
     </p>
 
-    <div class="grid" tabindex="-1" Virtualize="true">
-        <QuickGrid Items="@_members" Class="table table-sm table-striped table-bordered">
+    <div class="grid" tabindex="-1">
+        <QuickGrid Items="@_members" Virtualize="true" Class="table table-sm table-striped table-bordered">
             <TemplateColumn Title="Aktion" Class="action">
                 <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(context))"><span class="oi oi-pencil"></span></button>
                 <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(context))"><span class="oi oi-trash"></span></button>

@@ -17,7 +17,7 @@
 }
 /* For virtualized grids, it's essential that all rows have the same known height */
 .grid ::deep tr {
-    height: 30px;
+    height: 50px;
     border-bottom: 0.5px solid silver;
 }
 .grid ::deep tbody td {
