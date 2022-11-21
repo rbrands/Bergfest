@@ -19,45 +19,32 @@ else
         Anzahl Teilnehmer:innen: @_members.Count()
     </p>
 
-    <table class="table table-sm table-striped table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">Aktion</th>
-                <th scope="col">Vorname</th>
-                <th scope="col">Name</th>
-                <th scope="col">Geschlecht</th>
-                <th scope="col">Strava-Profil</th>
-                <th scope="col">Token-Expiration</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (StravaAccess member in _members)
-            {
-                <tr>
-                    <td>
-                        <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(member))"><span class="oi oi-pencil"></span></button>
-                        <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(member))"><span class="oi oi-trash"></span></button>
-                    </td>
-                    <td>@member.FirstName</td>
-                    <td>@member.LastName</td>
-                    <td>@member.Sex</td>
-                    <td>
-                        <a href="@member.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @member.GetFullName()">
-                            @if (!String.IsNullOrEmpty(member.ProfileImageLink))
-                            {
-                                <img src="@member.ProfileSmallImageLink" class="img-fluid" alt="Strava-Profil @member.GetFullName()" />
-                            }
-                            else
-                            {
-                                @member.GetAhtleteLink()
-                            }
-                        </a>
-                    </td>
-                    <td>@(member.StravaAuthorizationIsPending ? "Authorization noch offen" : member.ExpirationAt)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="grid" tabindex="-1" Virtualize="true">
+        <QuickGrid Items="@_members" Class="table table-sm table-striped table-bordered">
+            <TemplateColumn Title="Aktion" Class="action">
+                <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(context))"><span class="oi oi-pencil"></span></button>
+                <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(context))"><span class="oi oi-trash"></span></button>
+            </TemplateColumn>
+            <PropertyColumn Title="Vorname" Property="@(m => m.FirstName)" Sortable="true" />
+            <PropertyColumn Title="Name" Property="@(m => m.LastName)" Sortable="true" />
+            <PropertyColumn Title="Geschlecht" Property="@(m => m.Sex)" Sortable="false" />
+            <TemplateColumn Title="Strava-Profil">
+                <a href="@context.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @context.GetFullName()">
+                    @if (!String.IsNullOrEmpty(context.ProfileImageLink))
+                    {
+                        <img src="@context.ProfileSmallImageLink" class="img-fluid" alt="Strava-Profil @context.GetFullName()" />
+                    }
+                    else
+                    {
+                        @context.GetAhtleteLink()
+                    }
+                </a>
+            </TemplateColumn>
+            <TemplateColumn Title="Token-Gültigkeit" Sortable="true" SortBy="@(GridSort<StravaAccess>.ByAscending(m => m.ExpirationAt))">
+                @(context.StravaAuthorizationIsPending ? "Authorization noch offen" : context.ExpirationAt)
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
 }
 
 
@@ -65,7 +52,7 @@ else
     [CascadingParameter]
     public IModalService? Modal { get; set; }
     private NotificationMessage? _notificationMessage;
-    IEnumerable<StravaAccess>? _members = null;
+    IQueryable<StravaAccess>? _members = null;
 
     protected override async Task OnInitializedAsync()
     {
