@@ -20,13 +20,17 @@ else
     </p>
 
     <div class="grid" tabindex="-1">
-        <QuickGrid Items="@_members" Virtualize="true" Class="table table-sm table-striped table-bordered">
+        <QuickGrid Items="@_filteredMembers" Virtualize="true" Class="table table-sm table-striped table-bordered">
             <TemplateColumn Title="Aktion" Class="action">
                 <button class="btn btn-sm btn-outline-secondary" title="Ändern" @onclick="@(() => EditItem(context))"><span class="oi oi-pencil"></span></button>
                 <button class="btn btn-sm btn-outline-secondary" title="Löschen" @onclick="@(() => DeleteItem(context))"><span class="oi oi-trash"></span></button>
             </TemplateColumn>
             <PropertyColumn Title="Vorname" Property="@(m => m.FirstName)" Sortable="true" />
-            <PropertyColumn Title="Name" Property="@(m => m.LastName)" Sortable="true" />
+            <PropertyColumn Title="Name" Property="@(m => m.LastName)" Sortable="true" Class="last-name">
+                <ColumnOptions>
+                    <input type="search" class="form-control" autofocus @bind="NameFilter" @bind:event="oninput" placeholder="Nachame..." />
+                </ColumnOptions>
+            </PropertyColumn>
             <PropertyColumn Title="Geschlecht" Property="@(m => m.Sex)" Sortable="false" />
             <TemplateColumn Title="Strava-Profil">
                 <a href="@context.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @context.GetFullName()">
@@ -52,7 +56,18 @@ else
     [CascadingParameter]
     public IModalService? Modal { get; set; }
     private NotificationMessage? _notificationMessage;
-    IQueryable<StravaAccess>? _members = null;
+    private IQueryable<StravaAccess>? _members = null;
+    private string _nameFilter = string.Empty;
+    private string NameFilter
+    {
+        get => _nameFilter;
+        set
+        {
+            _nameFilter = value;
+            FilterLastName(); 
+        }
+    }
+    private IQueryable<StravaAccess>? _filteredMembers = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,7 +76,7 @@ else
             _members = await Api.GetUsers();
             if (null != _members)
             {
-                _members = _members.OrderBy(m => m.FirstName);
+                _filteredMembers = _members.OrderBy(m => m.FirstName);
             }
         }
         catch (Exception ex)
@@ -98,6 +113,10 @@ else
             ModalResult result = await EditMember.Show(Modal, null);
             _members = await Api.GetUsers();
         }
+    }
+    protected void FilterLastName()
+    {
+        _filteredMembers = _members?.Where(m => m.LastName.StartsWith(_nameFilter, StringComparison.CurrentCultureIgnoreCase));       
     }
 
 

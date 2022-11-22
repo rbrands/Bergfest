@@ -30,28 +30,27 @@
         else
         {
             <div class="p-4 bg-light border">
-                <div class="overflow-auto" style="max-height: 800px">
-                    @if (!String.IsNullOrEmpty(_challenge.ImageLink))
-                    {
-                        <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
-                    }
-                    <h2>@_challenge.ChallengeTitle</h2>
-                    @if (!_challenge.ForRoute)
-                    {
-                        <h6 class="fw-light">
-                            @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
-                        </h6>
-                        <h6>
+                @if (!String.IsNullOrEmpty(_challenge.ImageLink))
+                {
+                    <img src="@_challenge.ImageLink" alt="Header-Image" class="img-fluid float-end m-3 mb-0" style="max-height:200px" />
+                }
+                <h2>@_challenge.ChallengeTitle</h2>
+                @if (!_challenge.ForRoute)
+                {
+                    <h6 class="fw-light">
+                        @_challenge.StartDateUTC.ToLocalTime().ToString("dd.MM.yyyy") - @_challenge.EndDateUTC.ToLocalTime().ToString("dd.MM.yyyy")
+                    </h6>
+                    <h6>
 
-                        </h6>
-                    }
+                    </h6>
+                }
+                <div class="overflow-auto" style="max-height: 500px">
                     @((MarkupString)_challenge.Description)
-                    <p>
-                        
-                        <a href="@GetChallengeLink()" target="_blank" title="Direkter Link" style="font-size: small">@GetChallengeLink()</a>
-                        <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="true"></CopyToClipboardButton>
-                    </p>
                 </div>
+                <p>
+                    <a href="@GetChallengeLink()" target="_blank" title="Direkter Link" style="font-size: small">@GetChallengeLink()</a>
+                    <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="true"></CopyToClipboardButton>
+                </p>
                 @if (_registrationAllowed)
                 {
                     <div class="container m-0 p-0">
