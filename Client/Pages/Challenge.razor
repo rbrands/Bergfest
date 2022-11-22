@@ -48,8 +48,8 @@
                     @((MarkupString)_challenge.Description)
                 </div>
                 <p>
-                    <a href="@GetChallengeLink()" target="_blank" title="Direkter Link" style="font-size: small">@GetChallengeLink()</a>
-                    <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="true"></CopyToClipboardButton>
+                    Link: <a href="@_challenge.GetUrl()" target="_blank" title="Direkter Link">@_challenge.GetUrl()</a>
+                    <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="false"></CopyToClipboardButton>
                 </p>
                 @if (_registrationAllowed)
                 {

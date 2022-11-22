@@ -35,7 +35,7 @@ else
                     <input type="search" class="form-control" autofocus @bind="NameFilter" @bind:event="oninput" placeholder="Nachame..." />
                 </ColumnOptions>
             </PropertyColumn>
-            <PropertyColumn Title="Geschlecht" Property="@(m => m.Sex)" Sortable="false" />
+            <PropertyColumn Title="Geschlecht" Property="@(m => m.Sex)" Sortable="false" Class="sex" />
             <TemplateColumn Title="Strava-Profil">
                 <a href="@context.GetAhtleteLink()" target="_blank" alt="Strava-Link" title="Strava-Profil @context.GetFullName()">
                     @if (!String.IsNullOrEmpty(context.ProfileImageLink))

@@ -30,6 +30,9 @@
 .grid ::deep th.action {
     width: 7rem;
 }
+.grid ::deep td.sex {
+    width: 7rem;
+}
 
 /* Magnifying glass */
 .grid ::deep .search-box .col-options-button {
