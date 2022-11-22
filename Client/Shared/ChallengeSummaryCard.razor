@@ -144,6 +144,7 @@
     <div class="card-footer">
         <div class="btn-toolbar" role="toolbar" aria-label="Zur Challenge" hidden="@(!ShowFooter)">
             <a class="btn btn-sm btn-outline-secondary" title="Details" href=@(Challenge.ForRoute ? $"scope/{Challenge.UrlTitle}" : $"{Challenge.UrlTitle}")>Zu den Segmenten</a>
+            <CopyToClipboardButton Text="@GetChallengeLink()" WithLabel="false"></CopyToClipboardButton>
             <AuthorizeView Roles="admin,segmentadmin">
                 <Authorized>
                     <a class="btn btn-sm btn-outline-secondary" title="Ändern" href=@($"editchallenge/{Challenge.Id}")><i class="bi-pencil-fill"></i></a>
@@ -188,5 +189,10 @@
             await Api.DeleteChallenge(Challenge);
         }
     }
+        private string GetChallengeLink()
+    {
+        return NavigationManager.BaseUri + (Challenge.ForRoute ? $"scope/{Challenge.UrlTitle}" : $"{Challenge.UrlTitle}");
+    }
+
 
 }

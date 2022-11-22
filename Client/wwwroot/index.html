@@ -17,7 +17,6 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/gh/lipis/bootstrap-social/bootstrap-social.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <link href="css/app.css" rel="stylesheet" />
     <link rel="apple-touch-icon" sizes="512x512" href="apple-touch-icon.png" />
     <link href="manifest.json" rel="manifest" />
@@ -38,9 +37,11 @@
 
 <body>
     <div id="app">
-        <div class="spinner-border" role="status">
-            <span class="sr-only">Momentchen...</span>
-        </div>
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
     </div>
 
     <div id="blazor-error-ui">

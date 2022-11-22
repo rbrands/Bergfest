@@ -21,7 +21,7 @@
     }
     <AuthorizeView Roles="admin">
         <Authorized>
-            <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SwitchToEditMode())"><span class="oi oi-pencil"></span></button>
+            <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SwitchToEditMode())"><i class="bi-pencil-fill"></i></button>
         </Authorized>
     </AuthorizeView>
 }
@@ -87,8 +87,8 @@ else
             }
         </EditorContent>
     </BlazoredTextEditor>
-    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><span class="oi oi-check" title="Speichern"></span></button>
-    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><span class="oi oi-x" title="Abbrechen"></span></button>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => SaveArticle())"><i class="bi-check-lg" title="Speichern"></i></button>
+    <button class="btn btn-sm btn-outline-secondary" role="button" @onclick="@(() => Cancel())"><i class="bi-x-lg" title="Abbrechen"></i></button>
     <div class="row mb-3">
         <div class="col-md-6">
            <input class="form-control" @bind="@_imageLink" placeholder="Link zu einem Bild" title="Bildlink"></input>
