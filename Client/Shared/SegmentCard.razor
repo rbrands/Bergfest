@@ -144,7 +144,7 @@
     private List<StravaSegmentEffort> _efforts = new List<StravaSegmentEffort>(50);
     private IEnumerable<DaySection> _daySections = new List<DaySection>();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await Task.Run(() => ReadData());
     }
