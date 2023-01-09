@@ -20,7 +20,7 @@ The following diagram shows the overall architecture:
 
 The means to operate Bergfest you need 
 - Azure Static Web App - Free Tier is good enough.
-- Cosmos DB - Free Tier is good enoughg.
+- Cosmos DB - Free Tier is good enough.
 - Azure Functions - To be checked: Fee tier (consumption based). Otherwise App Service based.
 
 ## Deploy to Azure Static Web Apps and Azure Functions
