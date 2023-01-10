@@ -18,10 +18,11 @@ The following diagram shows the overall architecture:
 - **Bergfest-Webhook**: A C# Azure Functions API, essentially with the Webhook to be called by Strava
 - **BackenLibrary**: Repositories (like access to Cosmos DB) to be used by "Api" and "Bergfest-Webhook"
 
-The means to operate Bergfest you need 
+The means to operate Bergfest you need: 
 - Azure Static Web App - Free Tier is good enough.
 - Cosmos DB - Free Tier is good enough.
 - Azure Functions - To be checked: Fee tier (consumption based). Otherwise App Service based.
+- Storage Account - Event Queue for Strava Webhook and blob storage for image upload.
 
 ## Deploy to Azure Static Web Apps and Azure Functions
 
