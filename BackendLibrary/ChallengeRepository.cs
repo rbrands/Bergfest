@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using BlazorApp.Shared;
 using Flurl.Http.Configuration;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
