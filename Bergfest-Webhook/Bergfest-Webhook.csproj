@@ -7,11 +7,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.35.0" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
-    <PackageReference Include="Azure.Storage.Common" Version="12.16.0" />
-    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.15.0" />
-    <PackageReference Include="Azure.Storage.Queues" Version="12.15.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.3" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.18.0" />
+    <PackageReference Include="Azure.Storage.Common" Version="12.17.0" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.16.0" />
+    <PackageReference Include="Azure.Storage.Queues" Version="12.16.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.35.4" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="4.3.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage.Queues" Version="5.1.3" />
