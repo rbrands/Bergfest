@@ -81,7 +81,7 @@ namespace BlazorApp.Shared
             }
             else
             {
-                link = GetSegmentLink();
+                link = GetActivityLink();
             }
             return link;
         }
