@@ -239,8 +239,8 @@
                 _saveMessage?.ShowError("Das Enddatum der Challenge darf nicht vor dem Startdatum liegen.");
                 return;
             }
-            _challenge.StartDateUTC = _startDateLocal.ToUniversalTime();
-            _challenge.EndDateUTC = _endDateLocal.ToUniversalTime();
+            _challenge.StartDateUTC = _startDateLocal.Date.ToUniversalTime();
+            _challenge.EndDateUTC = _endDateLocal.Date.AddHours(23.0).AddMinutes(59.0).ToUniversalTime();
             if (_inUpdateMode)
             {
                 _notificationMessage!.ShowInfo(_challenge.PointLookup[0].ToString());
